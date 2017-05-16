@@ -44,9 +44,21 @@ func (self *SWS_MainWidget) repaint() {
     var solid *sdl.Surface
     var err error
     var headbgcolor=self.bgColor
+    var lightcolorR uint8=0xff
+    var lightcolorG uint8=0xff
+    var lightcolorB uint8=0xff
+    var darkcolorR uint8=0x88
+    var darkcolorG uint8=0x88
+    var darkcolorB uint8=0x88
     
     if self.hasfocus {
         headbgcolor=0xfffff10b
+        lightcolorR=0xff
+        lightcolorG=0xf9
+        lightcolorB=0x96
+        darkcolorR=0xbd
+        darkcolorG=0xb2
+        darkcolorB=0x00
     }
     
     color:=sdl.Color{0,0,0,255}
@@ -61,6 +73,29 @@ func (self *SWS_MainWidget) repaint() {
     maxW:=solid.W+40
     if (maxW>self.Width()) { maxW=self.Width() }
     self.FillRect(0,0,maxW,20,headbgcolor)
+    
+    self.SetDrawColor(darkcolorR,darkcolorG,darkcolorB,0xff)
+    self.DrawLine(2,2,2,18)
+    self.DrawLine(2,2,18,2)
+    self.DrawLine(3,17,17,17)
+    self.DrawLine(17,3,17,17)
+    self.SetDrawColor(lightcolorR,lightcolorG,lightcolorB,0xff)
+    self.DrawLine(3,3,18,3)
+    self.DrawLine(18,3,18,18)
+    self.DrawLine(18,18,3,18)
+    self.DrawLine(3,18,3,3)
+    
+    for i:=4; i<=16; i++ {
+        for j:=4; j<=16; j++ {
+            self.SetDrawColor(
+               uint8(int(lightcolorR)+(int(darkcolorR)-int(lightcolorR))*(i+j-8)/24),
+               uint8(int(lightcolorG)+(int(darkcolorG)-int(lightcolorG))*(i+j-8)/24),
+               uint8(int(lightcolorB)+(int(darkcolorB)-int(lightcolorB))*(i+j-8)/24),
+               0xff)
+            self.DrawPoint(int32(i),int32(j))
+        }
+    }
+    
     rectSrc := sdl.Rect{0,0, maxW-40,solid.H}
     rectDst := sdl.Rect{20,0, maxW-40,20}
     if err = solid.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {

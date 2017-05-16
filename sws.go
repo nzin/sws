@@ -141,6 +141,13 @@ type SWS_RootWidget struct {
 
 
 
+func (self *SWS_RootWidget) RaiseToTop(widget SWS_Widget) {
+    self.RemoveChild(widget)
+    self.AddChild(widget)
+}
+
+
+
 func (self *SWS_RootWidget) WindowSurface() *sdl.Surface {
     return self.windowsurface
 }
@@ -223,11 +230,12 @@ func PoolEvent() (bool) {
                     if (previousmainwindowfocus!=mainwindowfocus) {
                         if previousmainwindowfocus!=nil && mainwindowfocus!=nil {
                             previousmainwindowfocus.HasFocus(false)
-                            previousmainwindowfocus=mainwindowfocus
                         }
 			if mainwindowfocus!=nil {
                             mainwindowfocus.HasFocus(true)
+                            root.RaiseToTop(mainwindowfocus)
                         }
+                        previousmainwindowfocus=mainwindowfocus
                     }
 
                     // else find the widget
@@ -303,7 +311,7 @@ func PoolEvent() (bool) {
                 
         if (menuStack!=nil) {
             for _,m := range menuStack {
-                fmt.Println("menu display")
+//                fmt.Println("menu display")
                 m.repaint()
                 rectSrc := sdl.Rect{0,0, m.Width(),m.Height()}
                 rectDst := sdl.Rect{m.X(), m.Y(), m.Width(),m.Height()}

@@ -123,6 +123,16 @@ func (self *SWS_CoreWidget) DrawLine(x1, y1, x2, y2 int32) {
 
 
 
+func (self *SWS_CoreWidget) SetDrawColorHex(color uint32) {
+    b:=color&0xff
+    g:=(color>>8)&0xff
+    r:=(color>>16)&0xff
+    a:=(color>>24)&0xff
+    self.Renderer().SetDrawColor(uint8(r),uint8(g),uint8(b),uint8(a))
+}
+
+
+
 func (self *SWS_CoreWidget) SetDrawColor(r, g, b, c uint8) {
     self.Renderer().SetDrawColor(r,g,b,c)
 }

@@ -1,2 +1,2 @@
 # sws
-SDL Window System
+SDL Window System (for Go)
