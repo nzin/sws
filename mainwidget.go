@@ -88,24 +88,35 @@ func (self *SWS_MainWidget) repaint() {
     }
 
     if self.hasfocus {
-        rectSrc := sdl.Rect{0,0, mainlefts.W,mainlefts.H}
-        rectDst := sdl.Rect{3,3, mainlefts.W,mainlefts.H}
+        rectSrc := sdl.Rect{0,0, mainlefths.W,mainlefths.H}
+        rectDst := sdl.Rect{3,3, mainlefths.W,mainlefths.H}
         if (self.buttonOnClose && self.cursorInsideClose) {
-            if mainleftclickeds.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
+            if mainlefthclickeds.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
             }
         } else {
-            if mainlefts.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
+            if mainlefths.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
             }
         }
         if (self.expandable) {
-            rectSrc = sdl.Rect{0,0, mainrights.W,mainrights.H}
-            rectDst = sdl.Rect{maxW-17,3, mainrights.W,mainrights.H}
+            rectSrc = sdl.Rect{0,0, mainrighths.W,mainrighths.H}
+            rectDst = sdl.Rect{maxW-19,3, mainrighths.W,mainrighths.H}
             if (self.buttonOnExpand && self.cursorInsideExpand) {
-                if mainrightclickeds.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
+                if mainrighthclickeds.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
                 }
             } else {
-                if mainrights.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
+                if mainrighths.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
                 }
+            }
+        }
+    } else {
+        rectSrc := sdl.Rect{0,0, mainlefts.W,mainlefts.H}
+        rectDst := sdl.Rect{3,3, mainlefts.W,mainlefts.H}
+        if mainlefts.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
+        }
+        if (self.expandable) {
+            rectSrc = sdl.Rect{0,0, mainrights.W,mainrights.H}
+            rectDst = sdl.Rect{maxW-19,3, mainrights.W,mainrights.H}
+            if mainrights.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
             }
         }
     }
@@ -185,7 +196,7 @@ func (self *SWS_MainWidget) MousePressDown(x,y int32, button uint8) {
         PostUpdate()
         return
     }
-    if (self.expandable && x>maxW-18 && x<maxW-2 && y>2 && y<18) {
+    if (self.expandable && x>maxW-19 && x<maxW-3 && y>2 && y<18) {
         self.buttonOnExpand=true
         self.cursorInsideExpand=true
         PostUpdate()
@@ -232,7 +243,7 @@ func (self *SWS_MainWidget) MouseMove(x,y,xrel,yrel int32) {
             PostUpdate()
         }
         if (self.buttonOnExpand) {
-            if (x>maxW-18 && x<maxW-2 && y>2 && y<18) {
+            if (x>maxW-19 && x<maxW-3 && y>2 && y<18) {
                 self.cursorInsideExpand=true
             } else {
                 self.cursorInsideExpand=false
