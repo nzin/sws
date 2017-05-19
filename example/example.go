@@ -52,7 +52,7 @@ func main() {
     root := sws.Init(800,600)
         
     //f:=sws.CreateCoreWidget(200,100)
-    f:=sws.CreateMainWidget(200,100,"very looooooooooooong title ")
+    f:=sws.CreateMainWidget(200,100,"very looooooooooooong title ",true)
     //f.SetColor(0xffff0000)
     f.Move(100,10)
     c:=sws.CreateLabel(100,50,"Footcheball")
@@ -67,7 +67,7 @@ func main() {
     i.Move(50,50)
     root.AddChild(f)
         
-    main1:=sws.CreateMainWidget(200,100,"main1")
+    main1:=sws.CreateMainWidget(200,100,"main1",false)
     main1.Move(400,300)
     root.AddChild(main1)
         

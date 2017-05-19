@@ -195,7 +195,7 @@ func (self *SWS_InputWidget) repaint() {
     wMiddle,_,_ := self.Font().SizeUTF8(strMiddle)
 
     wbefore,_ := self.WriteText(2,2,strbefore,sdl.Color{0, 0, 0, 255})
-    fmt.Println(wbefore,wMiddle)
+//    fmt.Println(wbefore,wMiddle)
     self.FillRect(wbefore+2,3,int32(wMiddle),self.Height()-2,0xff8888ff)
     self.SetDrawColor(0,0,0,255)
     self.WriteText(wbefore+2,2,strMiddle,sdl.Color{0, 0, 0, 255})

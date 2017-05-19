@@ -238,13 +238,11 @@ func (self *SWS_CoreWidget) TranslateXYToWidget(globalX,globalY int32) (x,y int3
 
 
 func (self *SWS_CoreWidget) MousePressDown(x,y int32, button uint8) {
-    fmt.Println(x,y)
 }
 
 
 
 func (self *SWS_CoreWidget) MousePressUp(x,y int32, button uint8) {
-    fmt.Println(x,y)
 }
 
 

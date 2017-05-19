@@ -158,13 +158,15 @@ func (self *SWS_RootWidget) WindowUpdateSurface() {
 }
 
 
-func CreateRootWidget(w int32, h int32, window *sdl.Window) *SWS_RootWidget {
+func CreateRootWidget(window *sdl.Window) *SWS_RootWidget {
     surface, err := window.GetSurface()
     if err != nil {
         panic(err)
     }
+    
+    w,h := window.GetSize()
 
-    corewidget := CreateCoreWidget(w,h)
+    corewidget := CreateCoreWidget(int32(w),int32(h))
     rootwidget := &SWS_RootWidget {
          SWS_CoreWidget: *corewidget,
          window:         window,
@@ -179,7 +181,7 @@ func Init(width,height int32) (*SWS_RootWidget) {
     sdl.Init(sdl.INIT_EVERYTHING)
 
     window, err := sdl.CreateWindow("test", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
-                800, 600, sdl.WINDOW_SHOWN) //|sdl.WINDOW_FULLSCREEN_DESKTOP)
+                800, 600, sdl.WINDOW_SHOWN|sdl.WINDOW_FULLSCREEN_DESKTOP)
     if err != nil {
         panic(err)
     }
@@ -193,10 +195,12 @@ func Init(width,height int32) (*SWS_RootWidget) {
     //if p.font, err = ttf.OpenFont("Arial.ttf", 16); err != nil {
         panic(err)
     }
+    
+    InitSprites()
 
     PostUpdate()
     
-    root=CreateRootWidget(width,height, window)
+    root=CreateRootWidget(window)
     root.SetColor(0xff111111)
     return root
 }
@@ -303,6 +307,7 @@ func PoolEvent() (bool) {
             }
         }
     if needUpdate == true {
+        fmt.Println("need update")
         needUpdate = false
         root.repaint()
         rectSrc := sdl.Rect{0,0, root.Width(),root.Height()}
