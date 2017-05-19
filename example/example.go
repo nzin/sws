@@ -12,7 +12,7 @@ import (
     _ "github.com/veandco/go-sdl2/sdl_ttf"
     "fmt"
     "flag"
-    "nzin/sws"
+    "github.com/nzin/sws"
     _ "runtime/pprof"
     _ "log"
 )
