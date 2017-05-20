@@ -61,6 +61,26 @@ func (self *SWS_CoreWidget) Destroy() {
 
 
 
+func (self *SWS_CoreWidget) Resize(width, height int32) {
+    surface,err := sdl.CreateRGBSurface(0,width,height,32,0x00ff0000,0x0000ff00,0x000000ff,0xff000000)
+    if err!=nil {
+        panic(err)
+    }
+    renderer,err := sdl.CreateSoftwareRenderer(surface)
+    if err!=nil {
+        panic(err)
+    }
+    self.surface.Free()
+    self.surface=surface
+    self.renderer.Destroy()
+    self.renderer=renderer
+    self.width = width
+    self.height = height
+    PostUpdate()
+}
+
+
+
 func (self *SWS_CoreWidget) FillRect(x,y,w,h int32, c uint32) {
     surface := self.Surface()
 
@@ -229,6 +249,7 @@ func (self *SWS_CoreWidget) IsInside(x,y int32) bool {
 
 
 func (self *SWS_CoreWidget) TranslateXYToWidget(globalX,globalY int32) (x,y int32) {
+    fmt.Println("TranslateXYToWidget:",self)
     if self.Parent()==nil {
         return globalX-self.X(),globalY-self.Y()
     }

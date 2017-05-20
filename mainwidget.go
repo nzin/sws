@@ -10,15 +10,17 @@ import (
 
 type SWS_MainWidget struct {
     SWS_CoreWidget
-    label             string
-    hasfocus          bool
-    expandable        bool
-    inmove            bool
-    Close             func()
-    buttonOnClose     bool
-    cursorInsideClose bool
-    buttonOnExpand    bool
-    cursorInsideExpand bool
+    label              string // title
+    hasfocus           bool
+    expandable         bool // can we full screen
+    resizable          bool // can be resized
+    inmove             bool // to know if we are currently "in move" state
+    Close              func()
+    buttonOnClose      bool // to know if we click down on the close button
+    cursorInsideClose  bool // to know if we are over the close button
+    buttonOnExpand     bool // to know if we click down on the fullscreen button
+    cursorInsideExpand bool // to know if we are over the full screen button
+    onResize           bool // to know if we are resizing
     subwidget         *SWS_CoreWidget
 }
 
@@ -110,6 +112,33 @@ func (self *SWS_MainWidget) repaint() {
     self.SetDrawColor(0x88,0x88,0x88,0xff)
     self.DrawLine(1,self.Height()-2,self.Width()-2,self.Height()-2)
     self.DrawLine(self.Width()-2,self.Height()-2,self.Width()-2,22)
+    
+    // low bezel interior
+    self.SetDrawColor(0xdd,0xdd,0xdd,0xff)
+    self.DrawLine(2,22,self.Width()-3,22)
+    self.DrawLine(self.Width()-3,22,self.Width()-3,self.Height()-3)
+    self.DrawLine(self.Width()-3,self.Height()-3,2,self.Height()-3)
+    self.DrawLine(2,self.Height()-3,2,22)
+    self.SetDrawColor(0xdd,0xdd,0xdd,0xff)
+    self.DrawLine(3,23,self.Width()-4,23)
+    self.DrawLine(self.Width()-4,23,self.Width()-4,self.Height()-4)
+    self.DrawLine(self.Width()-4,self.Height()-4,3,self.Height()-4)
+    self.DrawLine(3,self.Height()-4,3,23)
+    self.SetDrawColor(0xbb,0xbb,0xbb,0xff)
+    self.DrawLine(4,24,self.Width()-5,24)
+    self.DrawLine(self.Width()-5,24,self.Width()-5,self.Height()-5)
+    self.DrawLine(self.Width()-5,self.Height()-5,4,self.Height()-5)
+    self.DrawLine(4,self.Height()-5,4,24)
+    self.SetDrawColor(0x88,0x88,0x88,0xff)
+    self.DrawLine(5,25,self.Width()-6,25)
+    self.DrawLine(self.Width()-6,25,self.Width()-6,self.Height()-6)
+    self.DrawLine(self.Width()-6,self.Height()-6,4,self.Height()-6)
+    self.DrawLine(5,self.Height()-6,5,25)
+    
+    if self.resizable {
+        self.DrawLine(self.Width()-25,self.Height()-6,self.Width()-25,self.Height()-1)
+        self.DrawLine(self.Width()-6,self.Height()-25,self.Width()-1,self.Height()-25)
+    }
 
 
     if self.hasfocus {
@@ -179,11 +208,15 @@ func (self *SWS_MainWidget) MousePressDown(x,y int32, button uint8) {
     if (x< 40+int32(wText) && y<20) {
         self.inmove=true
     }
+    if (x>=self.Width()-25 && y>=self.Height()-6) || (x>=self.Width()-6 && y>=self.Height()-25) {
+        self.onResize=true
+    }
 }
 
 
 
 func (self *SWS_MainWidget) MousePressUp(x,y int32, button uint8) {
+    self.onResize=false
     self.inmove=false
     if (self.buttonOnClose==true) {
         self.buttonOnClose=false
@@ -203,48 +236,66 @@ func (self *SWS_MainWidget) MouseMove(x,y,xrel,yrel int32) {
         self.x+=xrel
         self.y+=yrel
         PostUpdate()
-    } else {
-        wText,_,_ := self.font.SizeUTF8(self.label)
-        maxW:=int32(wText)+40
-        if (maxW>self.Width()) { maxW=self.Width() }
+        return
+    }
+    if (self.onResize) {
+        fmt.Println("Resize",x,y)
+        self.Resize(x,y)
+        return
+    }
+    wText,_,_ := self.font.SizeUTF8(self.label)
+    maxW:=int32(wText)+40
+    if (maxW>self.Width()) { maxW=self.Width() }
 
-        if (self.buttonOnClose) {
-            if (x>2 && x<18 && y>2 && y<18) {
-                self.cursorInsideClose=true
-            } else {
-                self.cursorInsideClose=false
-            }
-            PostUpdate()
+    if (self.buttonOnClose) {
+        if (x>2 && x<18 && y>2 && y<18) {
+            self.cursorInsideClose=true
+        } else {
+            self.cursorInsideClose=false
         }
-        if (self.buttonOnExpand) {
-            if (x>maxW-19 && x<maxW-3 && y>2 && y<18) {
-                self.cursorInsideExpand=true
-            } else {
-                self.cursorInsideExpand=false
-            }
-            PostUpdate()
+        PostUpdate()
+    }
+    if (self.buttonOnExpand) {
+        if (x>maxW-19 && x<maxW-3 && y>2 && y<18) {
+            self.cursorInsideExpand=true
+        } else {
+            self.cursorInsideExpand=false
         }
+        PostUpdate()
     }
 }
 
 
 
-func CreateMainWidget(w,h int32, s string,expandable bool) *SWS_MainWidget {
+func (self *SWS_MainWidget) Resize(width, height int32) {
+    if (width<40) { width=40 }
+    if (height<40) { height=40 }
+    self.SWS_CoreWidget.Resize(width,height)
+    self.subwidget.Resize(width-12,height-32)
+    PostUpdate()
+}
+
+
+
+func CreateMainWidget(w,h int32, s string,expandable bool,resizable bool) *SWS_MainWidget {
     corewidget := CreateCoreWidget(w,h)
-    subwidget := CreateCoreWidget(w-4,h-24)
-    subwidget.Move(2,22)
+    subwidget := CreateCoreWidget(w-12,h-32)
+    subwidget.Move(6,26)
     corewidget.AddChild(subwidget)
     widget := &SWS_MainWidget{ SWS_CoreWidget: *corewidget,
-                     label:             s,
-                     hasfocus:          false,
-                     expandable:        expandable,
-                     inmove:            false, 
-                     buttonOnClose:     false,
-                     cursorInsideClose: false,
-                     buttonOnExpand:    false,
+                     label:              s,
+                     hasfocus:           false,
+                     expandable:         expandable,
+                     resizable:          resizable,
+                     inmove:             false, 
+                     buttonOnClose:      false,
+                     cursorInsideClose:  false,
+                     buttonOnExpand:     false,
                      cursorInsideExpand: false,
-                     subwidget:         subwidget}
-  return widget
+                     onResize:           false,
+                     subwidget:          subwidget}
+    subwidget.SetParent(widget)
+    return widget
 }
 
 

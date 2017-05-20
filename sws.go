@@ -31,6 +31,7 @@ type SWS_Widget interface {
     AddChild(child SWS_Widget)
     RemoveChild(child SWS_Widget)
     Move(x,y int32)
+    Resize(width,height int32)
     Surface() *sdl.Surface
     Renderer() *sdl.Renderer
     getChildren() []SWS_Widget
@@ -208,6 +209,7 @@ func Init(width,height int32) (*SWS_RootWidget) {
 
 var previousFocus,focus SWS_Widget
 var previousmainwindowfocus,mainwindowfocus SWS_Widget
+var buttonDown = false
 
 func PoolEvent() (bool) {
     var quit bool = false
@@ -222,6 +224,7 @@ func PoolEvent() (bool) {
                 t.Timestamp, t.Type, t.Which, t.X, t.Y, t.Button, t.State)
                 //fmt.Println(findWidget(t.X,t.Y,root))
                 if t.Type == sdl.MOUSEBUTTONDOWN {
+                    buttonDown=true
 
                     // if we click outside of a menu -> destroy the menu
                     menu := findMenu(t.X,t.Y)
@@ -232,7 +235,8 @@ func PoolEvent() (bool) {
                     // special case for main window
                     mainwindowfocus = findMainWidget(t.X,t.Y,root) 
                     if (previousmainwindowfocus!=mainwindowfocus) {
-                        if previousmainwindowfocus!=nil && mainwindowfocus!=nil {
+                        //if previousmainwindowfocus!=nil && mainwindowfocus!=nil {
+                        if previousmainwindowfocus!=nil {
                             previousmainwindowfocus.HasFocus(false)
                         }
 			if mainwindowfocus!=nil {
@@ -258,6 +262,7 @@ func PoolEvent() (bool) {
                     }
                 }
                 if t.Type == sdl.MOUSEBUTTONUP {
+                    buttonDown=false
                     // if we click outside of a menu -> destroy the menu
                     menu := findMenu(t.X,t.Y)
                     if menu==nil {
@@ -274,21 +279,22 @@ func PoolEvent() (bool) {
 //                        t.Timestamp, t.Type, t.Which, t.X, t.Y, t.XRel, t.YRel)
 
                 if t.Type == sdl.MOUSEMOTION {
-                    beforeW, bxTarget,byTarget := findWidget(t.X-t.XRel,t.Y-t.YRel,root) 
-                    afterW, axTarget,ayTarget := findWidget(t.X,t.Y,root) 
+                    if buttonDown==false {
+                        beforeW, bxTarget,byTarget := findWidget(t.X-t.XRel,t.Y-t.YRel,root) 
+                        afterW, axTarget,ayTarget := findWidget(t.X,t.Y,root) 
                             
-                    if (beforeW!=afterW) {
-                        if (beforeW!=nil) {
-                            beforeW.MouseMove(bxTarget+t.XRel,byTarget+t.YRel,t.XRel,t.YRel)
+                        if (beforeW!=afterW) {
+                            if (beforeW!=nil) {
+                                beforeW.MouseMove(bxTarget+t.XRel,byTarget+t.YRel,t.XRel,t.YRel)
+                            }
                         }
+                        if (afterW!=nil) {
+                            afterW.MouseMove(axTarget,ayTarget,t.XRel,t.YRel)
+                        }
+                    } else { // button down
+                        xTarget,yTarget=focus.TranslateXYToWidget(t.X,t.Y)
+                        focus.MouseMove(xTarget,yTarget,t.XRel,t.YRel)
                     }
-                    if (afterW!=nil) {
-                        afterW.MouseMove(axTarget,ayTarget,t.XRel,t.YRel)
-                    }
-                    //if focus != nil {
-                    //    xTarget,yTarget=focus.TranslateXYToWidget(t.X,t.Y)
-                    //    focus.MouseMove(xTarget,yTarget,t.XRel,t.YRel)
-                    //}
                 }
             case *sdl.KeyDownEvent:
                 fmt.Printf("[%d ms] Keyboard\ttype:%d\tsym:%c\tmodifiers:%d\tstate:%d\trepeat:%d\n",
