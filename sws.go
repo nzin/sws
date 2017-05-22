@@ -313,7 +313,6 @@ func PoolEvent() (bool) {
             }
         }
     if needUpdate == true {
-        fmt.Println("need update")
         needUpdate = false
         root.repaint()
         rectSrc := sdl.Rect{0,0, root.Width(),root.Height()}

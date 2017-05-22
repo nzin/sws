@@ -249,7 +249,6 @@ func (self *SWS_CoreWidget) IsInside(x,y int32) bool {
 
 
 func (self *SWS_CoreWidget) TranslateXYToWidget(globalX,globalY int32) (x,y int32) {
-    fmt.Println("TranslateXYToWidget:",self)
     if self.Parent()==nil {
         return globalX-self.X(),globalY-self.Y()
     }

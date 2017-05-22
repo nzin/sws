@@ -47,7 +47,6 @@ func (self *SWS_MainWidget) IsInside(x,y int32) bool {
 
 
 func (self *SWS_MainWidget) repaint() {
-    fmt.Println("SWS_MainWidget::repaint()")
     // paint header
     var solid *sdl.Surface
     var err error
@@ -239,7 +238,6 @@ func (self *SWS_MainWidget) MouseMove(x,y,xrel,yrel int32) {
         return
     }
     if (self.onResize) {
-        fmt.Println("Resize",x,y)
         self.Resize(x,y)
         return
     }
