@@ -288,8 +288,8 @@ func (self *SWS_MainWidget) MouseMove(x,y,xrel,yrel int32) {
 
 
 func (self *SWS_MainWidget) Resize(width, height int32) {
-    if (width<40) { width=40 }
-    if (height<40) { height=40 }
+    if (width<60) { width=60 }
+    if (height<60) { height=60 }
     self.SWS_CoreWidget.Resize(width,height)
     if self.menubar==nil {
         self.subwidget.Resize(width-12,height-32)
