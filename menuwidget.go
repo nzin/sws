@@ -269,6 +269,7 @@ func CreateMenuWidget() *SWS_MenuWidget {
 
 
 //var rootMenu SWS_Widget
+var currentMenuBar *SWS_MenuBarWidget
 var menuStack []*SWS_MenuWidget
 
 func ShowMenu(menu *SWS_MenuWidget) {
@@ -329,4 +330,171 @@ func hideMenu(menu *SWS_MenuWidget) {
         }
     }
 }
+
+
+
+type SWS_MenuBarWidget struct {
+    SWS_MenuWidget
+    hasfocus      bool
+    clickonmenu   bool
+}
+
+
+
+func (self *SWS_MenuBarWidget) HasFocus(hasfocus bool) {
+    self.hasfocus=hasfocus
+    if (hasfocus==false) {
+        currentMenuBar=nil
+        self.activeItem=-1
+        self.lastSubActive=-1
+    } else {
+        currentMenuBar=self
+    }
+    
+    //menuStack=append(make([]*SWS_MenuWidget,0,0),&(self.SWS_MenuWidget))
+
+    PostUpdate()
+}
+
+
+
+func (self *SWS_MenuBarWidget) repaint() {
+    var x int32
+    rect := sdl.Rect{0,0, self.width, self.height}
+    self.surface.FillRect(&rect, 0xffdddddd)
+    
+    renderer,err := sdl.CreateSoftwareRenderer(self.surface)
+    if err!=nil {
+        panic(err)
+    }   
+    
+    for i, item := range self.items {
+        w,h :=item.WidthHeight()
+        w+=10
+        if (i==self.activeItem || i==self.lastSubActive) {
+            rect := sdl.Rect{x,0, w, self.height}
+            self.surface.FillRect(&rect, 0xff8888ff)
+        }   
+        surface := item.repaint(i==self.activeItem || i==self.lastSubActive)
+        rectSrc := sdl.Rect{0,0, w,h}
+        rectDst := sdl.Rect{x+5,0, w,h}
+        surface.Blit(&rectSrc, self.surface, &rectDst)
+        
+        x+=w
+    }
+    renderer.SetDrawColor(255, 255, 255, 255)
+    renderer.DrawLine(0,int(self.height-1),int(self.width-1),int(self.height-1))
+}   
+
+
+
+func (self *SWS_MenuBarWidget) MousePressDown(x,y int32, button uint8) {
+    self.hasfocus=true
+    self.activeItem=-1 // because we close the menu in the main sws.go loop
+    self.clickonmenu=false
+    var xx int32
+    xx=0
+    if (y>=0 && y<self.height) {
+        for _, item := range self.items {
+            w,_ :=item.WidthHeight()
+            if (xx<=x && xx+w>x) {
+                self.clickonmenu=true
+                break
+            }
+            xx+=w
+        }
+    }
+
+    self.MouseMove(x,y,0,0)
+}
+
+
+
+func (self *SWS_MenuBarWidget) MousePressUp(x,y int32, button uint8) {
+    if (self.activeItem!=-1) {
+        submenu:=self.items[self.activeItem].SubMenu()
+        if (submenu==nil) {
+            self.items[self.activeItem].Clicked()
+        }
+    }
+    PostUpdate()
+}
+
+
+
+func (self *SWS_MenuBarWidget) MouseMove(x,y,xrel,yrel int32) {
+    if self.hasfocus==false || self.clickonmenu==false {
+        return
+    }
+    previousActiveItem:=self.activeItem
+    self.activeItem=-1
+    var xx int32
+    xx=0
+    if (y>=0 && y<self.height) {
+        for i, item := range self.items {
+            w,_ :=item.WidthHeight()
+            w+=10
+            if (xx<=x && xx+w>x) {
+                self.activeItem=i
+                break
+            }
+            xx+=w
+        }
+    }
+    if (previousActiveItem!=self.activeItem) {
+        //hideMenu(self)
+        if (previousActiveItem!=-1 && self.activeItem!=-1) {
+            submenu:=self.items[previousActiveItem].SubMenu()
+            if (submenu!=nil) {
+                hideMenu(submenu)
+            }
+        }
+        if (self.lastSubActive!=-1 && self.activeItem!=-1) {
+            submenu:=self.items[self.lastSubActive].SubMenu()
+            if (submenu!=nil) {
+                hideMenu(submenu)
+            }
+        }
+        if (self.activeItem!=-1) {
+            submenu:=self.items[self.activeItem].SubMenu()
+            if (submenu!=nil) {
+                self.lastSubActive=self.activeItem
+
+                yy:=self.height
+                var widget SWS_Widget
+                widget=self
+                for (widget!=nil) {
+                    xx+=widget.X()
+                    yy+=widget.Y()
+                    widget=widget.Parent()
+                }
+                submenu.Move(xx,yy-2)
+                ShowMenu(submenu)
+            } else {
+                self.lastSubActive=-1
+            }
+        }
+        PostUpdate()
+    }
+}
+
+
+
+func (self *SWS_MenuBarWidget) AddItem(item MenuItem) {
+    self.items=append(self.items,item)
+}
+
+
+
+func CreateMenuBarWidget() *SWS_MenuBarWidget {
+    menuwidget := CreateMenuWidget()
+    widget := &SWS_MenuBarWidget{ SWS_MenuWidget: *menuwidget,
+                     clickonmenu:   false,
+                     hasfocus:      false }
+    widget.height=25
+  return widget
+}
+
+
+
 

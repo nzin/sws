@@ -22,6 +22,22 @@ type SWS_MainWidget struct {
     cursorInsideExpand bool // to know if we are over the full screen button
     onResize           bool // to know if we are resizing
     subwidget         *SWS_CoreWidget
+    menubar           *SWS_MenuBarWidget
+}
+
+
+
+func (self *SWS_MainWidget) SetMenuBar(menubar *SWS_MenuBarWidget) {
+    if (self.menubar!=nil) {
+        self.RemoveChild(self.menubar)
+    }
+    self.menubar=menubar
+    self.SWS_CoreWidget.AddChild(menubar)
+    menubar.Move(6,26)
+    menubar.Resize(self.Width()-12,menubar.Height())
+    self.subwidget.Resize(self.Width()-12,self.Height()-32-menubar.Height())
+    self.subwidget.Move(6,26+self.menubar.Height())
+    PostUpdate()
 }
 
 
@@ -174,6 +190,12 @@ func (self *SWS_MainWidget) repaint() {
         }
     }
 
+    if (self.menubar!=nil) {
+        self.menubar.repaint()
+        rectSrc = sdl.Rect{0,0, self.menubar.Width(),self.menubar.Height()}
+        rectDst = sdl.Rect{self.menubar.X(), self.menubar.Y(), self.menubar.Width(),self.menubar.Height()}
+        self.menubar.Surface().Blit(&rectSrc,self.Surface(),&rectDst)
+    }
     self.subwidget.repaint()
     rectSrc = sdl.Rect{0,0, self.subwidget.Width(),self.subwidget.Height()}
     rectDst = sdl.Rect{self.subwidget.X(), self.subwidget.Y(), self.subwidget.Width(),self.subwidget.Height()}
@@ -269,7 +291,12 @@ func (self *SWS_MainWidget) Resize(width, height int32) {
     if (width<40) { width=40 }
     if (height<40) { height=40 }
     self.SWS_CoreWidget.Resize(width,height)
-    self.subwidget.Resize(width-12,height-32)
+    if self.menubar==nil {
+        self.subwidget.Resize(width-12,height-32)
+    } else {
+        self.menubar.Resize(width-12,self.menubar.Height())
+        self.subwidget.Resize(width-12,height-32-self.menubar.Height())
+    }
     PostUpdate()
 }
 
@@ -291,7 +318,8 @@ func CreateMainWidget(w,h int32, s string,expandable bool,resizable bool) *SWS_M
                      buttonOnExpand:     false,
                      cursorInsideExpand: false,
                      onResize:           false,
-                     subwidget:          subwidget}
+                     subwidget:          subwidget,
+                     menubar:            nil}
     subwidget.SetParent(widget)
     return widget
 }

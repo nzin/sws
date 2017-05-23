@@ -67,10 +67,24 @@ func main() {
     i.Move(50,50)
     root.AddChild(f)
         
+    filemenu:=sws.CreateMenuWidget()
+    filemenu.AddItem(sws.CreateMenuItemLabel("file bla bla",nil))
+    filemenu.AddItem(sws.CreateMenuItemLabel("file bla bla 2",nil))
+    filemenu.AddItem(sws.CreateMenuItemLabel("file bla bla 3",nil))
+    file:=sws.CreateMenuItemLabel("File",nil)
+    file.SetSubMenu(filemenu)
+    menubar:=sws.CreateMenuBarWidget()
+    menubar.AddItem(file)
+    menubar.AddItem(sws.CreateMenuItemLabel("View",nil))
+    menubar.AddItem(sws.CreateMenuItemLabel("About",nil))
+    
+
+    
     main1:=sws.CreateMainWidget(200,100,"main1",false,true)
     main1.Move(400,300)
+    main1.SetMenuBar(menubar)
     root.AddChild(main1)
-        
+    
 
     for sws.PoolEvent() == false {
     }

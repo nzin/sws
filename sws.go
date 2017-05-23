@@ -228,7 +228,7 @@ func PoolEvent() (bool) {
 
                     // if we click outside of a menu -> destroy the menu
                     menu := findMenu(t.X,t.Y)
-                    if menu==nil {
+                    if menu==nil && currentMenuBar==nil {
                         hideMenu(nil)
                     }
                             
@@ -265,7 +265,7 @@ func PoolEvent() (bool) {
                     buttonDown=false
                     // if we click outside of a menu -> destroy the menu
                     menu := findMenu(t.X,t.Y)
-                    if menu==nil {
+                    if menu==nil && currentMenuBar==nil {
                         hideMenu(nil)
                     }
                             
