@@ -397,6 +397,7 @@ func (self *SWS_MenuBarWidget) MousePressDown(x,y int32, button uint8) {
     if (y>=0 && y<self.height) {
         for _, item := range self.items {
             w,_ :=item.WidthHeight()
+            w+=10
             if (xx<=x && xx+w>x) {
                 self.clickonmenu=true
                 break
