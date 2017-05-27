@@ -37,7 +37,7 @@ type SWS_Widget interface {
     getChildren() []SWS_Widget
     Parent() SWS_Widget
     SetParent(SWS_Widget)
-    repaint()
+    Repaint()
     X() int32
     Y() int32
     Width() int32
@@ -314,7 +314,7 @@ func PoolEvent() (bool) {
         }
     if needUpdate == true {
         needUpdate = false
-        root.repaint()
+        root.Repaint()
         rectSrc := sdl.Rect{0,0, root.Width(),root.Height()}
         rectDst := sdl.Rect{root.X(), root.Y(), root.Width(),root.Height()}
         root.surface.Blit(&rectSrc,root.WindowSurface(),&rectDst)
@@ -322,7 +322,7 @@ func PoolEvent() (bool) {
         if (menuStack!=nil) {
             for _,m := range menuStack {
 //                fmt.Println("menu display")
-                m.repaint()
+                m.Repaint()
                 rectSrc := sdl.Rect{0,0, m.Width(),m.Height()}
                 rectDst := sdl.Rect{m.X(), m.Y(), m.Width(),m.Height()}
                 m.surface.Blit(&rectSrc,root.WindowSurface(),&rectDst)

@@ -13,8 +13,8 @@ type SWS_Label struct {
 
 
 
-func (self *SWS_Label) repaint() {
-    self.SWS_CoreWidget.repaint()
+func (self *SWS_Label) Repaint() {
+    self.SWS_CoreWidget.Repaint()
     self.WriteText(0,0,self.label,sdl.Color{0, 0, 0, 255})
 }
 

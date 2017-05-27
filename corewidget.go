@@ -309,13 +309,13 @@ func (self *SWS_CoreWidget) Move(x,y int32) {
 
 
 
-func (self *SWS_CoreWidget) repaint() {
+func (self *SWS_CoreWidget) Repaint() {
     if self.bgColor != 0 {
         self.FillRect(0,0,self.width,self.height,self.bgColor)
     }
     for _,child := range self.children {
         // adjust the clipping to the current child
-        child.repaint()
+        child.Repaint()
         rectSrc := sdl.Rect{0,0, child.Width(),child.Height()}
         rectDst := sdl.Rect{child.X(), child.Y(), child.Width(),child.Height()}
         child.Surface().Blit(&rectSrc,self.Surface(),&rectDst)

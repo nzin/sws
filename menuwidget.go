@@ -18,7 +18,7 @@ import (
  *   - else we send a MouseUp on the menutrigger/menu
  */
 type MenuItem interface {
-    repaint(selected bool) *sdl.Surface
+    Repaint(selected bool) *sdl.Surface
     WidthHeight() (int32,int32)
     SubMenu() *SWS_MenuWidget
     Clicked()
@@ -53,7 +53,7 @@ func (self *MenuItemLabel) Destroy() {
 
 
 
-func (self *MenuItemLabel) repaint(selected bool) *sdl.Surface {
+func (self *MenuItemLabel) Repaint(selected bool) *sdl.Surface {
     
     if self.Label != "" {
         var err error
@@ -214,7 +214,7 @@ func (self *SWS_MenuWidget) MouseMove(x,y,xrel,yrel int32) {
 
 
 
-func (self *SWS_MenuWidget) repaint() {
+func (self *SWS_MenuWidget) Repaint() {
     var y int32
     rect := sdl.Rect{0,0, self.width, self.height}
     self.surface.FillRect(&rect, 0xffdddddd)
@@ -238,7 +238,7 @@ func (self *SWS_MenuWidget) repaint() {
             rect := sdl.Rect{2,y+2, self.width-4, h}
             self.surface.FillRect(&rect, 0xff8888ff)
         }
-        surface := item.repaint(i==self.activeItem || i==self.lastSubActive)
+        surface := item.Repaint(i==self.activeItem || i==self.lastSubActive)
         rectSrc := sdl.Rect{0,0, w,h}
         rectDst := sdl.Rect{5+2,y+2, w,h}
         surface.Blit(&rectSrc, self.surface, &rectDst)
@@ -358,7 +358,7 @@ func (self *SWS_MenuBarWidget) HasFocus(hasfocus bool) {
 
 
 
-func (self *SWS_MenuBarWidget) repaint() {
+func (self *SWS_MenuBarWidget) Repaint() {
     var x int32
     rect := sdl.Rect{0,0, self.width, self.height}
     self.surface.FillRect(&rect, 0xffdddddd)
@@ -375,7 +375,7 @@ func (self *SWS_MenuBarWidget) repaint() {
             rect := sdl.Rect{x,0, w, self.height}
             self.surface.FillRect(&rect, 0xff8888ff)
         }   
-        surface := item.repaint(i==self.activeItem || i==self.lastSubActive)
+        surface := item.Repaint(i==self.activeItem || i==self.lastSubActive)
         rectSrc := sdl.Rect{0,0, w,h}
         rectDst := sdl.Rect{x+5,0, w,h}
         surface.Blit(&rectSrc, self.surface, &rectDst)

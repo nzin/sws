@@ -62,7 +62,7 @@ func (self *SWS_MainWidget) IsInside(x,y int32) bool {
 
 
 
-func (self *SWS_MainWidget) repaint() {
+func (self *SWS_MainWidget) Repaint() {
     // paint header
     var solid *sdl.Surface
     var err error
@@ -191,12 +191,12 @@ func (self *SWS_MainWidget) repaint() {
     }
 
     if (self.menubar!=nil) {
-        self.menubar.repaint()
+        self.menubar.Repaint()
         rectSrc = sdl.Rect{0,0, self.menubar.Width(),self.menubar.Height()}
         rectDst = sdl.Rect{self.menubar.X(), self.menubar.Y(), self.menubar.Width(),self.menubar.Height()}
         self.menubar.Surface().Blit(&rectSrc,self.Surface(),&rectDst)
     }
-    self.subwidget.repaint()
+    self.subwidget.Repaint()
     rectSrc = sdl.Rect{0,0, self.subwidget.Width(),self.subwidget.Height()}
     rectDst = sdl.Rect{self.subwidget.X(), self.subwidget.Y(), self.subwidget.Width(),self.subwidget.Height()}
     self.subwidget.Surface().Blit(&rectSrc,self.Surface(),&rectDst)

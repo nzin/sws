@@ -145,8 +145,8 @@ func (self *SWS_InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 
 
 
-func (self *SWS_InputWidget) repaint() {
-    self.SWS_CoreWidget.repaint()
+func (self *SWS_InputWidget) Repaint() {
+    self.SWS_CoreWidget.Repaint()
     self.SetDrawColor(0,0,0,255)
     self.DrawLine(0,2,0,self.Height()-3)
     self.DrawLine(self.Width()-1,2,self.Width()-1,self.Height()-3)
