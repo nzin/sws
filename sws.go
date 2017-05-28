@@ -207,6 +207,44 @@ func Init(width,height int32) (*SWS_RootWidget) {
 }
 
 
+
+func (root *SWS_RootWidget) SetFocus(widget SWS_Widget) {
+    mainwidget:=widget
+    for mainwidget.Parent()!=nil && mainwidget.Parent()!=SWS_Widget(root) {
+        mainwidget=mainwidget.Parent()
+    }
+    if mainwidget!=nil {
+        switch mainwidget.(type) {
+            case *SWS_MainWidget: {
+                mainwindowfocus=mainwidget
+                if (previousmainwindowfocus!=mainwindowfocus) {
+                    if previousmainwindowfocus!=nil {
+                        previousmainwindowfocus.HasFocus(false)
+                    }
+                    if mainwindowfocus!=nil {
+                        mainwindowfocus.HasFocus(true)
+                        root.RaiseToTop(mainwindowfocus)
+                    }
+                    previousmainwindowfocus=mainwindowfocus
+                }
+            }
+        }
+    }
+
+    focus=widget
+    if previousFocus!=focus {
+        if previousFocus!=nil && previousFocus!=mainwindowfocus {
+            previousFocus.HasFocus(false)
+        }
+        if focus!=nil {
+            focus.HasFocus(true)
+        }
+        previousFocus=focus
+    }
+}
+
+
+
 var previousFocus,focus SWS_Widget
 var previousmainwindowfocus,mainwindowfocus SWS_Widget
 var buttonDown = false
