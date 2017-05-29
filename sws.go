@@ -369,6 +369,7 @@ func PoolEvent() (bool) {
         root.WindowUpdateSurface()
     }
     time.Sleep(25 * time.Millisecond)
+    TriggerEvents()
     return quit
 }
 
