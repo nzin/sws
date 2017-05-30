@@ -23,25 +23,32 @@ func TimerAddEvent(triggertime time.Time, repeat time.Duration, trigger func()) 
         trigger:     trigger,
         next:        nil,
     }
+    placeEvent(te)
+    return te
+}
+
+
+
+func placeEvent(te *TimerEvent) {
     if timerlist==nil {
         timerlist=te
-        return te
+        return
     } else {
         if (timerlist.triggertime.After(te.triggertime)) {
             te.next=timerlist
             timerlist=te
-            return te
+            return
         }
         e:=timerlist
         for (e.next!=nil) {
             if (e.next.triggertime.After(te.triggertime)) {
                 break
             }
+            e=e.next
         }
         te.next=e.next
         e.next=te
     }
-    return te
 }
 
 
@@ -53,7 +60,8 @@ func TriggerEvents() {
         timerlist=timerlist.next
         t.trigger()
         if (t.repeat>0) {
-            TimerAddEvent(t.triggertime.Add(t.repeat),t.repeat,t.trigger)
+            t.triggertime=t.triggertime.Add(t.repeat)
+            placeEvent(t)
         }
     }
 }
@@ -61,6 +69,7 @@ func TriggerEvents() {
 
 
 func StopRepeat(te *TimerEvent) bool {
+    if (te==nil || timerlist==nil) { return false }
     if timerlist==te {
         timerlist=timerlist.next
         return true
