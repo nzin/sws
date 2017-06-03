@@ -273,7 +273,6 @@ func PoolEvent() (bool) {
                     // special case for main window
                     mainwindowfocus = findMainWidget(t.X,t.Y,root) 
                     if (previousmainwindowfocus!=mainwindowfocus) {
-                        //if previousmainwindowfocus!=nil && mainwindowfocus!=nil {
                         if previousmainwindowfocus!=nil {
                             previousmainwindowfocus.HasFocus(false)
                         }
@@ -348,8 +347,8 @@ func PoolEvent() (bool) {
                     focus.KeyUp(t.Keysym.Sym,t.Keysym.Mod)
                 }
 
-            }
         }
+    }
     if needUpdate == true {
         needUpdate = false
         root.Repaint()
