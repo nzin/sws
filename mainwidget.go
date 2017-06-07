@@ -21,8 +21,19 @@ type SWS_MainWidget struct {
     buttonOnExpand     bool // to know if we click down on the fullscreen button
     cursorInsideExpand bool // to know if we are over the full screen button
     onResize           bool // to know if we are resizing
-    subwidget         *SWS_CoreWidget
+    subwidget         SWS_Widget
     menubar           *SWS_MenuBarWidget
+}
+
+
+
+func (self *SWS_MainWidget) SetInnerWidget(widget SWS_Widget) bool {
+    if widget == nil { return false}
+    self.RemoveChild(self.subwidget)
+    self.subwidget=widget
+    self.AddChild(widget)
+    widget.SetParent(self)
+    return true
 }
 
 
