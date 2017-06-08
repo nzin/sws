@@ -270,17 +270,19 @@ func PoolEvent() (bool) {
                         hideMenu(nil)
                     }
                             
-                    // special case for main window
-                    mainwindowfocus = findMainWidget(t.X,t.Y,root) 
-                    if (previousmainwindowfocus!=mainwindowfocus) {
-                        if previousmainwindowfocus!=nil {
-                            previousmainwindowfocus.HasFocus(false)
+                    if menu==nil {
+                        // special case for main window
+                        mainwindowfocus = findMainWidget(t.X,t.Y,root) 
+                        if (previousmainwindowfocus!=mainwindowfocus) {
+                            if previousmainwindowfocus!=nil {
+                                previousmainwindowfocus.HasFocus(false)
+                            }
+  			    if mainwindowfocus!=nil {
+                                mainwindowfocus.HasFocus(true)
+                                root.RaiseToTop(mainwindowfocus)
+                            }
+                            previousmainwindowfocus=mainwindowfocus
                         }
-			if mainwindowfocus!=nil {
-                            mainwindowfocus.HasFocus(true)
-                            root.RaiseToTop(mainwindowfocus)
-                        }
-                        previousmainwindowfocus=mainwindowfocus
                     }
 
                     // else find the widget

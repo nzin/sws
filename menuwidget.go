@@ -406,6 +406,7 @@ func (self *SWS_MenuBarWidget) MousePressDown(x,y int32, button uint8) {
         }
     }
 
+    // to open the corresponding menu
     self.MouseMove(x,y,0,0)
 }
 

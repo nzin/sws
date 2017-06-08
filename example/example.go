@@ -65,6 +65,9 @@ func main() {
     i:=sws.CreateInputWidget(100,25,"text")
     f.AddChild(i)
     i.Move(50,50)
+    dd:=sws.CreateDropdownWidget(100,25,[]string{"text 1","text 2"})
+    f.AddChild(dd)
+    dd.Move(50,110)
     root.AddChild(f)
         
     filemenu:=sws.CreateMenuWidget()
