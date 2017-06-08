@@ -266,10 +266,7 @@ func PoolEvent() (bool) {
 
                     // if we click outside of a menu -> destroy the menu
                     menu := findMenu(t.X,t.Y)
-                    if menu==nil && currentMenuBar==nil {
-                        hideMenu(nil)
-                    }
-                            
+                     
                     if menu==nil {
                         // special case for main window
                         mainwindowfocus = findMainWidget(t.X,t.Y,root) 
@@ -296,6 +293,11 @@ func PoolEvent() (bool) {
                         }
                         previousFocus=focus
                     }
+
+                    if menu==nil && menuInitiator==nil {
+                        hideMenu(nil)
+                    }
+
                     if focus != nil {
                         focus.MousePressDown(xTarget,yTarget,t.Button)
                     }
@@ -304,7 +306,7 @@ func PoolEvent() (bool) {
                     buttonDown=false
                     // if we click outside of a menu -> destroy the menu
                     menu := findMenu(t.X,t.Y)
-                    if menu==nil && currentMenuBar==nil {
+                    if menu==nil && menuInitiator==nil {
                         hideMenu(nil)
                     }
                             

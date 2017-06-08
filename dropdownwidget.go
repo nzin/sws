@@ -15,7 +15,21 @@ type SWS_DropdownWidget struct {
     cursorInside bool
     clicked      func()
     menu         *SWS_MenuWidget
-    menuvisible  bool
+    hasfocus     bool
+}
+
+
+
+func (self *SWS_DropdownWidget) HasFocus(hasfocus bool) {
+    self.hasfocus=hasfocus
+    if (hasfocus==false) {
+        menuInitiator=nil
+    } else {
+        hideMenu(nil)
+        menuInitiator=self
+    }
+
+    PostUpdate()
 }
 
 
@@ -31,16 +45,14 @@ func (self *SWS_DropdownWidget) MousePressDown(x,y int32, button uint8) {
     if button == sdl.BUTTON_LEFT {
         self.buttonState=true
         self.cursorInside=true
-        if (self.menuvisible==true) {
+        if (self.menu!=nil && self.menu.Parent()!=nil) {
             hideMenu(nil)
-            self.menuvisible=false
         } else {
             self.menu=CreateMenuWidget()
             for i,choice := range self.Choices {
                 index:=i
                 self.menu.AddItem(CreateMenuItemLabel(choice, func() {
                     self.ActiveChoice=int32(index)
-                    self.menuvisible=false
                     if self.clicked!=nil {
                         self.clicked()
                     }
@@ -56,7 +68,6 @@ func (self *SWS_DropdownWidget) MousePressDown(x,y int32, button uint8) {
                 widget=widget.Parent()
             }
             self.menu.Move(xx,yy-2)
-            self.menuvisible=true
             ShowMenu(self.menu)
             PostUpdate()
         }
@@ -72,7 +83,7 @@ func (self *SWS_DropdownWidget) MousePressUp(x,y int32, button uint8) {
             /*if self.clicked != nil {
                 self.clicked()
             }*/
-            if self.menuvisible {
+            if self.menu!=nil && self.menu.Parent()!=nil {
                 var xx int32
                 yy:=self.height
                 var widget SWS_Widget
@@ -85,8 +96,6 @@ func (self *SWS_DropdownWidget) MousePressUp(x,y int32, button uint8) {
                 self.menu.Move(xx,yy-2)
                 ShowMenu(self.menu)
             }
-        } else {
-            self.menuvisible=false
         }
         self.cursorInside=false
         PostUpdate()

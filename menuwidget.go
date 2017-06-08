@@ -269,7 +269,7 @@ func CreateMenuWidget() *SWS_MenuWidget {
 
 
 //var rootMenu SWS_Widget
-var currentMenuBar *SWS_MenuBarWidget
+var menuInitiator SWS_Widget
 var menuStack []*SWS_MenuWidget
 
 func ShowMenu(menu *SWS_MenuWidget) {
@@ -311,6 +311,7 @@ func hideMenu(menu *SWS_MenuWidget) {
         //        m.Destroy()
             fmt.Println("***remove menu",m)
             root.RemoveChild(m)
+            m.SetParent(nil)
         }
         menuStack=nil
         PostUpdate()
@@ -344,11 +345,12 @@ type SWS_MenuBarWidget struct {
 func (self *SWS_MenuBarWidget) HasFocus(hasfocus bool) {
     self.hasfocus=hasfocus
     if (hasfocus==false) {
-        currentMenuBar=nil
+        menuInitiator=nil
         self.activeItem=-1
         self.lastSubActive=-1
     } else {
-        currentMenuBar=self
+        hideMenu(nil)
+        menuInitiator=self
     }
     
     //menuStack=append(make([]*SWS_MenuWidget,0,0),&(self.SWS_MenuWidget))
