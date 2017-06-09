@@ -1,18 +1,18 @@
 //
 // This a SDL Windowing System for Go
 // Other UI toolkit (or binding) exists (Nulkear, Qt, ...), but I
-// didn't found one for SDL, so I am developping it for my own need
+// didn't found one for SDL, so I am developping it for my own need.
 // 
 // It means that this Windowing System is far to be complete, the
-// most fast, low-memory that exist, but should be complete enough for me :-)
+// most fast, low-memory that exist, but should be complete enough for me :-).
 //
-// - The base "class" for all widget is the SWS_Widget interface
+// - The base "class" for all widget is the SWS_Widget interface.
 //
-// - And the base implementation is SWS_CoreWidget 
+// - And the base implementation is SWS_CoreWidget.
 //
-// - the root widget (background widget) is the SWS_RootWidget
+// - the root widget (background widget) is the SWS_RootWidget.
 //
-// - and main widget that floats on top of the root widget are SWS_MainWidget
+// - and main widget that floats on top of the root widget are SWS_MainWidget.
 //
 package sws
 
