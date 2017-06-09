@@ -24,8 +24,9 @@ var timerlist *TimerEvent
 
 
 //
-// Main entry point to create a new timer
-// if repeat>0, this event is repeatable (until stopped. See StopRepeat())
+// Main entry point to create a new timer (and place it into the event queue)
+//
+// If repeat>0, this event is repeatable (until stopped. See StopRepeat())
 //
 func TimerAddEvent(triggertime time.Time, repeat time.Duration, trigger func()) *TimerEvent {
 	te := &TimerEvent{
@@ -37,6 +38,8 @@ func TimerAddEvent(triggertime time.Time, repeat time.Duration, trigger func()) 
 	placeEvent(te)
 	return te
 }
+
+
 
 func placeEvent(te *TimerEvent) {
 	if timerlist == nil {
@@ -86,7 +89,7 @@ func TriggerEvents() {
 //
 // When you need to stop a repeatable event, call this function
 //
-func StopRepeat(te *TimerEvent) bool {
+func (te *TimerEvent) StopRepeat() bool {
 	if (te == nil || timerlist == nil) {
 		return false
 	}
