@@ -7,8 +7,11 @@
 // most fast, low-memory that exist, but should be complete enough for me :-)
 //
 // - The base "class" for all widget is the SWS_Widget interface
+//
 // - And the base implementation is SWS_CoreWidget 
+//
 // - the root widget (background widget) is the SWS_RootWidget
+//
 // - and main widget that floats on top of the root widget are SWS_MainWidget
 //
 package sws
