@@ -39,8 +39,6 @@ func TimerAddEvent(triggertime time.Time, repeat time.Duration, trigger func()) 
 	return te
 }
 
-
-
 func placeEvent(te *TimerEvent) {
 	if timerlist == nil {
 		timerlist = te
