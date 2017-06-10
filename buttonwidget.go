@@ -2,7 +2,6 @@ package sws
 
 import (
 	"github.com/veandco/go-sdl2/sdl"
-	"fmt"
 )
 
 type SWS_ButtonWidget struct {
@@ -18,7 +17,6 @@ func (self *SWS_ButtonWidget) SetClicked(callback func()) {
 }
 
 func (self *SWS_ButtonWidget) MousePressDown(x, y int32, button uint8) {
-	fmt.Println("Button.PressDown")
 	if button == sdl.BUTTON_LEFT {
 		self.buttonState = true
 		self.cursorInside = true
