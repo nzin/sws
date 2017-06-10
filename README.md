@@ -1,6 +1,7 @@
 # sws
 SDL Window System (for Go)
-BeOS inspired style:
+
+It is a VERY simple widget system, BeOS inspired style:
 
 ![different widget example](screenshot.png)
 
