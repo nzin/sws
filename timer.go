@@ -4,7 +4,6 @@ import (
 	"time"
 )
 
-
 //
 // The TimerEvent struct is an opaque object, you mainly
 // use func TimerAddEvent() and StopRepeat() functions
@@ -20,8 +19,6 @@ type TimerEvent struct {
 }
 
 var timerlist *TimerEvent
-
-
 
 //
 // Main entry point to create a new timer (and place it into the event queue)
@@ -44,14 +41,14 @@ func placeEvent(te *TimerEvent) {
 		timerlist = te
 		return
 	} else {
-		if (timerlist.triggertime.After(te.triggertime)) {
+		if timerlist.triggertime.After(te.triggertime) {
 			te.next = timerlist
 			timerlist = te
 			return
 		}
 		e := timerlist
-		for (e.next != nil) {
-			if (e.next.triggertime.After(te.triggertime)) {
+		for e.next != nil {
+			if e.next.triggertime.After(te.triggertime) {
 				break
 			}
 			e = e.next
@@ -61,8 +58,6 @@ func placeEvent(te *TimerEvent) {
 	}
 }
 
-
-
 //
 // For now, the events are not running into their own thread, so
 // we must pool regularly, if an event has to be trigger.
@@ -71,24 +66,22 @@ func placeEvent(te *TimerEvent) {
 //
 func TriggerEvents() {
 	now := time.Now()
-	for (timerlist != nil && timerlist.triggertime.Before(now)) {
+	for timerlist != nil && timerlist.triggertime.Before(now) {
 		t := timerlist
 		timerlist = timerlist.next
 		t.trigger()
-		if (t.repeat > 0) {
+		if t.repeat > 0 {
 			t.triggertime = t.triggertime.Add(t.repeat)
 			placeEvent(t)
 		}
 	}
 }
 
-
-
 //
 // When you need to stop a repeatable event, call this function
 //
 func (te *TimerEvent) StopRepeat() bool {
-	if (te == nil || timerlist == nil) {
+	if te == nil || timerlist == nil {
 		return false
 	}
 	if timerlist == te {
@@ -96,7 +89,7 @@ func (te *TimerEvent) StopRepeat() bool {
 		return true
 	}
 	e := timerlist
-	for (e.next != nil) {
+	for e.next != nil {
 		if e.next == te {
 			e.next = te.next
 			return true

@@ -1,19 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"flag"
+	"fmt"
 	"os"
 )
-
-
 
 //
 // After translation it can be used with:
 //rwops := sdl.RWFromMem(unsafe.Pointer(&bmp[0]), len(bmp))
 //surface := sdl.LoadBMP_RW(rwops,1)
 //
-
 
 func main() {
 	bmpfile := flag.String("bmpfile", "", "bmp image to read")
@@ -34,7 +31,7 @@ func main() {
 	var beginning = true
 	fmt.Print("var bmp = []byte(\"")
 	for n, err = f.Read(buffer); n > 0; n, err = f.Read(buffer) {
-		if (beginning == false) {
+		if beginning == false {
 			fmt.Print("\" +\n    \"")
 		} else {
 			beginning = false

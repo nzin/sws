@@ -20,6 +20,3 @@ func CreateLabel(w, h int32, s string) *SWS_Label {
 		label: s}
 	return widget
 }
-
-
-

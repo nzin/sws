@@ -2,7 +2,7 @@
 // This a SDL Windowing System for Go
 // Other UI toolkit (or binding) exists (Nulkear, Qt, ...), but I
 // didn't found one for SDL, so I am developping it for my own need.
-// 
+//
 // It means that this Windowing System is far to be complete, the
 // most fast, low-memory that exist, but should be complete enough for me :-).
 //
@@ -17,30 +17,26 @@
 package sws
 
 import (
+	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/sdl_ttf"
-	"fmt"
 	"time"
 )
 
 var defaultFont *ttf.Font
 var needUpdate bool
 
-
-
 //
 // Currently when a widget needs to refresh its content it calls
 // this PostUpdate() function, that ask all windows to repaint
-// This is not smart, we should at least have in each widget a 
+// This is not smart, we should at least have in each widget a
 // boolean to know if the window is dirty (and its parent)
-// 
+//
 // Would be nice to implement it :-)
 //
 func PostUpdate() {
 	needUpdate = true
 }
-
-
 
 //
 // "Abstract" class of all widget
@@ -72,8 +68,6 @@ type SWS_Widget interface {
 	Destroy()
 }
 
-
-
 //
 // special function to deal with MainWindow focus
 //
@@ -87,14 +81,14 @@ func findMainWidget(x, y int32, root *SWS_RootWidget) (target SWS_Widget) {
 	for _, child := range root.getChildren() {
 		maxX := child.X() + child.Width()
 		maxY := child.Y() + child.Height()
-		if (maxX > root.Width()) {
+		if maxX > root.Width() {
 			maxX = root.Width()
 		}
-		if (maxY > root.Height()) {
+		if maxY > root.Height() {
 			maxY = root.Height()
 		}
-		if (x >= 0 && y >= 0 && x < maxX && y < maxY) {
-			if (child.IsInside(x - child.X(), y - child.Y())) {
+		if x >= 0 && y >= 0 && x < maxX && y < maxY {
+			if child.IsInside(x-child.X(), y-child.Y()) {
 				target = child
 			}
 		}
@@ -105,14 +99,13 @@ func findMainWidget(x, y int32, root *SWS_RootWidget) (target SWS_Widget) {
 
 	// we found a child
 	switch target.(type) {
-	case *SWS_MainWidget: {
-		return target
-	}
+	case *SWS_MainWidget:
+		{
+			return target
+		}
 	}
 	return nil
 }
-
-
 
 //
 // function used to find the end widget where the mouse is over
@@ -123,31 +116,30 @@ func findWidget(x, y int32, root SWS_Widget) (target SWS_Widget, xTarget, yTarge
 	x -= root.X()
 	y -= root.Y()
 
-
 	// we take the closest
 	for _, child := range root.getChildren() {
 		maxX := child.X() + child.Width()
 		maxY := child.Y() + child.Height()
-		if (maxX > root.Width()) {
+		if maxX > root.Width() {
 			maxX = root.Width()
 		}
-		if (maxY > root.Height()) {
+		if maxY > root.Height() {
 			maxY = root.Height()
 		}
-		if (x >= 0 && y >= 0 && x < maxX && y < maxY) {
-			if (child.IsInside(x - child.X(), y - child.Y())) {
+		if x >= 0 && y >= 0 && x < maxX && y < maxY {
+			if child.IsInside(x-child.X(), y-child.Y()) {
 				target = child
 			}
 		}
 	}
 
 	// we found a child
-	if (target != nil) {
+	if target != nil {
 		return findWidget(x, y, target)
 	}
 
 	//if (x>=0 && y>=0 && x<root.Width() && y<root.Height()) {
-	if (root.IsInside(x, y)) {
+	if root.IsInside(x, y) {
 		target = root
 		xTarget = x
 		yTarget = y
@@ -159,8 +151,6 @@ func findWidget(x, y int32, root SWS_Widget) (target SWS_Widget, xTarget, yTarge
 
 var root *SWS_RootWidget
 
-
-
 //
 // The SWS_RootWidget is the background widget that fill up all the
 // desktop window
@@ -170,8 +160,6 @@ type SWS_RootWidget struct {
 	window        *sdl.Window
 	windowsurface *sdl.Surface
 }
-
-
 
 //
 // to put on top of the widget stack a particular widget
@@ -202,12 +190,10 @@ func CreateRootWidget(window *sdl.Window) *SWS_RootWidget {
 	rootwidget := &SWS_RootWidget{
 		SWS_CoreWidget: *corewidget,
 		window:         window,
-		windowsurface:  surface }
+		windowsurface:  surface}
 
 	return rootwidget
 }
-
-
 
 //
 // When we start the program, we must call this function
@@ -220,11 +206,11 @@ func CreateRootWidget(window *sdl.Window) *SWS_RootWidget {
 //        }
 //    }
 //
-func Init(width, height int32) (*SWS_RootWidget) {
+func Init(width, height int32) *SWS_RootWidget {
 	sdl.Init(sdl.INIT_EVERYTHING)
 
 	window, err := sdl.CreateWindow("test", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
-		800, 600, sdl.WINDOW_SHOWN | sdl.WINDOW_FULLSCREEN_DESKTOP)
+		800, 600, sdl.WINDOW_SHOWN|sdl.WINDOW_FULLSCREEN_DESKTOP)
 	if err != nil {
 		panic(err)
 	}
@@ -248,8 +234,6 @@ func Init(width, height int32) (*SWS_RootWidget) {
 	return root
 }
 
-
-
 //
 // When we need to get keyboard event (especially), we need to get
 // the focus
@@ -261,19 +245,20 @@ func (root *SWS_RootWidget) SetFocus(widget SWS_Widget) {
 	}
 	if mainwidget != nil {
 		switch mainwidget.(type) {
-		case *SWS_MainWidget: {
-			mainwindowfocus = mainwidget
-			if (previousmainwindowfocus != mainwindowfocus) {
-				if previousmainwindowfocus != nil {
-					previousmainwindowfocus.HasFocus(false)
+		case *SWS_MainWidget:
+			{
+				mainwindowfocus = mainwidget
+				if previousmainwindowfocus != mainwindowfocus {
+					if previousmainwindowfocus != nil {
+						previousmainwindowfocus.HasFocus(false)
+					}
+					if mainwindowfocus != nil {
+						mainwindowfocus.HasFocus(true)
+						root.RaiseToTop(mainwindowfocus)
+					}
+					previousmainwindowfocus = mainwindowfocus
 				}
-				if mainwindowfocus != nil {
-					mainwindowfocus.HasFocus(true)
-					root.RaiseToTop(mainwindowfocus)
-				}
-				previousmainwindowfocus = mainwindowfocus
 			}
-		}
 		}
 	}
 
@@ -293,13 +278,11 @@ var previousFocus, focus SWS_Widget
 var previousmainwindowfocus, mainwindowfocus SWS_Widget
 var buttonDown = false
 
-
-
 //
 // main loop event function.
 // see func Init(width,height int32) for an example
 //
-func PoolEvent() (bool) {
+func PoolEvent() bool {
 	var quit bool = false
 	var xTarget, yTarget int32
 
@@ -320,7 +303,7 @@ func PoolEvent() (bool) {
 				if menu == nil {
 					// special case for main window
 					mainwindowfocus = findMainWidget(t.X, t.Y, root)
-					if (previousmainwindowfocus != mainwindowfocus) {
+					if previousmainwindowfocus != mainwindowfocus {
 						if previousmainwindowfocus != nil {
 							previousmainwindowfocus.HasFocus(false)
 						}
@@ -371,15 +354,15 @@ func PoolEvent() (bool) {
 
 			if t.Type == sdl.MOUSEMOTION {
 				if buttonDown == false {
-					beforeW, bxTarget, byTarget := findWidget(t.X - t.XRel, t.Y - t.YRel, root)
+					beforeW, bxTarget, byTarget := findWidget(t.X-t.XRel, t.Y-t.YRel, root)
 					afterW, axTarget, ayTarget := findWidget(t.X, t.Y, root)
 
-					if (beforeW != afterW) {
-						if (beforeW != nil) {
-							beforeW.MouseMove(bxTarget + t.XRel, byTarget + t.YRel, t.XRel, t.YRel)
+					if beforeW != afterW {
+						if beforeW != nil {
+							beforeW.MouseMove(bxTarget+t.XRel, byTarget+t.YRel, t.XRel, t.YRel)
 						}
 					}
-					if (afterW != nil) {
+					if afterW != nil {
 						afterW.MouseMove(axTarget, ayTarget, t.XRel, t.YRel)
 					}
 				} else {
@@ -411,7 +394,7 @@ func PoolEvent() (bool) {
 		rectDst := sdl.Rect{root.X(), root.Y(), root.Width(), root.Height()}
 		root.surface.Blit(&rectSrc, root.WindowSurface(), &rectDst)
 
-		if (menuStack != nil) {
+		if menuStack != nil {
 			for _, m := range menuStack {
 				//                fmt.Println("menu display")
 				m.Repaint()
@@ -426,4 +409,3 @@ func PoolEvent() (bool) {
 	TriggerEvents()
 	return quit
 }
-

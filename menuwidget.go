@@ -1,9 +1,9 @@
 package sws
 
 import (
+	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/sdl_ttf"
-	"fmt"
 	"os"
 )
 
@@ -41,7 +41,7 @@ func (self *MenuItemLabel) Repaint(selected bool) *sdl.Surface {
 		var err error
 		var solid *sdl.Surface
 		color := sdl.Color{0, 0, 0, 255}
-		if (selected) {
+		if selected {
 			color = sdl.Color{255, 255, 255, 255}
 		}
 
@@ -80,16 +80,14 @@ func CreateMenuItemLabel(label string, callback func()) *MenuItemLabel {
 		subMenu:       nil,
 		surface:       surface,
 		//renderer:      renderer,
-		font:          defaultFont}
+		font: defaultFont}
 	return menuitem
 }
-
-
 
 //
 // SWS_MenuWidget: representation of a (floating) menu.
 // It is composed of several SWS_MenuItem (that could have sub-menus)
-// 
+//
 // in the main loop
 // if menuInitiator widget exists, then:
 // - if MouseMove -> find the corresponding menuInitiator/menu and
@@ -137,9 +135,9 @@ func (self *SWS_MenuWidget) MousePressDown(x, y int32, button uint8) {
 }
 
 func (self *SWS_MenuWidget) MousePressUp(x, y int32, button uint8) {
-	if (self.activeItem != -1) {
+	if self.activeItem != -1 {
 		submenu := self.items[self.activeItem].SubMenu()
-		if (submenu == nil) {
+		if submenu == nil {
 			self.items[self.activeItem].Clicked()
 		}
 	}
@@ -152,35 +150,35 @@ func (self *SWS_MenuWidget) MouseMove(x, y, xrel, yrel int32) {
 	self.activeItem = -1
 	var yy int32
 	yy = 0
-	if (x >= 0 && x < self.width) {
+	if x >= 0 && x < self.width {
 		for i, item := range self.items {
 			_, h := item.WidthHeight()
-			if (yy <= y && yy + h > y) {
+			if yy <= y && yy+h > y {
 				self.activeItem = i
 				break
 			}
 			yy += h
 		}
 	}
-	if (previousActiveItem != self.activeItem) {
+	if previousActiveItem != self.activeItem {
 		//hideMenu(self)
-		if (previousActiveItem != -1 && self.activeItem != -1) {
+		if previousActiveItem != -1 && self.activeItem != -1 {
 			submenu := self.items[previousActiveItem].SubMenu()
-			if (submenu != nil) {
+			if submenu != nil {
 				hideMenu(submenu)
 			}
 		}
-		if (self.lastSubActive != -1 && self.activeItem != -1) {
+		if self.lastSubActive != -1 && self.activeItem != -1 {
 			submenu := self.items[self.lastSubActive].SubMenu()
-			if (submenu != nil) {
+			if submenu != nil {
 				hideMenu(submenu)
 			}
 		}
-		if (self.activeItem != -1) {
+		if self.activeItem != -1 {
 			submenu := self.items[self.activeItem].SubMenu()
-			if (submenu != nil) {
+			if submenu != nil {
 				self.lastSubActive = self.activeItem
-				submenu.Move(self.X() + self.Width() - 2, self.Y() + yy)
+				submenu.Move(self.X()+self.Width()-2, self.Y()+yy)
 				ShowMenu(submenu)
 			} else {
 				self.lastSubActive = -1
@@ -202,15 +200,15 @@ func (self *SWS_MenuWidget) Repaint() {
 	renderer.SetDrawColor(0, 0, 0, 255)
 	renderer.DrawRect(&rect)
 	renderer.SetDrawColor(255, 255, 255, 255)
-	renderer.DrawLine(1, 1, int(self.width - 2), 1)
-	renderer.DrawLine(1, 1, 1, int(self.height) - 2)
+	renderer.DrawLine(1, 1, int(self.width-2), 1)
+	renderer.DrawLine(1, 1, 1, int(self.height)-2)
 	renderer.SetDrawColor(0x88, 0x88, 0x88, 255)
-	renderer.DrawLine(int(self.width) - 2, 2, int(self.width) - 2, int(self.height) - 2)
-	renderer.DrawLine(2, int(self.height) - 2, int(self.width) - 2, int(self.height) - 2)
+	renderer.DrawLine(int(self.width)-2, 2, int(self.width)-2, int(self.height)-2)
+	renderer.DrawLine(2, int(self.height)-2, int(self.width)-2, int(self.height)-2)
 
 	for i, item := range self.items {
 		w, h := item.WidthHeight()
-		if (i == self.activeItem || i == self.lastSubActive) {
+		if i == self.activeItem || i == self.lastSubActive {
 			rect := sdl.Rect{2, y + 2, self.width - 4, h}
 			self.surface.FillRect(&rect, 0xff8888ff)
 		}
@@ -219,10 +217,10 @@ func (self *SWS_MenuWidget) Repaint() {
 		rectDst := sdl.Rect{5 + 2, y + 2, w, h}
 		surface.Blit(&rectSrc, self.surface, &rectDst)
 
-		if (item.SubMenu() != nil) {
+		if item.SubMenu() != nil {
 			var i int32
 			for i = 0; i < 5; i++ {
-				rect := sdl.Rect{self.width - 15 + 2, y + (h / 2) - i + 2, (5 - i) * 2, 2 * i + 1}
+				rect := sdl.Rect{self.width - 15 + 2, y + (h / 2) - i + 2, (5 - i) * 2, 2*i + 1}
 				self.surface.FillRect(&rect, 0xff000000)
 			}
 		}
@@ -236,11 +234,9 @@ func CreateMenuWidget() *SWS_MenuWidget {
 	widget := &SWS_MenuWidget{SWS_CoreWidget: *corewidget,
 		items:         make([]MenuItem, 0, 0),
 		activeItem:    -1,
-		lastSubActive: -1 }
+		lastSubActive: -1}
 	return widget
 }
-
-
 
 // menuInitiator when set to not nil, is the widget creating the menu,
 // usually a bar menu, or a dropdown button
@@ -270,14 +266,12 @@ func findMenu(x int32, y int32) *SWS_MenuWidget {
 	}
 	for i := len(menuStack) - 1; i >= 0; i-- {
 		menu := menuStack[i]
-		if x >= menu.X() && x < menu.X() + menu.Width() && y >= menu.Y() && y < menu.Y() + menu.Height() {
+		if x >= menu.X() && x < menu.X()+menu.Width() && y >= menu.Y() && y < menu.Y()+menu.Height() {
 			return menu
 		}
 	}
 	return nil
 }
-
-
 
 //
 // how do we show or hide a menu? Well simple
@@ -315,11 +309,9 @@ func hideMenu(menu *SWS_MenuWidget) {
 	}
 }
 
-
-
 //
 // special type of menu: the MenuBar.
-// 
+//
 // It is a regular widget, but that can spawn menus
 //
 type SWS_MenuBarWidget struct {
@@ -330,7 +322,7 @@ type SWS_MenuBarWidget struct {
 
 func (self *SWS_MenuBarWidget) HasFocus(hasfocus bool) {
 	self.hasfocus = hasfocus
-	if (hasfocus == false) {
+	if hasfocus == false {
 		menuInitiator = nil
 		self.activeItem = -1
 		self.lastSubActive = -1
@@ -357,7 +349,7 @@ func (self *SWS_MenuBarWidget) Repaint() {
 	for i, item := range self.items {
 		w, h := item.WidthHeight()
 		w += 10
-		if (i == self.activeItem || i == self.lastSubActive) {
+		if i == self.activeItem || i == self.lastSubActive {
 			rect := sdl.Rect{x, 0, w, self.height}
 			self.surface.FillRect(&rect, 0xff8888ff)
 		}
@@ -369,7 +361,7 @@ func (self *SWS_MenuBarWidget) Repaint() {
 		x += w
 	}
 	renderer.SetDrawColor(255, 255, 255, 255)
-	renderer.DrawLine(0, int(self.height - 1), int(self.width - 1), int(self.height - 1))
+	renderer.DrawLine(0, int(self.height-1), int(self.width-1), int(self.height-1))
 }
 
 func (self *SWS_MenuBarWidget) MousePressDown(x, y int32, button uint8) {
@@ -378,11 +370,11 @@ func (self *SWS_MenuBarWidget) MousePressDown(x, y int32, button uint8) {
 	self.clickonmenu = false
 	var xx int32
 	xx = 0
-	if (y >= 0 && y < self.height) {
+	if y >= 0 && y < self.height {
 		for _, item := range self.items {
 			w, _ := item.WidthHeight()
 			w += 10
-			if (xx <= x && xx + w > x) {
+			if xx <= x && xx+w > x {
 				self.clickonmenu = true
 				break
 			}
@@ -395,9 +387,9 @@ func (self *SWS_MenuBarWidget) MousePressDown(x, y int32, button uint8) {
 }
 
 func (self *SWS_MenuBarWidget) MousePressUp(x, y int32, button uint8) {
-	if (self.activeItem != -1) {
+	if self.activeItem != -1 {
 		submenu := self.items[self.activeItem].SubMenu()
-		if (submenu == nil) {
+		if submenu == nil {
 			self.items[self.activeItem].Clicked()
 		}
 	}
@@ -412,45 +404,45 @@ func (self *SWS_MenuBarWidget) MouseMove(x, y, xrel, yrel int32) {
 	self.activeItem = -1
 	var xx int32
 	xx = 0
-	if (y >= 0 && y < self.height) {
+	if y >= 0 && y < self.height {
 		for i, item := range self.items {
 			w, _ := item.WidthHeight()
 			w += 10
-			if (xx <= x && xx + w > x) {
+			if xx <= x && xx+w > x {
 				self.activeItem = i
 				break
 			}
 			xx += w
 		}
 	}
-	if (previousActiveItem != self.activeItem) {
+	if previousActiveItem != self.activeItem {
 		//hideMenu(self)
-		if (previousActiveItem != -1 && self.activeItem != -1) {
+		if previousActiveItem != -1 && self.activeItem != -1 {
 			submenu := self.items[previousActiveItem].SubMenu()
-			if (submenu != nil) {
+			if submenu != nil {
 				hideMenu(submenu)
 			}
 		}
-		if (self.lastSubActive != -1 && self.activeItem != -1) {
+		if self.lastSubActive != -1 && self.activeItem != -1 {
 			submenu := self.items[self.lastSubActive].SubMenu()
-			if (submenu != nil) {
+			if submenu != nil {
 				hideMenu(submenu)
 			}
 		}
-		if (self.activeItem != -1) {
+		if self.activeItem != -1 {
 			submenu := self.items[self.activeItem].SubMenu()
-			if (submenu != nil) {
+			if submenu != nil {
 				self.lastSubActive = self.activeItem
 
 				yy := self.height
 				var widget SWS_Widget
 				widget = self
-				for (widget != nil) {
+				for widget != nil {
 					xx += widget.X()
 					yy += widget.Y()
 					widget = widget.Parent()
 				}
-				submenu.Move(xx, yy - 2)
+				submenu.Move(xx, yy-2)
 				ShowMenu(submenu)
 			} else {
 				self.lastSubActive = -1
@@ -467,12 +459,8 @@ func (self *SWS_MenuBarWidget) AddItem(item MenuItem) {
 func CreateMenuBarWidget() *SWS_MenuBarWidget {
 	menuwidget := CreateMenuWidget()
 	widget := &SWS_MenuBarWidget{SWS_MenuWidget: *menuwidget,
-		clickonmenu:   false,
-		hasfocus:      false }
+		clickonmenu: false,
+		hasfocus:    false}
 	widget.height = 25
 	return widget
 }
-
-
-
-

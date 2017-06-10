@@ -1,13 +1,11 @@
 package sws
 
 import (
+	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/sdl_ttf"
-	"fmt"
 	"os"
 )
-
-
 
 //
 // main "abstract" class that implement the SWS_Widget interface
@@ -57,8 +55,6 @@ func (self *SWS_CoreWidget) Destroy() {
 	self.surface.Free()
 }
 
-
-
 //
 // when we resize we need to
 // destroy the current surface, recreate it, and
@@ -89,8 +85,6 @@ func (self *SWS_CoreWidget) FillRect(x, y, w, h int32, c uint32) {
 	surface.FillRect(&rect, c)
 }
 
-
-
 //
 // Write text into the surface
 //
@@ -116,8 +110,6 @@ func (self *SWS_CoreWidget) WriteText(x, y int32, str string, color sdl.Color) (
 
 	return solid.W, solid.H
 }
-
-
 
 //
 // Write text into the surface but centered
@@ -145,8 +137,6 @@ func (self *SWS_CoreWidget) WriteTextCenter(x, y int32, str string, color sdl.Co
 func (self *SWS_CoreWidget) DrawLine(x1, y1, x2, y2 int32) {
 	self.Renderer().DrawLine(int(x1), int(y1), int(x2), int(y2))
 }
-
-
 
 //
 // the color should be 0xrrggbbaa (r=red, g=green, b=blue, a=alpha)
@@ -198,7 +188,7 @@ func (self *SWS_CoreWidget) RemoveChild(child SWS_Widget) {
 			if i == 0 {
 				self.children = self.children[1:]
 			} else {
-				self.children = append(self.children[:i], self.children[i + 1:]...)
+				self.children = append(self.children[:i], self.children[i+1:]...)
 			}
 			return
 		}
@@ -222,10 +212,8 @@ func (self *SWS_CoreWidget) getChildren() []SWS_Widget {
 	return self.children
 }
 
-
-
 //
-// This function seems to be obvious, but if we want to 
+// This function seems to be obvious, but if we want to
 // create widget that are not squared (like SWS_MainWindow), the
 // calculation is a bit more complicated
 //
@@ -237,7 +225,7 @@ func (self *SWS_CoreWidget) TranslateXYToWidget(globalX, globalY int32) (x, y in
 	if self.Parent() == nil {
 		return globalX - self.X(), globalY - self.Y()
 	}
-	return self.Parent().TranslateXYToWidget(globalX - self.X(), globalY - self.Y())
+	return self.Parent().TranslateXYToWidget(globalX-self.X(), globalY-self.Y())
 }
 
 func (self *SWS_CoreWidget) MousePressDown(x, y int32, button uint8) {
@@ -249,8 +237,6 @@ func (self *SWS_CoreWidget) MousePressUp(x, y int32, button uint8) {
 func (self *SWS_CoreWidget) MouseMove(x, y, xrel, yrel int32) {
 }
 
-
-
 //
 // X() and Y() correspond to the position of this widget into its parent
 // widget
@@ -258,8 +244,6 @@ func (self *SWS_CoreWidget) MouseMove(x, y, xrel, yrel int32) {
 func (self *SWS_CoreWidget) X() int32 {
 	return self.x
 }
-
-
 
 //
 // X() and Y() correspond to the position of this widget into its parent
@@ -286,8 +270,6 @@ func (self *SWS_CoreWidget) Move(x, y int32) {
 	self.y = y
 }
 
-
-
 //
 // One of the main window: how do we want to write to our widget
 // content
@@ -304,5 +286,3 @@ func (self *SWS_CoreWidget) Repaint() {
 		child.Surface().Blit(&rectSrc, self.Surface(), &rectDst)
 	}
 }
-
-
