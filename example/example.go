@@ -64,7 +64,7 @@ func main() {
 	i.Move(50, 50)
 	dd := sws.CreateDropdownWidget(100, 25, []string{"text 1", "text 2"})
 	dd.Move(50, 110)
-	root.AddChild(f)
+	f.AddChild(dd)
 	sbh := sws.CreateScrollbarWidget(100, 20, true, 0, 1000, nil)
 	f.AddChild(sbh)
 	sbh.Move(50, 140)
