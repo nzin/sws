@@ -1,7 +1,6 @@
 package sws
 
 import (
-	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"time"
 )
@@ -43,13 +42,12 @@ func (self *SWS_ScrollbarWidget) SetMaximum(m int32) {
 }
 
 func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
-	fmt.Println("SWS_ScrollbarWidget::MousePressDown()")
 	if button == sdl.BUTTON_LEFT {
 		self.buttondown = true
 		if self.horizontal {
 			w := self.Width() * self.Width() / (self.maximum - self.minimum + self.Width())
-			if w < 20 {
-				w = 20
+			if w < 25 {
+				w = 25
 			}
 			var offset int32
 			if self.maximum > self.minimum {
@@ -101,8 +99,8 @@ func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 			}
 		} else {
 			h := self.Height() * self.Height() / (self.maximum - self.minimum + self.Height())
-			if h < 20 {
-				h = 20
+			if h < 25 {
+				h = 25
 			}
 			var offset int32
 			if self.maximum > self.minimum {
@@ -171,8 +169,8 @@ func (self *SWS_ScrollbarWidget) MouseMove(x, y, xrel, yrel int32) {
 	if self.buttondown == true && self.onelevator {
 		if self.horizontal {
 			w := self.Width() * self.Width() / (self.maximum - self.minimum + self.Width())
-			if w < 20 {
-				w = 20
+			if w < 25 {
+				w = 25
 			}
 			//offset:=(self.Width()-w)*(self.Currentposition-self.minimum)/((self.maximum-self.minimum))
 			xpos := x - self.initialpos
@@ -189,8 +187,8 @@ func (self *SWS_ScrollbarWidget) MouseMove(x, y, xrel, yrel int32) {
 			PostUpdate()
 		} else {
 			h := self.Height() * self.Height() / (self.maximum - self.minimum + self.Height())
-			if h < 20 {
-				h = 20
+			if h < 25 {
+				h = 25
 			}
 			//offset:=(self.Height()-h)*(self.Currentposition-self.minimum)/((self.maximum-self.minimum))
 			ypos := y - self.initialpos
@@ -224,8 +222,8 @@ func (self *SWS_ScrollbarWidget) Repaint() {
 	self.DrawLine(self.Width()-2, 1, self.Width()-2, self.Height()-2)
 	if self.horizontal {
 		w := self.Width() * self.Width() / (self.maximum - self.minimum + self.Width())
-		if w < 20 {
-			w = 20
+		if w < 25 {
+			w = 25
 		}
 		var offset int32
 		if self.maximum > self.minimum {
@@ -243,10 +241,25 @@ func (self *SWS_ScrollbarWidget) Repaint() {
 		self.DrawLine(offset+w-2, 0, offset+w-2, self.Height()-2)
 		self.DrawLine(offset+1, self.Height()-2, offset+w-2, self.Height()-2)
 		self.FillRect(offset+2, 2, w-4, self.Height()-4, 0xffdddddd)
+		
+		//knob
+		if (self.Height()>10) {
+			self.SetDrawColor(255, 255, 255, 255)
+			self.DrawLine(offset+w/2,3,offset+w/2,self.Height()-4)
+			self.DrawLine(offset+w/2,3,offset+w/2+1,3)
+			self.DrawLine(offset+w/2-4,3,offset+w/2-4,self.Height()-4)
+			self.DrawLine(offset+w/2-4,3,offset+w/2-3,3)
+			self.SetDrawColor(100, 100, 100, 255)
+			self.DrawLine(offset+w/2+2,3,offset+w/2+2,self.Height()-4)
+			self.DrawLine(offset+w/2+1,self.Height()-4,offset+w/2+2,self.Height()-4)
+			self.DrawLine(offset+w/2-2,3,offset+w/2-2,self.Height()-4)
+			self.DrawLine(offset+w/2-3,self.Height()-4,offset+w/2-2,self.Height()-4)
+		}
+		
 	} else {
 		h := self.Height() * self.Height() / (self.maximum - self.minimum + self.Height())
-		if h < 20 {
-			h = 20
+		if h < 25 {
+			h = 25
 		}
 		var offset int32
 		if self.maximum > self.minimum {
@@ -264,6 +277,19 @@ func (self *SWS_ScrollbarWidget) Repaint() {
 		self.DrawLine(1, offset+h-2, self.Width()-2, offset+h-2)
 		self.DrawLine(self.Width()-2, offset+1, self.Width()-2, offset+h-2)
 		self.FillRect(2, offset+2, self.Width()-4, h-4, 0xffdddddd)
+		//knob
+		if (self.Width()>10) {
+			self.SetDrawColor(255, 255, 255, 255)
+			self.DrawLine(3,offset+h/2,self.Width()-4,offset+h/2)
+			self.DrawLine(3,offset+h/2,3,offset+h/2+1)
+			self.DrawLine(3,offset+h/2-4,self.Width()-4,offset+h/2-4)
+			self.DrawLine(3,offset+h/2-4,3,offset+h/2-3)
+			self.SetDrawColor(100, 100, 100, 255)
+			self.DrawLine(3,offset+h/2+2,self.Width()-4,offset+h/2+2)
+			self.DrawLine(self.Width()-4,offset+h/2+1,self.Width()-4,offset+h/2+2)
+			self.DrawLine(3,offset+h/2-2,self.Width()-4,offset+h/2-2)
+			self.DrawLine(self.Width()-4,offset+h/2-3,self.Width()-4,offset+h/2-2)
+		}
 	}
 }
 
