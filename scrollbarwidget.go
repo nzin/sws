@@ -3,6 +3,7 @@ package sws
 import (
 	"github.com/veandco/go-sdl2/sdl"
 	"time"
+	"fmt"
 )
 
 type Scrollbarcallback func(currentposition int32)
@@ -20,7 +21,20 @@ type SWS_ScrollbarWidget struct {
 	timerevent      *TimerEvent
 }
 
+func (self *SWS_ScrollbarWidget) SetCallback(callback Scrollbarcallback) {
+	self.callback=callback
+}
+
+func (self *SWS_ScrollbarWidget) SetMinimum(m int32) {
+	self.minimum=m
+}
+
+func (self *SWS_ScrollbarWidget) SetMaximum(m int32) {
+	self.maximum=m
+}
+
 func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
+	fmt.Println("SWS_ScrollbarWidget::MousePressDown()")
 	if button == sdl.BUTTON_LEFT {
 		self.buttondown = true
 		if self.horizontal {
@@ -35,12 +49,14 @@ func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 				if self.Currentposition < self.minimum {
 					self.Currentposition = self.minimum
 				}
+				if (self.callback!=nil) { self.callback(self.Currentposition) }
 				PostUpdate()
 				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
 					self.Currentposition -= (self.maximum - self.minimum) / 10
 					if self.Currentposition < self.minimum {
 						self.Currentposition = self.minimum
 					}
+					if (self.callback!=nil) { self.callback(self.Currentposition) }
 					PostUpdate()
 				})
 			} else if x > offset+w {
@@ -49,12 +65,14 @@ func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 				if self.Currentposition > self.maximum {
 					self.Currentposition = self.maximum
 				}
+				if (self.callback!=nil) { self.callback(self.Currentposition) }
 				PostUpdate()
 				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
 					self.Currentposition += (self.maximum - self.minimum) / 10
 					if self.Currentposition > self.maximum {
 						self.Currentposition = self.maximum
 					}
+					if (self.callback!=nil) { self.callback(self.Currentposition) }
 					PostUpdate()
 				})
 			} else {
@@ -73,12 +91,14 @@ func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 				if self.Currentposition < self.minimum {
 					self.Currentposition = self.minimum
 				}
+				if (self.callback!=nil) { self.callback(self.Currentposition) }
 				PostUpdate()
 				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
 					self.Currentposition -= (self.maximum - self.minimum) / 10
 					if self.Currentposition < self.minimum {
 						self.Currentposition = self.minimum
 					}
+					if (self.callback!=nil) { self.callback(self.Currentposition) }
 					PostUpdate()
 				})
 			} else if y > offset+h {
@@ -87,12 +107,14 @@ func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 				if self.Currentposition > self.maximum {
 					self.Currentposition = self.maximum
 				}
+				if (self.callback!=nil) { self.callback(self.Currentposition) }
 				PostUpdate()
 				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
 					self.Currentposition += (self.maximum - self.minimum) / 10
 					if self.Currentposition > self.maximum {
 						self.Currentposition = self.maximum
 					}
+					if (self.callback!=nil) { self.callback(self.Currentposition) }
 					PostUpdate()
 				})
 			} else {
@@ -130,6 +152,7 @@ func (self *SWS_ScrollbarWidget) MouseMove(x, y, xrel, yrel int32) {
 				xpos = self.Width() - w
 			}
 			self.Currentposition = self.minimum + (self.maximum-self.minimum)*xpos/(self.Width()-w)
+			if (self.callback!=nil) { self.callback(self.Currentposition) }
 			PostUpdate()
 		} else {
 			h := self.Height() * self.Height() / (self.maximum - self.minimum)
@@ -145,6 +168,7 @@ func (self *SWS_ScrollbarWidget) MouseMove(x, y, xrel, yrel int32) {
 				ypos = self.Height() - h
 			}
 			self.Currentposition = self.minimum + (self.maximum-self.minimum)*ypos/(self.Height()-h)
+			self.callback(self.Currentposition)
 			PostUpdate()
 		}
 	}
@@ -202,14 +226,14 @@ func (self *SWS_ScrollbarWidget) Repaint() {
 	}
 }
 
-func CreateScrollbarWidget(w, h int32, horizontal bool, minimum, maximum int32, callback Scrollbarcallback) *SWS_ScrollbarWidget {
+func CreateScrollbarWidget(w, h int32, horizontal bool) *SWS_ScrollbarWidget {
 	corewidget := CreateCoreWidget(w, h)
 	corewidget.SetColor(0xffcccccc)
 	widget := &SWS_ScrollbarWidget{SWS_CoreWidget: *corewidget,
 		horizontal:      horizontal,
-		minimum:         minimum,
-		maximum:         maximum,
-		callback:        callback,
+		minimum:         0,
+		maximum:         0,
+		callback:        nil,
 		Currentposition: 0,
 		buttondown:      false,
 		onelevator:      false,

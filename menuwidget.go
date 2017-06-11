@@ -255,7 +255,6 @@ func ShowMenu(menu *SWS_MenuWidget) {
 	} else {
 		menuStack = append(menuStack, menu)
 	}
-	fmt.Println("menuStack=", menuStack)
 	root.AddChild(menu)
 	PostUpdate()
 }

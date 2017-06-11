@@ -37,8 +37,9 @@ func (self *SWS_MainWidget) SetInnerWidget(widget SWS_Widget) bool {
 	}
 	self.RemoveChild(self.subwidget)
 	self.subwidget = widget
-	self.AddChild(widget)
-	widget.SetParent(self)
+	self.SWS_CoreWidget.AddChild(widget)
+	widget.Move(6, 26)
+	widget.Resize(self.Width()-12,self.Height()-32)
 	return true
 }
 
@@ -295,8 +296,8 @@ func (self *SWS_MainWidget) Resize(width, height int32) {
 	if width < 60 {
 		width = 60
 	}
-	if height < 60 {
-		height = 60
+	if height < 80 {
+		height = 80
 	}
 	self.SWS_CoreWidget.Resize(width, height)
 	if self.menubar == nil {

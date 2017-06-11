@@ -50,27 +50,43 @@ func main() {
 
 	//f:=sws.CreateCoreWidget(200,100)
 	f := sws.CreateMainWidget(200, 100, "very looooooooooooong title ", true, true)
+	scrollwidget:=sws.CreateScrollWidget(300,200)
+	corewidget:=sws.CreateCoreWidget(200,300)
+	scrollwidget.SetInnerWidget(corewidget)
+	fmt.Println("debug1")
 	//f.SetColor(0xffff0000)
 	f.Move(100, 10)
+
 	c := sws.CreateLabel(100, 50, "Footcheball")
-	f.AddChild(c)
+	corewidget.AddChild(c)
 	c.Move(-10, 85)
+
 	b := sws.CreateButtonWidget(100, 25, "click")
 	b.SetClicked(a)
-	f.AddChild(b)
 	b.Move(10, 10)
+	corewidget.AddChild(b)
+
 	i := sws.CreateInputWidget(100, 25, "text")
-	f.AddChild(i)
+	corewidget.AddChild(i)
 	i.Move(50, 50)
+
 	dd := sws.CreateDropdownWidget(100, 25, []string{"text 1", "text 2"})
 	dd.Move(50, 110)
-	f.AddChild(dd)
-	sbh := sws.CreateScrollbarWidget(100, 20, true, 0, 1000, nil)
-	f.AddChild(sbh)
+	corewidget.AddChild(dd)
+
+	sbh := sws.CreateScrollbarWidget(100, 20, true)
+	sbh.SetMaximum(1000)
+	corewidget.AddChild(sbh)
 	sbh.Move(50, 140)
-	sbv := sws.CreateScrollbarWidget(20, 100, false, 0, 1000, nil)
-	f.AddChild(sbv)
+
+	sbv := sws.CreateScrollbarWidget(20, 100, false)
+	sbv.SetMaximum(1000)
+	corewidget.AddChild(sbv)
 	sbv.Move(50, 170)
+
+	fmt.Println("debug2")
+	f.SetInnerWidget(scrollwidget)
+	fmt.Println("debug3")
 	root.AddChild(f)
 
 	filemenu := sws.CreateMenuWidget()
