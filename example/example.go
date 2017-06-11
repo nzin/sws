@@ -96,10 +96,15 @@ func main() {
 	menubar.AddItem(file)
 	menubar.AddItem(sws.CreateMenuItemLabel("View", nil))
 	menubar.AddItem(sws.CreateMenuItemLabel("About", nil))
+	
+	sv := sws.CreateSplitviewWidget(200,200,true)
 
 	main1 := sws.CreateMainWidget(200, 100, "main1", false, true)
 	main1.Move(400, 300)
 	main1.SetMenuBar(menubar)
+	
+	main1.SetInnerWidget(sv)
+	
 	root.AddChild(main1)
 
 	for sws.PoolEvent() == false {

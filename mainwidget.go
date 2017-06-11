@@ -38,8 +38,14 @@ func (self *SWS_MainWidget) SetInnerWidget(widget SWS_Widget) bool {
 	self.RemoveChild(self.subwidget)
 	self.subwidget = widget
 	self.SWS_CoreWidget.AddChild(widget)
-	widget.Move(6, 26)
-	widget.Resize(self.Width()-12, self.Height()-32)
+	if self.menubar==nil {
+		widget.Move(6, 26)
+		widget.Resize(self.Width()-12, self.Height()-32)
+	} else {
+		widget.Move(6, 26+self.menubar.Height())
+		widget.Resize(self.Width()-12, self.Height()-32-self.menubar.Height())
+	}
+	PostUpdate()
 	return true
 }
 
@@ -207,9 +213,17 @@ func (self *SWS_MainWidget) Repaint() {
 		rectDst = sdl.Rect{self.menubar.X(), self.menubar.Y(), self.menubar.Width(), self.menubar.Height()}
 		self.menubar.Surface().Blit(&rectSrc, self.Surface(), &rectDst)
 	}
+	maxwidth:=self.subwidget.Width()
+	if maxwidth>self.Width()-12 { maxwidth=self.Width()-12 }
+	maxheight:=self.subwidget.Height()
+	if self.menubar!=nil {
+		if maxheight>self.Height()-32-self.menubar.Height() { maxheight=self.Height()-32-self.menubar.Height() }
+	} else {
+		if maxheight>self.Height()-32 { maxheight=self.Height()-32 }
+	}
 	self.subwidget.Repaint()
-	rectSrc = sdl.Rect{0, 0, self.subwidget.Width(), self.subwidget.Height()}
-	rectDst = sdl.Rect{self.subwidget.X(), self.subwidget.Y(), self.subwidget.Width(), self.subwidget.Height()}
+	rectSrc = sdl.Rect{0, 0, maxwidth, maxheight}
+	rectDst = sdl.Rect{self.subwidget.X(), self.subwidget.Y(), maxwidth, maxheight}
 	self.subwidget.Surface().Blit(&rectSrc, self.Surface(), &rectDst)
 }
 
