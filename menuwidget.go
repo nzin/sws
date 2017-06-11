@@ -282,10 +282,8 @@ func hideMenu(menu *SWS_MenuWidget) {
 	}
 	// destroy all menus
 	if menu == nil {
-		fmt.Println("***", menuStack)
 		for _, m := range menuStack {
 			//        m.Destroy()
-			fmt.Println("***remove menu", m)
 			root.RemoveChild(m)
 			m.SetParent(nil)
 		}

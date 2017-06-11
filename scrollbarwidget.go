@@ -57,7 +57,7 @@ func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 			}
 			if x < offset {
 				// click before
-				self.Currentposition -= (self.maximum - self.minimum) / 10
+				self.Currentposition -= self.Width()/2
 				if self.Currentposition < self.minimum {
 					self.Currentposition = self.minimum
 				}
@@ -66,7 +66,7 @@ func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 				}
 				PostUpdate()
 				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
-					self.Currentposition -= (self.maximum - self.minimum) / 10
+					self.Currentposition -= self.Width()/2
 					if self.Currentposition < self.minimum {
 						self.Currentposition = self.minimum
 					}
@@ -77,7 +77,7 @@ func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 				})
 			} else if x > offset+w {
 				// click after
-				self.Currentposition += (self.maximum - self.minimum) / 10
+				self.Currentposition += self.Width()/2
 				if self.Currentposition > self.maximum {
 					self.Currentposition = self.maximum
 				}
@@ -86,7 +86,7 @@ func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 				}
 				PostUpdate()
 				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
-					self.Currentposition += (self.maximum - self.minimum) / 10
+					self.Currentposition += self.Width()/2
 					if self.Currentposition > self.maximum {
 						self.Currentposition = self.maximum
 					}
@@ -110,7 +110,7 @@ func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 			}
 			if y < offset {
 				// click before
-				self.Currentposition -= (self.maximum - self.minimum) / 10
+				self.Currentposition -= self.Height()/2
 				if self.Currentposition < self.minimum {
 					self.Currentposition = self.minimum
 				}
@@ -119,7 +119,7 @@ func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 				}
 				PostUpdate()
 				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
-					self.Currentposition -= (self.maximum - self.minimum) / 10
+					self.Currentposition -= self.Height()/2
 					if self.Currentposition < self.minimum {
 						self.Currentposition = self.minimum
 					}
@@ -130,7 +130,7 @@ func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 				})
 			} else if y > offset+h {
 				// click after
-				self.Currentposition += (self.maximum - self.minimum) / 10
+				self.Currentposition += self.Height()/2
 				if self.Currentposition > self.maximum {
 					self.Currentposition = self.maximum
 				}
@@ -139,7 +139,7 @@ func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 				}
 				PostUpdate()
 				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
-					self.Currentposition += (self.maximum - self.minimum) / 10
+					self.Currentposition += self.Height()/2
 					if self.Currentposition > self.maximum {
 						self.Currentposition = self.maximum
 					}
@@ -201,7 +201,9 @@ func (self *SWS_ScrollbarWidget) MouseMove(x, y, xrel, yrel int32) {
 				ypos = self.Height() - h
 			}
 			self.Currentposition = self.minimum + (self.maximum-self.minimum)*ypos/(self.Height()-h)
-			self.callback(self.Currentposition)
+			if (self.callback!=nil) {
+				self.callback(self.Currentposition)
+			}
 			PostUpdate()
 		}
 	}
