@@ -1,7 +1,6 @@
 package sws
 
 import (
-	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -33,7 +32,6 @@ func (self *SWS_DropdownWidget) SetClicked(callback func()) {
 }
 
 func (self *SWS_DropdownWidget) MousePressDown(x, y int32, button uint8) {
-	fmt.Println("Button.PressDown")
 	if button == sdl.BUTTON_LEFT {
 		self.buttonState = true
 		self.cursorInside = true
