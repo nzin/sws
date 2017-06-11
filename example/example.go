@@ -53,7 +53,6 @@ func main() {
 	scrollwidget := sws.CreateScrollWidget(300, 200)
 	corewidget := sws.CreateCoreWidget(200, 300)
 	scrollwidget.SetInnerWidget(corewidget)
-	fmt.Println("debug1")
 	//f.SetColor(0xffff0000)
 	f.Move(100, 10)
 
@@ -84,9 +83,7 @@ func main() {
 	corewidget.AddChild(sbv)
 	sbv.Move(50, 170)
 
-	fmt.Println("debug2")
 	f.SetInnerWidget(scrollwidget)
-	fmt.Println("debug3")
 	root.AddChild(f)
 
 	filemenu := sws.CreateMenuWidget()
