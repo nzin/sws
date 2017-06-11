@@ -31,6 +31,13 @@ func (self *SWS_ScrollbarWidget) SetMinimum(m int32) {
 
 func (self *SWS_ScrollbarWidget) SetMaximum(m int32) {
 	self.maximum=m
+	if self.maximum<self.minimum {
+		self.maximum=self.minimum
+	}
+	if self.Currentposition > self.maximum {
+		self.Currentposition = self.maximum
+		if (self.callback!=nil) { self.callback(self.Currentposition) }
+	}
 }
 
 func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
@@ -38,11 +45,14 @@ func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 	if button == sdl.BUTTON_LEFT {
 		self.buttondown = true
 		if self.horizontal {
-			w := self.Width() * self.Width() / (self.maximum - self.minimum)
+			w := self.Width() * self.Width() / (self.maximum - self.minimum + self.Width())
 			if w < 20 {
 				w = 20
 			}
-			offset := (self.Width() - w) * (self.Currentposition - self.minimum) / (self.maximum - self.minimum)
+			var offset int32
+			if self.maximum > self.minimum {
+				offset = (self.Width() - w) * (self.Currentposition - self.minimum) / (self.maximum - self.minimum)
+			}
 			if x < offset {
 				// click before
 				self.Currentposition -= (self.maximum - self.minimum) / 10
@@ -80,11 +90,14 @@ func (self *SWS_ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 				self.initialpos = x - offset
 			}
 		} else {
-			h := self.Height() * self.Height() / (self.maximum - self.minimum)
+			h := self.Height() * self.Height() / (self.maximum - self.minimum + self.Height())
 			if h < 20 {
 				h = 20
 			}
-			offset := (self.Height() - h) * (self.Currentposition - self.minimum) / (self.maximum - self.minimum)
+			var offset int32
+			if self.maximum > self.minimum {
+				offset = (self.Height() - h) * (self.Currentposition - self.minimum) / (self.maximum - self.minimum)
+			}
 			if y < offset {
 				// click before
 				self.Currentposition -= (self.maximum - self.minimum) / 10
@@ -139,7 +152,7 @@ func (self *SWS_ScrollbarWidget) MousePressUp(x, y int32, button uint8) {
 func (self *SWS_ScrollbarWidget) MouseMove(x, y, xrel, yrel int32) {
 	if self.buttondown == true && self.onelevator {
 		if self.horizontal {
-			w := self.Width() * self.Width() / (self.maximum - self.minimum)
+			w := self.Width() * self.Width() / (self.maximum - self.minimum  + self.Width())
 			if w < 20 {
 				w = 20
 			}
@@ -155,7 +168,7 @@ func (self *SWS_ScrollbarWidget) MouseMove(x, y, xrel, yrel int32) {
 			if (self.callback!=nil) { self.callback(self.Currentposition) }
 			PostUpdate()
 		} else {
-			h := self.Height() * self.Height() / (self.maximum - self.minimum)
+			h := self.Height() * self.Height() / (self.maximum - self.minimum + self.Height())
 			if h < 20 {
 				h = 20
 			}
@@ -188,11 +201,14 @@ func (self *SWS_ScrollbarWidget) Repaint() {
 	self.DrawLine(1, self.Height()-2, self.Width()-2, self.Height()-2)
 	self.DrawLine(self.Width()-2, 1, self.Width()-2, self.Height()-2)
 	if self.horizontal {
-		w := self.Width() * self.Width() / (self.maximum - self.minimum)
+		w := self.Width() * self.Width() / (self.maximum - self.minimum + self.Width())
 		if w < 20 {
 			w = 20
 		}
-		offset := (self.Width() - w) * (self.Currentposition - self.minimum) / (self.maximum - self.minimum)
+		var offset int32
+		if (self.maximum>self.minimum) {
+			offset = (self.Width() - w) * (self.Currentposition - self.minimum) / (self.maximum - self.minimum)
+		}
 		self.SetDrawColor(50, 50, 50, 255)
 		self.DrawLine(offset, 0, offset+w-1, 0)
 		self.DrawLine(offset+w-1, 0, offset+w-1, self.Height()-1)
@@ -206,11 +222,14 @@ func (self *SWS_ScrollbarWidget) Repaint() {
 		self.DrawLine(offset+1, self.Height()-2, offset+w-2, self.Height()-2)
 		self.FillRect(offset+2, 2, w-4, self.Height()-4, 0xffdddddd)
 	} else {
-		h := self.Height() * self.Height() / (self.maximum - self.minimum)
+		h := self.Height() * self.Height() / (self.maximum - self.minimum + self.Height())
 		if h < 20 {
 			h = 20
 		}
-		offset := (self.Height() - h) * (self.Currentposition - self.minimum) / (self.maximum - self.minimum)
+		var offset int32
+		if (self.maximum>self.minimum) {
+			offset = (self.Height() - h) * (self.Currentposition - self.minimum) / (self.maximum - self.minimum)
+		}
 		self.SetDrawColor(50, 50, 50, 255)
 		self.DrawLine(0, offset, 0, offset+h-1)
 		self.DrawLine(0, offset+h-1, self.Width()-1, offset+h-1)
