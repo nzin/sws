@@ -50,8 +50,8 @@ func main() {
 
 	//f:=sws.CreateCoreWidget(200,100)
 	f := sws.CreateMainWidget(200, 100, "very looooooooooooong title ", true, true)
-	scrollwidget:=sws.CreateScrollWidget(300,200)
-	corewidget:=sws.CreateCoreWidget(200,300)
+	scrollwidget := sws.CreateScrollWidget(300, 200)
+	corewidget := sws.CreateCoreWidget(200, 300)
 	scrollwidget.SetInnerWidget(corewidget)
 	fmt.Println("debug1")
 	//f.SetColor(0xffff0000)

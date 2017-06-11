@@ -39,7 +39,7 @@ func (self *SWS_MainWidget) SetInnerWidget(widget SWS_Widget) bool {
 	self.subwidget = widget
 	self.SWS_CoreWidget.AddChild(widget)
 	widget.Move(6, 26)
-	widget.Resize(self.Width()-12,self.Height()-32)
+	widget.Resize(self.Width()-12, self.Height()-32)
 	return true
 }
 
