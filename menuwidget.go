@@ -292,7 +292,6 @@ func hideMenu(menu *SWS_MenuWidget) {
 		return
 	}
 	// destroy submenu
-	fmt.Println("destroy submenu")
 	for i, m := range menuStack {
 		if m == menu {
 			for _, s := range menuStack[i:] {

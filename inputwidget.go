@@ -12,6 +12,7 @@ type SWS_InputWidget struct {
 	endCursorPosition     int
 	hasfocus              bool
 	leftButtonDown        bool
+	writeOffset           int32
 }
 
 func (self *SWS_InputWidget) HasFocus(focus bool) {
@@ -30,7 +31,7 @@ func (self *SWS_InputWidget) MousePressDown(x, y int32, button uint8) {
 			if err != nil {
 				panic(err)
 			}
-			if w > int(x-2) {
+			if w > int(x-2+self.writeOffset) {
 				break
 			}
 			self.initialCursorPosition++
@@ -48,13 +49,30 @@ func (self *SWS_InputWidget) MousePressUp(x, y int32, button uint8) {
 
 func (self *SWS_InputWidget) MouseMove(x, y, xrel, yrel int32) {
 	if self.leftButtonDown == true {
+		if (self.writeOffset>0 && x<0) {
+			self.writeOffset+=x/2
+			if self.writeOffset<0 {
+				self.writeOffset=0
+			}
+		}
+		w, _, err := self.Font().SizeUTF8(self.text)
+		if err != nil {
+			panic(err)
+		}
+		if (self.writeOffset<int32(w)-self.Width()+4 && x>self.Width()) {
+			self.writeOffset+=(x-self.Width())/2
+			if self.writeOffset>int32(w)-self.Width()+4 {
+				self.writeOffset=int32(w)-self.Width()+4
+			}
+		}
+		
 		self.initialCursorPosition = 0
 		for i := 1; i <= len(self.text); i++ {
 			w, _, err := self.Font().SizeUTF8(self.text[:i])
 			if err != nil {
 				panic(err)
 			}
-			if w > int(x-2) {
+			if w > int(x-2+self.writeOffset) {
 				break
 			}
 			self.initialCursorPosition++
@@ -129,10 +147,57 @@ func (self *SWS_InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		self.endCursorPosition = self.initialCursorPosition
 		PostUpdate()
 	}
+	// replace cursor
+	w, _, err := self.Font().SizeUTF8(self.text[:self.initialCursorPosition])
+	if err != nil {
+		panic(err)
+	}
+	if self.writeOffset>int32(w) {
+		self.writeOffset=int32(w)
+		PostUpdate()
+	}
+	if self.writeOffset+self.Width()-4<int32(w) {
+		self.writeOffset=int32(w)-self.Width()+4
+		PostUpdate()
+	}
 }
 
 func (self *SWS_InputWidget) Repaint() {
 	self.SWS_CoreWidget.Repaint()
+	// write text and cursor
+	i := self.initialCursorPosition
+	e := self.endCursorPosition
+	if i > e {
+		i, e = e, i
+	}
+
+	self.SetDrawColor(0, 0, 0, 255)
+	if e > len(self.text) {
+		e = len(self.text)
+	}
+	if i > len(self.text) {
+		i = len(self.text)
+	}
+	strbefore := self.text[:i]
+	strMiddle := self.text[i:e]
+	strafter := self.text[e:]
+	wMiddle, _, _ := self.Font().SizeUTF8(strMiddle)
+
+	wbefore, _ := self.WriteText(2-self.writeOffset, 2, strbefore, sdl.Color{0, 0, 0, 255})
+	//    fmt.Println(wbefore,wMiddle)
+	self.FillRect(wbefore+2-self.writeOffset, 3, int32(wMiddle), self.Height()-2, 0xff8888ff)
+	self.SetDrawColor(0, 0, 0, 255)
+	self.WriteText(wbefore+2-self.writeOffset, 2, strMiddle, sdl.Color{0, 0, 0, 255})
+	self.WriteText(wbefore+int32(wMiddle)+2-self.writeOffset, 2, strafter, sdl.Color{0, 0, 0, 255})
+	if self.hasfocus {
+		if self.initialCursorPosition < self.endCursorPosition {
+			self.DrawLine(wbefore+2-self.writeOffset, 3, wbefore+2-self.writeOffset, self.Height()-4)
+		} else {
+			self.DrawLine(wbefore+int32(wMiddle)+2-self.writeOffset, 3, wbefore+int32(wMiddle)+2-self.writeOffset, self.Height()-4)
+		}
+	}
+
+	// write boundaries
 	self.SetDrawColor(0, 0, 0, 255)
 	self.DrawLine(0, 2, 0, self.Height()-3)
 	self.DrawLine(self.Width()-1, 2, self.Width()-1, self.Height()-3)
@@ -162,37 +227,7 @@ func (self *SWS_InputWidget) Repaint() {
 	self.DrawPoint(self.Width()-1, self.Height()-2)
 	self.DrawPoint(self.Width()-2, self.Height()-1)
 
-	i := self.initialCursorPosition
-	e := self.endCursorPosition
-	if i > e {
-		i, e = e, i
-	}
 
-	self.SetDrawColor(0, 0, 0, 255)
-	if e > len(self.text) {
-		e = len(self.text)
-	}
-	if i > len(self.text) {
-		i = len(self.text)
-	}
-	strbefore := self.text[:i]
-	strMiddle := self.text[i:e]
-	strafter := self.text[e:]
-	wMiddle, _, _ := self.Font().SizeUTF8(strMiddle)
-
-	wbefore, _ := self.WriteText(2, 2, strbefore, sdl.Color{0, 0, 0, 255})
-	//    fmt.Println(wbefore,wMiddle)
-	self.FillRect(wbefore+2, 3, int32(wMiddle), self.Height()-2, 0xff8888ff)
-	self.SetDrawColor(0, 0, 0, 255)
-	self.WriteText(wbefore+2, 2, strMiddle, sdl.Color{0, 0, 0, 255})
-	self.WriteText(wbefore+int32(wMiddle)+2, 2, strafter, sdl.Color{0, 0, 0, 255})
-	if self.hasfocus {
-		if self.initialCursorPosition < self.endCursorPosition {
-			self.DrawLine(wbefore+2, 3, wbefore+2, self.Height()-4)
-		} else {
-			self.DrawLine(wbefore+int32(wMiddle)+2, 3, wbefore+int32(wMiddle)+2, self.Height()-4)
-		}
-	}
 }
 
 func CreateInputWidget(w, h int32, s string) *SWS_InputWidget {
@@ -201,7 +236,8 @@ func CreateInputWidget(w, h int32, s string) *SWS_InputWidget {
 		text: s,
 		initialCursorPosition: 0,
 		hasfocus:              false,
-		leftButtonDown:        false}
+		leftButtonDown:        false,
+		writeOffset:           10}
 	widget.SetColor(0xffffffff)
 	return widget
 }
