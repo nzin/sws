@@ -82,6 +82,19 @@ func (self *SWS_InputWidget) MouseMove(x, y, xrel, yrel int32) {
 }
 
 func (self *SWS_InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
+	if key == sdl.K_UP {
+		if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
+			if self.initialCursorPosition > 0 {
+				self.initialCursorPosition=0
+			}
+		} else {
+			if self.initialCursorPosition > 0 {
+				self.initialCursorPosition=0
+			}
+			self.endCursorPosition = self.initialCursorPosition
+		}
+		PostUpdate()
+	}
 	if key == sdl.K_LEFT {
 		if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
 			if self.initialCursorPosition > 0 {
@@ -109,6 +122,20 @@ func (self *SWS_InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		PostUpdate()
 	}
 
+	if key == sdl.K_DOWN {
+		if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
+			if self.initialCursorPosition < len(self.text) {
+				self.initialCursorPosition=len(self.text)
+			}
+		} else {
+			if self.initialCursorPosition < len(self.text) {
+				self.initialCursorPosition=len(self.text)
+			}
+			self.endCursorPosition = self.initialCursorPosition
+		}
+		PostUpdate()
+	}
+
 	if key == sdl.K_BACKSPACE {
 		if self.initialCursorPosition == self.endCursorPosition {
 			if self.initialCursorPosition > 0 {
@@ -127,7 +154,13 @@ func (self *SWS_InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		PostUpdate()
 	}
 
-	if (key >= 'a' && key <= 'z') || (key >= '0' && key <= '9') || key == ' ' {
+	if mod == sdl.KMOD_LCTRL || mod == sdl.KMOD_RCTRL {
+		if key=='a' {
+			self.endCursorPosition = 0
+			self.initialCursorPosition = len(self.text)
+			PostUpdate()
+		}
+	} else if (key >= 'a' && key <= 'z') || (key >= '0' && key <= '9') || key == ' ' {
 		if key >= 'a' && key <= 'z' {
 			if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
 				key += 'A' - 'a'
