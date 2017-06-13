@@ -237,7 +237,7 @@ func CreateInputWidget(w, h int32, s string) *SWS_InputWidget {
 		initialCursorPosition: 0,
 		hasfocus:              false,
 		leftButtonDown:        false,
-		writeOffset:           10}
+		writeOffset:           0}
 	widget.SetColor(0xffffffff)
 	return widget
 }
