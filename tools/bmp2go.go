@@ -28,14 +28,8 @@ func main() {
 
 	buffer := make([]byte, 16)
 	var n int
-	var beginning = true
-	fmt.Print("var bmp = []byte(\"")
+	fmt.Print("var bmp = \n []byte(\"")
 	for n, err = f.Read(buffer); n > 0; n, err = f.Read(buffer) {
-		if beginning == false {
-			fmt.Print("\" +\n    \"")
-		} else {
-			beginning = false
-		}
 		for i := range buffer {
 			fmt.Printf("\\x%02x", uint8(buffer[i]))
 		}
