@@ -62,7 +62,7 @@ func (self *SWS_SplitviewWidget) SetLeftWidget(widget SWS_Widget) bool {
 	return true
 }
 
-func (self *SWS_SplitviewWidget) SetRighWidget(widget SWS_Widget) bool {
+func (self *SWS_SplitviewWidget) SetRightWidget(widget SWS_Widget) bool {
 
 	if widget == nil {
 		return false

@@ -11,8 +11,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/nzin/sws"
-	_ "github.com/veandco/go-sdl2/sdl"
-	_ "github.com/veandco/go-sdl2/sdl_ttf"
+	//"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/sdl_image"
 	_ "log"
 	_ "runtime/pprof"
 )
@@ -109,6 +109,15 @@ func main() {
 	vboxscroll.ShowHorizontalScrollbar(false)
 	vboxscroll.SetInnerWidget(vbox)
 	sv.SetLeftWidget(vboxscroll)
+
+	corewidget2 := sws.CreateCoreWidget(200, 300)
+	sv.SetRightWidget(corewidget2)
+
+	b2 := sws.CreateButtonWidget(100, 100, "idea")
+	if img,err := img.Load("idea.png"); err==nil {
+		b2.SetImage(img)
+	}
+	corewidget2.AddChild(b2)
 
 	main1 := sws.CreateMainWidget(200, 100, "main1", false, true)
 	main1.Move(400, 300)
