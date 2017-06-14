@@ -98,6 +98,17 @@ func main() {
 	menubar.AddItem(sws.CreateMenuItemLabel("About", nil))
 	
 	sv := sws.CreateSplitviewWidget(200,200,true)
+	
+	vbox := sws.CreateVBoxWidget(200,10)
+	vbox.AddChild(sws.CreateLabel(200, 25, "Element 1"))
+	vbox.AddChild(sws.CreateLabel(200, 25, "Element 2"))
+	vbox.AddChild(sws.CreateLabel(200, 25, "Element 3"))
+	vbox.AddChild(sws.CreateLabel(200, 25, "longer element 4"))
+	
+	vboxscroll := sws.CreateScrollWidget(200, 200)
+	vboxscroll.ShowHorizontalScrollbar(false)
+	vboxscroll.SetInnerWidget(vbox)
+	sv.SetLeftWidget(vboxscroll)
 
 	main1 := sws.CreateMainWidget(200, 100, "main1", false, true)
 	main1.Move(400, 300)

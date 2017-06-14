@@ -16,6 +16,16 @@ type SWS_ScrollWidget struct {
 	corner     *SWS_CoreWidget
 	xOffset    int32
 	yOffset    int32
+	showH      bool
+	showV      bool
+}
+
+func (self *SWS_ScrollWidget) ShowVerticalScrollbar(showV bool) {
+	self.showV=showV
+}
+
+func (self *SWS_ScrollWidget) ShowHorizontalScrollbar(showH bool) {
+	self.showH=showH
 }
 
 func (self *SWS_ScrollWidget) Resize(width, height int32) {
@@ -33,7 +43,7 @@ func (self *SWS_ScrollWidget) Resize(width, height int32) {
 	self.hScrollbar.SetMaximum(self.subwidget.Width() - self.Width())
 	self.vScrollbar.SetMaximum(self.subwidget.Height() - self.Height())
 	if self.subwidget != nil {
-		if self.subwidget.Width() > self.Width()-SCROLLBAR_WIDTH && self.subwidget.Height() > self.Height()-SCROLLBAR_WIDTH {
+		if self.subwidget.Width() > self.Width()-SCROLLBAR_WIDTH && self.subwidget.Height() > self.Height()-SCROLLBAR_WIDTH && self.showH==true && self.showV==true {
 			self.hScrollbar.SetMaximum(self.subwidget.Width() - (self.Width() - SCROLLBAR_WIDTH))
 			self.AddChild(self.hScrollbar)
 			self.hScrollbar.Resize(self.Width()-SCROLLBAR_WIDTH, SCROLLBAR_WIDTH)
@@ -44,12 +54,12 @@ func (self *SWS_ScrollWidget) Resize(width, height int32) {
 			self.vScrollbar.Move(self.Width()-SCROLLBAR_WIDTH, 0)
 			self.AddChild(self.corner)
 			self.corner.Move(self.Width()-SCROLLBAR_WIDTH, self.Height()-SCROLLBAR_WIDTH)
-		} else if self.subwidget.Width() > self.Width()-SCROLLBAR_WIDTH {
+		} else if self.subwidget.Width() > self.Width()-SCROLLBAR_WIDTH && self.showH==true {
 			self.hScrollbar.SetMaximum(self.subwidget.Width() - (self.Width() - SCROLLBAR_WIDTH))
 			self.AddChild(self.hScrollbar)
 			self.hScrollbar.Move(0, self.Height()-SCROLLBAR_WIDTH)
 			self.hScrollbar.Resize(self.Width(), SCROLLBAR_WIDTH)
-		} else if self.subwidget.Height() > self.Height()-SCROLLBAR_WIDTH {
+		} else if self.subwidget.Height() > self.Height()-SCROLLBAR_WIDTH && self.showV==true {
 			self.vScrollbar.SetMaximum(self.subwidget.Height() - (self.Height() - SCROLLBAR_WIDTH))
 			self.AddChild(self.vScrollbar)
 			self.vScrollbar.Resize(SCROLLBAR_WIDTH, self.Height())
@@ -81,7 +91,9 @@ func CreateScrollWidget(w, h int32) *SWS_ScrollWidget {
 		subwidget:  nil,
 		hScrollbar: CreateScrollbarWidget(100, SCROLLBAR_WIDTH, true),
 		vScrollbar: CreateScrollbarWidget(SCROLLBAR_WIDTH, 100, false),
-		corner:     CreateCoreWidget(SCROLLBAR_WIDTH, SCROLLBAR_WIDTH)}
+		corner:     CreateCoreWidget(SCROLLBAR_WIDTH, SCROLLBAR_WIDTH),
+		showH:      true,
+		showV:      true}
 	widget.hScrollbar.SetParent(widget)
 	widget.hScrollbar.SetCallback(func(currentposition int32) {
 		w := widget
