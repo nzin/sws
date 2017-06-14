@@ -23,7 +23,6 @@ import (
 	"time"
 )
 
-var defaultFont *ttf.Font
 var needUpdate bool
 
 //
@@ -220,12 +219,8 @@ func Init(width, height int32) *SWS_RootWidget {
 		panic(err)
 	}
 
-	if defaultFont, err = ttf.OpenFont("Lato-Regular.ttf", 16); err != nil {
-		//if p.font, err = ttf.OpenFont("Arial.ttf", 16); err != nil {
-		panic(err)
-	}
-
 	InitSprites()
+	InitFonts()
 
 	PostUpdate()
 
