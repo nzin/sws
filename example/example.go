@@ -127,6 +127,13 @@ func main() {
 	corewidget2.AddChild(l2)
 	l2.Move(0, 100)
 
+	b3 := sws.CreateFlatButtonWidget(100, 100, "idea")
+	if img,err := img.Load("idea.png"); err==nil {
+		b3.SetImage(img)
+	}
+	corewidget2.AddChild(b3)
+	b3.Move(100, 0)
+
 	main1 := sws.CreateMainWidget(200, 100, "main1", false, true)
 	main1.Move(400, 300)
 	main1.SetMenuBar(menubar)
