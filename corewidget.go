@@ -61,6 +61,8 @@ func (self *SWS_CoreWidget) Destroy() {
 // trigger a PostUpdate() to ask for a refresh
 //
 func (self *SWS_CoreWidget) Resize(width, height int32) {
+	if width<0 { width=0}
+	if height<0 { height=0}
 	surface, err := sdl.CreateRGBSurface(0, width, height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000)
 	if err != nil {
 		panic(err)
