@@ -31,6 +31,9 @@ func (self *SWS_FlatButtonWidget) Repaint() {
 	if (text!=nil && self.image == nil) {
 		wGap := self.Width() - text.W
 		hGap := self.Height() - text.H
+		if self.centered==false {
+			wGap=0
+		}
 		rectSrc := sdl.Rect{0, 0, text.W, text.H}
 		rectDst := sdl.Rect{(wGap/2), (hGap/2), self.Width()-(wGap/2), self.Height()-(hGap/2)}
 		if err = text.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
@@ -38,6 +41,9 @@ func (self *SWS_FlatButtonWidget) Repaint() {
 	} else if (text==nil && self.image !=nil) {
 		wGap := self.Width() - self.image.W
 		hGap := self.Height() - self.image.H
+		if self.centered==false {
+			wGap=0
+		}
 		rectSrc := sdl.Rect{0, 0, self.image.W, self.image.H}
 		rectDst := sdl.Rect{(wGap/2), (hGap/2), self.Width()-(wGap/2), self.Height()-(hGap/2)}
 		if err = self.image.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
@@ -46,6 +52,10 @@ func (self *SWS_FlatButtonWidget) Repaint() {
 		wTGap := self.Width() - text.W
 		wIGap := self.Width() - self.image.W
 		hGap := self.Height() - self.image.H - text.H
+		if self.centered==false {
+			wTGap=0
+			wIGap=0
+		}
 		rectSrc := sdl.Rect{0, 0, self.image.W, self.image.H}
 		rectDst := sdl.Rect{(wIGap/2), (hGap/2), self.Width()-(wIGap/2), self.Height()-(hGap/2)}
 		if err = self.image.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {

@@ -35,7 +35,6 @@ func (self *SWS_Label) Repaint() {
 		hGap := self.Height() - text.H
 		if self.centered==false {
 			wGap=0
-			hGap=0
 		}
 		rectSrc := sdl.Rect{0, 0, text.W, text.H}
 		rectDst := sdl.Rect{(wGap/2), (hGap/2), self.Width()-(wGap/2), self.       Height()-(hGap/2)}
@@ -46,7 +45,6 @@ func (self *SWS_Label) Repaint() {
 		hGap := self.Height() - self.image.H
 		if self.centered==false {
 			wGap=0
-			hGap=0
 		}
 		rectSrc := sdl.Rect{0, 0, self.image.W, self.image.H}
 		rectDst := sdl.Rect{(wGap/2), (hGap/2), self.Width()-(wGap/2), self.       Height()-(hGap/2)}
@@ -59,7 +57,6 @@ func (self *SWS_Label) Repaint() {
 		if self.centered==false {
 			wTGap=0
 			wIGap=0
-			hGap=0
 		}
 		rectSrc := sdl.Rect{0, 0, self.image.W, self.image.H}
 		rectDst := sdl.Rect{(wIGap/2), (hGap/2), self.Width()-(wIGap/2), self.     Height()-(hGap/2)}
