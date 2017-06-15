@@ -99,11 +99,11 @@ func main() {
 	
 	sv := sws.CreateSplitviewWidget(200,200,true)
 	
-	vbox := sws.CreateVBoxWidget(200,10)
-	vbox.AddChild(sws.CreateLabel(200, 25, "Element 1"))
-	vbox.AddChild(sws.CreateLabel(200, 25, "Element 2"))
-	vbox.AddChild(sws.CreateLabel(200, 25, "Element 3"))
-	vbox.AddChild(sws.CreateLabel(200, 25, "longer element 4"))
+	vbox := sws.CreateListWidget(200,10)
+	vbox.AddItem(25,"Element 1",nil,nil)
+	vbox.AddItem(25,"Element 2",nil,nil)
+	vbox.AddItem(25,"Element 3",nil,nil)
+	vbox.AddItem(25, "longer element 4",nil,nil)
 	
 	vboxscroll := sws.CreateScrollWidget(200, 200)
 	vboxscroll.ShowHorizontalScrollbar(false)
