@@ -119,6 +119,14 @@ func main() {
 	}
 	corewidget2.AddChild(b2)
 
+	l2 := sws.CreateLabel(100, 100, "idea2")
+	if img,err := img.Load("idea.png"); err==nil {
+		l2.SetImage(img)
+	}
+	l2.SetCentered(true)
+	corewidget2.AddChild(l2)
+	l2.Move(0, 100)
+
 	main1 := sws.CreateMainWidget(200, 100, "main1", false, true)
 	main1.Move(400, 300)
 	main1.SetMenuBar(menubar)
