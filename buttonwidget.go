@@ -11,7 +11,12 @@ type SWS_ButtonWidget struct {
 	buttonState  bool
 	cursorInside bool
 	centered     bool
+	textcolor    sdl.Color
 	clicked      func()
+}
+
+func (self *SWS_ButtonWidget) SetTextColor(color sdl.Color) {
+	self.textcolor=color
 }
 
 func (self *SWS_ButtonWidget) SetCentered(centered bool) {
@@ -73,7 +78,7 @@ func (self *SWS_ButtonWidget) Repaint() {
 	var text *sdl.Surface
 	var err error
 	if (self.label!="") {
-		if text, err = self.Font().RenderUTF8_Blended(self.label, sdl.Color{0, 0, 0, 255}); err != nil {
+		if text, err = self.Font().RenderUTF8_Blended(self.label, self.textcolor); err != nil {
 		//	fmt.Fprint(os.Stderr, "Failed to render text: %s\n", err)
 		}
         	defer text.Free()
@@ -193,6 +198,7 @@ func CreateButtonWidget(w, h int32, s string) *SWS_ButtonWidget {
 		image:        nil,
 		buttonState:  false,
 		cursorInside: false,
-		centered:     true}
+		centered:     true,
+		textcolor:    sdl.Color{0, 0, 0, 255}}
 	return widget
 }

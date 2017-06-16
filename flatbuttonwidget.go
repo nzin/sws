@@ -15,7 +15,7 @@ func (self *SWS_FlatButtonWidget) Repaint() {
 	var text *sdl.Surface
 	var err error
 	if (self.label!="") {
-		if text, err = self.Font().RenderUTF8_Blended(self.label, sdl.Color{0, 0, 0, 255}); err != nil {
+		if text, err = self.Font().RenderUTF8_Blended(self.label, self.textcolor); err != nil {
 		//	fmt.Fprint(os.Stderr, "Failed to render text: %s\n", err)
 		}
         	defer text.Free()
