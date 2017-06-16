@@ -12,6 +12,14 @@ type SWS_SplitviewWidget struct {
 	horizontal  bool
 }
 
+func (self *SWS_SplitviewWidget) SplitBarMovable(movable bool) {
+	self.splitwidget.SetMovable(movable)
+}
+
+func (self *SWS_SplitviewWidget) PlaceSplitBar(position int32) {
+	self.splitwidget.Place(position)
+}
+
 func (self *SWS_SplitviewWidget) Resize(width, height int32) {
         if width < 45 {
                 width = 45
@@ -132,16 +140,24 @@ type SWS_SplitWidget struct {
 	callback   func()
 	buttondown bool
 	initialPos int32
+	movable    bool
+}
+
+func (self *SWS_SplitWidget) SetMovable(movable bool) {
+	self.movable=movable
+	PostUpdate()
 }
 
 func (self *SWS_SplitWidget) Repaint() {
 	self.SWS_CoreWidget.Repaint()
-	self.SetDrawColor(255, 255, 255, 255)
-        self.DrawLine(0, 0, 0, self.Height()-1)
-        self.DrawLine(0, 0, self.Width()-1,0)
-	self.SetDrawColor(100, 100, 100, 100)
-        self.DrawLine(1, self.Height()-1,self.Width()-1,self.Height()-1)
-        self.DrawLine(self.Width()-1,1,self.Width()-1,self.Height()-1)
+	if (self.movable) {
+		self.SetDrawColor(255, 255, 255, 255)
+		self.DrawLine(0, 0, 0, self.Height()-1)
+		self.DrawLine(0, 0, self.Width()-1,0)
+		self.SetDrawColor(100, 100, 100, 100)
+		self.DrawLine(1, self.Height()-1,self.Width()-1,self.Height()-1)
+		self.DrawLine(self.Width()-1,1,self.Width()-1,self.Height()-1)
+	}
 }
 
 func (self *SWS_SplitWidget) SetCallback(callback func()) {
@@ -149,12 +165,14 @@ func (self *SWS_SplitWidget) SetCallback(callback func()) {
 }
 
 func (self *SWS_SplitWidget) MousePressDown(x, y int32, button uint8) {
-	if button == sdl.BUTTON_LEFT {
-		self.buttondown = true
-		if self.horizontal {
-			self.initialPos = x
-		} else {
-			self.initialPos = y
+	if self.movable {
+		if button == sdl.BUTTON_LEFT {
+			self.buttondown = true
+			if self.horizontal {
+				self.initialPos = x
+			} else {
+				self.initialPos = y
+			}
 		}
 	}
 }
@@ -187,6 +205,17 @@ func (self *SWS_SplitWidget) MousePressUp(x, y int32, button uint8) {
 	}
 }
 
+func (self *SWS_SplitWidget) Place(position int32) {
+	if self.horizontal {
+		self.Move(position,0)
+	} else {
+		self.Move(0,position)
+	}
+	if self.callback!=nil {
+		self.callback()
+	}
+}
+
 func CreateSplitWidget(horizontal bool) *SWS_SplitWidget {
 	var corewidget *SWS_CoreWidget
 	if horizontal {
@@ -196,7 +225,8 @@ func CreateSplitWidget(horizontal bool) *SWS_SplitWidget {
 	}
 	widget := &SWS_SplitWidget{SWS_CoreWidget: *corewidget,
 		horizontal: horizontal,
-		callback: nil,
-		buttondown: false}
+		callback:   nil,
+		buttondown: false,
+		movable:    true}
 	return widget
 }
