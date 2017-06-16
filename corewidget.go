@@ -169,6 +169,10 @@ func (self *SWS_CoreWidget) Font() *ttf.Font {
 	return self.font
 }
 
+func (self *SWS_CoreWidget) SetFont(font *ttf.Font) {
+	self.font=font
+}
+
 func (self *SWS_CoreWidget) HasFocus(focus bool) {
 }
 
