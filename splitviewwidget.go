@@ -43,7 +43,7 @@ func (self *SWS_SplitviewWidget) Resize(width, height int32) {
 			self.leftwidget.Resize(width,self.splitwidget.Y())
 		}
 		if self.rightwidget!=nil {
-			self.rightwidget.Resize(height-(self.splitwidget.Y()+self.splitwidget.Height()),width)
+			self.rightwidget.Resize(width,height-(self.splitwidget.Y()+self.splitwidget.Height()))
 		}
 	}
 	PostUpdate()

@@ -87,13 +87,16 @@ func (self *SWS_ScrollWidget) SetInnerWidget(widget SWS_Widget) bool {
 
 func CreateScrollWidget(w, h int32) *SWS_ScrollWidget {
 	corewidget := CreateCoreWidget(w, h)
+	subwidget := CreateCoreWidget(w, h)
 	widget := &SWS_ScrollWidget{SWS_CoreWidget: *corewidget,
-		subwidget:  nil,
+		subwidget:  subwidget,
 		hScrollbar: CreateScrollbarWidget(100, SCROLLBAR_WIDTH, true),
 		vScrollbar: CreateScrollbarWidget(SCROLLBAR_WIDTH, 100, false),
 		corner:     CreateCoreWidget(SCROLLBAR_WIDTH, SCROLLBAR_WIDTH),
 		showH:      true,
 		showV:      true}
+	widget.AddChild(subwidget)
+	subwidget.SetParent(widget)
 	widget.hScrollbar.SetParent(widget)
 	widget.hScrollbar.SetCallback(func(currentposition int32) {
 		w := widget
