@@ -2,6 +2,7 @@ package sws
 
 import (
 	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/sdl_image"
 )
 
 type SWS_Label struct {
@@ -15,8 +16,10 @@ func (self *SWS_Label) SetCentered(centered bool) {
         self.centered=centered
 }
 
-func (self *SWS_Label) SetImage(image *sdl.Surface) {
-        self.image=image
+func (self *SWS_Label) SetImage(image string) {
+	if img,err := img.Load(image); err==nil {
+        	self.image=img
+	}
 }
 
 func (self *SWS_Label) Repaint() {

@@ -1,7 +1,6 @@
 package sws
 
 import (
-	"github.com/veandco/go-sdl2/sdl"
 )
 
 //
@@ -25,10 +24,10 @@ func (self *SWS_ListWidget) GetCurrentItem() (int32, *SWS_FlatButtonWidget) {
 	return self.currentItem,self.children[self.currentItem].(*SWS_FlatButtonWidget)
 }
 
-func (self *SWS_ListWidget) AddItem(height int32,label string,image *sdl.Surface,callback func()) {
+func (self *SWS_ListWidget) AddItem(height int32,label string,image string,callback func()) {
 	button:=CreateFlatButtonWidget(self.Width(),height,label)
 	button.SetCentered(false)
-	if image!=nil { button.SetImage(image) }
+	if image!="" { button.SetImage(image) }
 	self.callbacks[button]=callback
 
 	button.SetColor(0xffdddddd)

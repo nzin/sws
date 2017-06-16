@@ -2,6 +2,7 @@ package sws
 
 import (
 	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/sdl_image"
 )
 
 type SWS_ButtonWidget struct {
@@ -23,8 +24,10 @@ func (self *SWS_ButtonWidget) SetCentered(centered bool) {
 	self.centered=centered
 }
 
-func (self *SWS_ButtonWidget) SetImage(image *sdl.Surface) {
-	self.image=image
+func (self *SWS_ButtonWidget) SetImage(image string) {
+	if img,err := img.Load(image); err==nil {
+		self.image=img
+	}
 }
 
 func (self *SWS_ButtonWidget) SetClicked(callback func()) {

@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"github.com/nzin/sws"
 	//"github.com/veandco/go-sdl2/sdl"
-	"github.com/veandco/go-sdl2/sdl_image"
 	_ "log"
 	_ "runtime/pprof"
 )
@@ -100,10 +99,10 @@ func main() {
 	sv := sws.CreateSplitviewWidget(200,200,true)
 	
 	vbox := sws.CreateListWidget(200,10)
-	vbox.AddItem(25,"Element 1",nil,nil)
-	vbox.AddItem(25,"Element 2",nil,nil)
-	vbox.AddItem(25,"Element 3",nil,nil)
-	vbox.AddItem(25, "longer element 4",nil,nil)
+	vbox.AddItem(25,"Element 1","",nil)
+	vbox.AddItem(25,"Element 2","",nil)
+	vbox.AddItem(25,"Element 3","",nil)
+	vbox.AddItem(25, "longer element 4","",nil)
 	
 	vboxscroll := sws.CreateScrollWidget(200, 200)
 	vboxscroll.ShowHorizontalScrollbar(false)
@@ -114,23 +113,17 @@ func main() {
 	sv.SetRightWidget(corewidget2)
 
 	b2 := sws.CreateButtonWidget(100, 100, "idea")
-	if img,err := img.Load("idea.png"); err==nil {
-		b2.SetImage(img)
-	}
+	b2.SetImage("idea.png")
 	corewidget2.AddChild(b2)
 
 	l2 := sws.CreateLabel(100, 100, "idea2")
-	if img,err := img.Load("idea.png"); err==nil {
-		l2.SetImage(img)
-	}
+	l2.SetImage("idea.png")
 	l2.SetCentered(true)
 	corewidget2.AddChild(l2)
 	l2.Move(0, 100)
 
 	b3 := sws.CreateFlatButtonWidget(100, 100, "idea")
-	if img,err := img.Load("idea.png"); err==nil {
-		b3.SetImage(img)
-	}
+	b3.SetImage("idea.png")
 	corewidget2.AddChild(b3)
 	b3.Move(100, 0)
 
