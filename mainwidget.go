@@ -21,7 +21,7 @@ type SWS_MainWidget struct {
 	expandable         bool // can we full screen
 	resizable          bool // can be resized
 	inmove             bool // to know if we are currently "in move" state
-	Close              func()
+	closeCallback      func()
 	buttonOnClose      bool // to know if we click down on the close button
 	cursorInsideClose  bool // to know if we are over the close button
 	buttonOnExpand     bool // to know if we click down on the fullscreen button
@@ -29,6 +29,10 @@ type SWS_MainWidget struct {
 	onResize           bool // to know if we are resizing
 	subwidget          SWS_Widget
 	menubar            *SWS_MenuBarWidget
+}
+
+func (self *SWS_MainWidget) SetCloseCallback(callback func()) {
+    self.closeCallback=callback
 }
 
 func (self *SWS_MainWidget) SetInnerWidget(widget SWS_Widget) bool {
@@ -262,6 +266,9 @@ func (self *SWS_MainWidget) MousePressUp(x, y int32, button uint8) {
 	self.inmove = false
 	if self.buttonOnClose == true {
 		self.buttonOnClose = false
+		if self.closeCallback!=nil {
+			self.closeCallback()
+		}
 		PostUpdate()
 	}
 	if self.buttonOnExpand == true {
