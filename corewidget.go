@@ -202,6 +202,16 @@ func (self *SWS_CoreWidget) RemoveChild(child SWS_Widget) {
 }
 
 func (self *SWS_CoreWidget) AddChild(child SWS_Widget) {
+	// we don't want to add it twice
+	for i,c:= range self.children {
+		if c==child {
+			if i == 0 {
+				self.children = self.children[1:]
+			} else {
+				self.children = append(self.children[:i], self.children[i+1:]...)
+			}
+		}
+	} 
 	self.children = append(self.children, child)
 	child.SetParent(self)
 }
