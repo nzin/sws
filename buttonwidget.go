@@ -71,6 +71,7 @@ func (self *SWS_ButtonWidget) MouseMove(x, y, xrel, yrel int32) {
 
 func (self *SWS_ButtonWidget) Repaint() {
 	self.SWS_CoreWidget.Repaint()
+	self.FillRect(2, 2, self.width-4, self.height-4, 0xffdddddd)
 	self.SetDrawColor(0, 0, 0, 255)
 	self.DrawLine(0, 1, 0, self.Height()-2)
 	self.DrawLine(self.Width()-1, 1, self.Width()-1, self.Height()-2)

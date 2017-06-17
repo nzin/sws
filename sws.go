@@ -47,7 +47,7 @@ type SWS_Widget interface {
 	Resize(width, height int32)
 	Surface() *sdl.Surface
 	Renderer() *sdl.Renderer
-	getChildren() []SWS_Widget
+	GetChildren() []SWS_Widget
 	Parent() SWS_Widget
 	SetParent(SWS_Widget)
 	Repaint()
@@ -77,7 +77,7 @@ func findMainWidget(x, y int32, root *SWS_RootWidget) (target SWS_Widget) {
 	y -= root.Y()
 
 	// we take the closest
-	for _, child := range root.getChildren() {
+	for _, child := range root.GetChildren() {
 		maxX := child.X() + child.Width()
 		maxY := child.Y() + child.Height()
 		if maxX > root.Width() {
@@ -116,7 +116,7 @@ func findWidget(x, y int32, root SWS_Widget) (target SWS_Widget, xTarget, yTarge
 	y -= root.Y()
 
 	// we take the closest
-	for _, child := range root.getChildren() {
+	for _, child := range root.GetChildren() {
 		maxX := child.X() + child.Width()
 		maxY := child.Y() + child.Height()
 		if maxX > root.Width() {

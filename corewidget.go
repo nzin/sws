@@ -214,7 +214,7 @@ func (self *SWS_CoreWidget) Parent() SWS_Widget {
 	return self.parent
 }
 
-func (self *SWS_CoreWidget) getChildren() []SWS_Widget {
+func (self *SWS_CoreWidget) GetChildren() []SWS_Widget {
 	return self.children
 }
 
