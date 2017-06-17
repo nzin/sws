@@ -20,6 +20,14 @@ type SWS_ScrollWidget struct {
 	showV      bool
 }
 
+func (self *SWS_ScrollWidget) SetHorizontalPosition(position int32) {
+	self.hScrollbar.SetPosition(position)
+}
+
+func (self *SWS_ScrollWidget) SetVerticalPosition(position int32) {
+	self.vScrollbar.SetPosition(position)
+}
+
 func (self *SWS_ScrollWidget) ShowVerticalScrollbar(showV bool) {
 	self.showV=showV
 }

@@ -20,6 +20,16 @@ type SWS_ScrollbarWidget struct {
 	timerevent      *TimerEvent
 }
 
+func (self *SWS_ScrollbarWidget) SetPosition(position int32) {
+	if position<self.minimum { position=self.minimum}
+	if position>self.maximum { position=self.maximum}
+	self.Currentposition = position
+	if (self.callback!=nil) {
+		self.callback(self.Currentposition)
+	}
+	PostUpdate()
+}
+
 func (self *SWS_ScrollbarWidget) SetCallback(callback Scrollbarcallback) {
 	self.callback = callback
 }
