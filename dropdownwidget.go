@@ -15,6 +15,12 @@ type SWS_DropdownWidget struct {
 	hasfocus     bool
 }
 
+func (self *SWS_DropdownWidget) SetChoices(choices []string) {
+	self.Choices=choices
+	self.ActiveChoice=0
+	PostUpdate()
+}
+
 func (self *SWS_DropdownWidget) HasFocus(hasfocus bool) {
 	self.hasfocus = hasfocus
 	if hasfocus == false {
@@ -114,6 +120,7 @@ func (self *SWS_DropdownWidget) Repaint() {
 	}
 
 	self.SWS_CoreWidget.Repaint()
+	self.FillRect(2, 2, self.width-4, self.height-4, 0xffdddddd)
 	self.SetDrawColor(0, 0, 0, 255)
 	self.DrawLine(0, 1, 0, self.Height()-2)
 	self.DrawLine(self.Width()-1, 1, self.Width()-1, self.Height()-2)

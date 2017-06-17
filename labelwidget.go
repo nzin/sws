@@ -14,12 +14,19 @@ type SWS_Label struct {
 
 func (self *SWS_Label) SetCentered(centered bool) {
         self.centered=centered
+	PostUpdate()
+}
+
+func (self *SWS_Label) SetText(label string) {
+        self.label=label
+	PostUpdate()
 }
 
 func (self *SWS_Label) SetImage(image string) {
 	if img,err := img.Load(image); err==nil {
         	self.image=img
 	}
+	PostUpdate()
 }
 
 func (self *SWS_Label) Repaint() {
