@@ -1,7 +1,6 @@
 package sws
 
 import (
-	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -15,6 +14,7 @@ type SWS_TextAreaWidget struct {
 	hasfocus              bool
 	leftButtonDown        bool
 	writeOffset           int32 // how far we scroll the text
+	readonly              bool
 }
 
 const (
@@ -25,13 +25,26 @@ const (
 	GLYPH_ENTER = 4
 )
 
+func (self *SWS_TextAreaWidget) SetText(text string) {
+	self.text=text
+	PostUpdate()
+}
+
+func (self *SWS_TextAreaWidget) SetReadonly(readonly bool) {
+	self.readonly=readonly
+	self.SetColor(0xffdddddd)
+	PostUpdate()
+}
+
 func (self *SWS_TextAreaWidget) HasFocus(focus bool) {
-	fmt.Println("HasFocus")
 	self.hasfocus = focus
 	PostUpdate()
 }
 
 func (self *SWS_TextAreaWidget) MousePressDown(x, y int32, button uint8) {
+	if self.readonly==true {
+		return
+	}
 
 	if button == sdl.BUTTON_LEFT {
 		self.leftButtonDown = true
@@ -67,6 +80,9 @@ func (self *SWS_TextAreaWidget) MouseMove(x, y, xrel, yrel int32) {
 }
 
 func (self *SWS_TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
+	if self.readonly==true {
+		return
+	}
 	if key == sdl.K_UP {
 		self.UpdatePosition(self.xCursor,self.yCursor-int32(self.Font().Height()))
 		if mod != sdl.KMOD_LSHIFT && mod != sdl.KMOD_RSHIFT {
@@ -175,7 +191,6 @@ func (self *SWS_TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 type treatWord func(ta *SWS_TextAreaWidget, typeGlyph,x,y int32, word string, position int32)
 
 func updatePositionWord(self *SWS_TextAreaWidget, typeGlyph, x,y int32, word string,position int32) {
-	fmt.Println("updatePositionWord",x,y,position)
 	// we didn't reach the line
 	if y+int32(self.Font().Height())<=self.yCursor {
 		self.initialCursorPosition=int(position)
@@ -197,7 +212,6 @@ func updatePositionWord(self *SWS_TextAreaWidget, typeGlyph, x,y int32, word str
 }
 
 func (self *SWS_TextAreaWidget) UpdatePosition(x,y int32) {
-	fmt.Println("UpdatePosition(",x,y,")")
 	if (y<2 && self.writeOffset==0) {
 		self.initialCursorPosition=0
 	} else {
@@ -228,7 +242,6 @@ func renderWord(self *SWS_TextAreaWidget, typeGlyph, x,y int32, word string,posi
 			widthLeft, _, _ := self.Font().SizeUTF8(word[:e-int(position)])
 			self.FillRect(x,y, int32(widthLeft), int32(self.Font().Height()), 0xff8888ff)
 		} else if (i<=int(position)+len(word) && e>=int(position)) {
-			fmt.Println("word=",word,"i=",i,"position=",position)
 			widthLeft, _, _ := self.Font().SizeUTF8(word[:i-int(position)])
 			widthRight, _, _ := self.Font().SizeUTF8(word[i-int(position):e-int(position)])
 			self.FillRect(x+int32(widthLeft),y, int32(widthRight), int32(self.Font().Height()), 0xff8888ff)
@@ -242,7 +255,6 @@ func renderWord(self *SWS_TextAreaWidget, typeGlyph, x,y int32, word string,posi
 		self.WriteText(x,y, word, sdl.Color{0, 0, 0, 255})
 	} else { // TAB
 		if (i<=int(position) && e>=int(position)+1) {
-			fmt.Println("tab -->",x,y)
 			self.FillRect(x,y, 2+(((x-2+32)>>5)<<5)-x, int32(self.Font().Height()), 0xff8888ff)
 		}
 		// compute x,y cursor position
@@ -273,7 +285,6 @@ func renderWord(self *SWS_TextAreaWidget, typeGlyph, x,y int32, word string,posi
 }
 
 func (self *SWS_TextAreaWidget) renderText(typeGlyph int32, word string, x,y *int32,position int32, treat treatWord) {
-	//fmt.Println("renderText: ",typeGlyph,word,*x,*y)
 	if (typeGlyph==GLYPH_SPACE) { // space
 		width, _, _ := self.Font().SizeUTF8(word)
 		treat(self,typeGlyph,*x,*y, word, position)
@@ -375,41 +386,41 @@ func (self *SWS_TextAreaWidget) parseText(treat treatWord) {
 
 
 func (self *SWS_TextAreaWidget) Repaint() {
-	fmt.Println("TA:Repaint",self.xCursor,self.yCursor,self.initialCursorPosition)
 	self.SWS_CoreWidget.Repaint()
 
 	self.parseText(renderWord)
 
 	// write boundaries
-	self.SetDrawColor(0, 0, 0, 255)
-	self.DrawLine(0, 2, 0, self.Height()-3)
-	self.DrawLine(self.Width()-1, 2, self.Width()-1, self.Height()-3)
-	self.DrawLine(2, 0, self.Width()-3, 0)
-	self.DrawLine(2, self.Height()-1, self.Width()-3, self.Height()-1)
-	self.DrawPoint(1, self.Height()-2)
-	self.DrawPoint(1, 1)
-	self.DrawPoint(self.Width()-2, 1)
-	self.DrawPoint(self.Width()-2, self.Height()-2)
+	if self.readonly==false {
+		self.SetDrawColor(0, 0, 0, 255)
+		self.DrawLine(0, 2, 0, self.Height()-3)
+		self.DrawLine(self.Width()-1, 2, self.Width()-1, self.Height()-3)
+		self.DrawLine(2, 0, self.Width()-3, 0)
+		self.DrawLine(2, self.Height()-1, self.Width()-3, self.Height()-1)
+		self.DrawPoint(1, self.Height()-2)
+		self.DrawPoint(1, 1)
+		self.DrawPoint(self.Width()-2, 1)
+		self.DrawPoint(self.Width()-2, self.Height()-2)
 
-	self.SetDrawColor(0xdd, 0xdd, 0xdd, 255)
-	self.DrawLine(2, 1, self.Width()-3, 1)
-	self.DrawLine(1, 2, 1, self.Height()-3)
-	self.DrawPoint(0, 0)
-	self.DrawPoint(0, 1)
-	self.DrawPoint(1, 0)
-
-	self.DrawPoint(self.Width()-1, 0)
-	self.DrawPoint(self.Width()-1, 1)
-	self.DrawPoint(self.Width()-2, 0)
-
-	self.DrawPoint(0, self.Height()-1)
-	self.DrawPoint(0, self.Height()-2)
-	self.DrawPoint(1, self.Height()-1)
-
-	self.DrawPoint(self.Width()-1, self.Height()-1)
-	self.DrawPoint(self.Width()-1, self.Height()-2)
-	self.DrawPoint(self.Width()-2, self.Height()-1)
-
+		self.SetDrawColor(0xdd, 0xdd, 0xdd, 255)
+		self.DrawLine(2, 1, self.Width()-3, 1)
+		self.DrawLine(1, 2, 1, self.Height()-3)
+		self.DrawPoint(0, 0)
+		self.DrawPoint(0, 1)
+		self.DrawPoint(1, 0)
+	
+		self.DrawPoint(self.Width()-1, 0)
+		self.DrawPoint(self.Width()-1, 1)
+		self.DrawPoint(self.Width()-2, 0)
+	
+		self.DrawPoint(0, self.Height()-1)
+		self.DrawPoint(0, self.Height()-2)
+		self.DrawPoint(1, self.Height()-1)
+	
+		self.DrawPoint(self.Width()-1, self.Height()-1)
+		self.DrawPoint(self.Width()-1, self.Height()-2)
+		self.DrawPoint(self.Width()-2, self.Height()-1)
+	}
 
 }
 
@@ -420,7 +431,8 @@ func CreateTextAreaWidget(w, h int32, s string) *SWS_TextAreaWidget {
 		initialCursorPosition: 0,
 		hasfocus:              false,
 		leftButtonDown:        false,
-		writeOffset:           0}
+		writeOffset:           0,
+		readonly:              false}
 	widget.SetColor(0xffffffff)
 	return widget
 }

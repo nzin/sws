@@ -131,6 +131,11 @@ func main() {
         corewidget2.AddChild(ta)
 	ta.Move(100,100)
 
+	ta2 := sws.CreateTextAreaWidget(100,100,"initial text another line t\tt\tt")
+	ta2.SetReadonly(true)
+        corewidget2.AddChild(ta2)
+	ta2.Move(0,200)
+
 	main1 := sws.CreateMainWidget(200, 100, "main1", false, true)
 	main1.Move(400, 300)
 	main1.SetMenuBar(menubar)
