@@ -10,6 +10,8 @@ type SWS_TextAreaWidget struct {
 	text                  string
 	initialCursorPosition int // begin of selection
 	endCursorPosition     int // end of selection
+	xCursor               int32
+	yCursor               int32
 	hasfocus              bool
 	leftButtonDown        bool
 	writeOffset           int32 // how far we scroll the text
@@ -91,14 +93,8 @@ func (self *SWS_TextAreaWidget) MouseMove(x, y, xrel, yrel int32) {
 
 func (self *SWS_TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 	if key == sdl.K_UP {
-		if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
-			if self.initialCursorPosition > 0 {
-				self.initialCursorPosition=0
-			}
-		} else {
-			if self.initialCursorPosition > 0 {
-				self.initialCursorPosition=0
-			}
+		self.UpdatePosition(self.xCursor,self.yCursor-int32(self.Font().Height()))
+		if mod != sdl.KMOD_LSHIFT && mod != sdl.KMOD_RSHIFT {
 			self.endCursorPosition = self.initialCursorPosition
 		}
 		PostUpdate()
@@ -131,14 +127,8 @@ func (self *SWS_TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 	}
 
 	if key == sdl.K_DOWN {
-		if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
-			if self.initialCursorPosition < len(self.text) {
-				self.initialCursorPosition=len(self.text)
-			}
-		} else {
-			if self.initialCursorPosition < len(self.text) {
-				self.initialCursorPosition=len(self.text)
-			}
+		self.UpdatePosition(self.xCursor,self.yCursor+int32(self.Font().Height()))
+		if mod != sdl.KMOD_LSHIFT && mod != sdl.KMOD_RSHIFT {
 			self.endCursorPosition = self.initialCursorPosition
 		}
 		PostUpdate()
@@ -191,7 +181,6 @@ func (self *SWS_TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		self.endCursorPosition = self.initialCursorPosition
 		PostUpdate()
 	}
-	// replace cursor
 /*
 	w, _, err := self.Font().SizeUTF8(self.text[:self.initialCursorPosition])
 	if err != nil {
@@ -208,7 +197,43 @@ func (self *SWS_TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 */
 }
 
-func (self *SWS_TextAreaWidget) renderWord(typeGlyph, x,y int32, word string,position int32) {
+type treatWord func(ta *SWS_TextAreaWidget, typeGlyph,x,y int32, word string, position int32)
+
+func updatePositionWord(self *SWS_TextAreaWidget, typeGlyph, x,y int32, word string,position int32) {
+	fmt.Println("updatePositionWord",x,y,position)
+	// we didn't reach the line
+	if y+int32(self.Font().Height())<=self.yCursor {
+		self.initialCursorPosition=int(position)
+	// we are on the correct line
+	} else if (y<=self.yCursor && y+int32(self.Font().Height())>self.yCursor) {
+		if (x<=self.xCursor) {
+			self.initialCursorPosition=int(position)
+			width, _, _ := self.Font().SizeUTF8(word)
+			if (x+int32(width)>self.xCursor) {
+				for i,_:=range(word) {
+					width, _, _ := self.Font().SizeUTF8(word[:i])
+					if (x+int32(width)<=self.xCursor) {
+						self.initialCursorPosition=int(position)+i
+					}
+				}
+			}
+		}
+	}
+}
+
+func (self *SWS_TextAreaWidget) UpdatePosition(x,y int32) {
+	fmt.Println("UpdatePosition(",x,y,")")
+	if (y<2) {
+		self.initialCursorPosition=0
+	} else {
+		self.xCursor=x
+		self.yCursor=y
+		self.parseText(updatePositionWord)
+	}
+	PostUpdate()
+}
+
+func renderWord(self *SWS_TextAreaWidget, typeGlyph, x,y int32, word string,position int32) {
 	fmt.Println("renderWord:",typeGlyph, x,y,position)
 
 	i := self.initialCursorPosition
@@ -235,13 +260,25 @@ func (self *SWS_TextAreaWidget) renderWord(typeGlyph, x,y int32, word string,pos
 			widthRight, _, _ := self.Font().SizeUTF8(word[i-int(position):e-int(position)])
 			self.FillRect(x+int32(widthLeft),y, int32(widthRight), int32(self.Font().Height()), 0xff8888ff)
 		}
+		// compute x,y cursor position
+		if (self.initialCursorPosition>=int(position) && self.initialCursorPosition<int(position)+len(word)) {
+			width,_,_ := self.Font().SizeUTF8(word[:self.initialCursorPosition-int(position)])
+			self.xCursor=x+int32(width)
+			self.yCursor=y
+		}
 		self.WriteText(x,y, word, sdl.Color{0, 0, 0, 255})
 	} else { // TAB
 		if (i<=int(position) && e>=int(position)+1) {
 			fmt.Println("tab -->",x,y)
 			self.FillRect(x,y, 2+(((x-2+32)>>5)<<5)-x, int32(self.Font().Height()), 0xff8888ff)
 		}
+		// compute x,y cursor position
+		if (self.initialCursorPosition==int(position)) {
+			self.xCursor=x
+			self.yCursor=y
+		}
 	}
+
 	if int32(self.endCursorPosition)>=position && int32(self.endCursorPosition)<position+int32(len(word)) { // we have to print the cursor
 		for i,_ := range(word) {
 			if position+int32(i) == int32(self.endCursorPosition) {
@@ -257,26 +294,26 @@ func (self *SWS_TextAreaWidget) renderWord(typeGlyph, x,y int32, word string,pos
 	}
 }
 
-func (self *SWS_TextAreaWidget) renderText(typeGlyph int32, word string, x,y *int32,position int32) {
-	fmt.Println("renderText: ",typeGlyph,word,*x,*y)
+func (self *SWS_TextAreaWidget) renderText(typeGlyph int32, word string, x,y *int32,position int32, treat treatWord) {
+	//fmt.Println("renderText: ",typeGlyph,word,*x,*y)
 	if (typeGlyph==GLYPH_SPACE) { // space
 		width, _, _ := self.Font().SizeUTF8(word)
-		self.renderWord(typeGlyph,*x,*y, word, position)
+		treat(self,typeGlyph,*x,*y, word, position)
 		*x = *x+int32(width)
 	} else if (typeGlyph==GLYPH_TAB) { //tab
 		if ((*x-2+32)>>5)<<5 >= self.Width()-4 {
 			*x=2
 			*y+=int32(self.Font().Height())
-			self.renderWord(typeGlyph,*x,*y, word, position)
+			treat(self,typeGlyph,*x,*y, word, position)
 			*x=34
 		} else {
-			self.renderWord(typeGlyph,*x,*y, word, position)
+			treat(self,typeGlyph,*x,*y, word, position)
 			*x=2+((*x-2+32)>>5)<<5
 		}
 	} else if (typeGlyph==GLYPH_ENTER) { //enter
 		*x=2
 		*y+=int32(self.Font().Height())
-		self.renderWord(typeGlyph,*x,*y, "", position)
+		treat(self,typeGlyph,*x,*y, "", position)
 	} else if (typeGlyph==GLYPH_WORD) { // word
 		width, _, _ := self.Font().SizeUTF8(word)
 		if (*x+int32(width)) > self.Width()-4 && *x>2 {
@@ -294,55 +331,20 @@ func (self *SWS_TextAreaWidget) renderText(typeGlyph int32, word string, x,y *in
 					break
 				}
 			}
-			self.renderWord(typeGlyph,*x,*y, subword,position)
+			treat(self,typeGlyph,*x,*y, subword, position)
 			*y+=int32(self.Font().Height())
 			word=word[len(subword):]
 			position+=int32(len(subword))
 			width, _, _ = self.Font().SizeUTF8(word)
 		}
-		self.renderWord(typeGlyph,*x,*y, word,position)
+		treat(self,typeGlyph,*x,*y, word, position)
 		*x+=int32(width)
 	} else if (typeGlyph==GLYPH_END) { // end text
-		self.renderWord(typeGlyph,*x,*y, "",position)
+		treat(self,typeGlyph,*x,*y, "", position)
 	}
 }
 
-func (self *SWS_TextAreaWidget) Repaint() {
-	self.SWS_CoreWidget.Repaint()
-	/*
-	// write text and cursor
-	i := self.initialCursorPosition
-	e := self.endCursorPosition
-	if i > e {
-		i, e = e, i
-	}
-
-	self.SetDrawColor(0, 0, 0, 255)
-	if e > len(self.text) {
-		e = len(self.text)
-	}
-	if i > len(self.text) {
-		i = len(self.text)
-	}
-	strbefore := self.text[:i]
-	strMiddle := self.text[i:e]
-	strafter := self.text[e:]
-	wMiddle, _, _ := self.Font().SizeUTF8(strMiddle)
-
-	wbefore, _ := self.WriteText(2-self.writeOffset, 2, strbefore, sdl.Color{0, 0, 0, 255})
-	//    fmt.Println(wbefore,wMiddle)
-	self.FillRect(wbefore+2-self.writeOffset, 3, int32(wMiddle), self.Height()-2, 0xff8888ff)
-	self.SetDrawColor(0, 0, 0, 255)
-	self.WriteText(wbefore+2-self.writeOffset, 2, strMiddle, sdl.Color{0, 0, 0, 255})
-	self.WriteText(wbefore+int32(wMiddle)+2-self.writeOffset, 2, strafter, sdl.Color{0, 0, 0, 255})
-	if self.hasfocus {
-		if self.initialCursorPosition < self.endCursorPosition {
-			self.DrawLine(wbefore+2-self.writeOffset, 3, wbefore+2-self.writeOffset, self.Height()-4)
-		} else {
-			self.DrawLine(wbefore+int32(wMiddle)+2-self.writeOffset, 3, wbefore+int32(wMiddle)+2-self.writeOffset, self.Height()-4)
-		}
-	}
-	*/
+func (self *SWS_TextAreaWidget) parseText(treat treatWord) {
 	// cut the string into 5 types: word, tab, enter, multiple spaces, and end of string
 	// for each boundary: we have to render it:
 	// if word we check if we have to go to the next line
@@ -356,31 +358,48 @@ func (self *SWS_TextAreaWidget) Repaint() {
 	word:=""
 	for currentpos,char := range (self.text) {
 		if char==' ' && typeGlyph!=GLYPH_SPACE { // space
-			self.renderText(typeGlyph,word,&x,&y,position)
+			self.renderText(typeGlyph,word,&x,&y,position,treat)
 			typeGlyph=GLYPH_SPACE
 			word=""
 			position=int32(currentpos)
 		} else if char=='\t' { // tab
-			self.renderText(typeGlyph,word,&x,&y,position)
+			self.renderText(typeGlyph,word,&x,&y,position,treat)
 			typeGlyph=GLYPH_TAB
 			word=""
 			position=int32(currentpos)
 		} else if char=='\n' { // enter
-			self.renderText(typeGlyph,word,&x,&y,position)
+			self.renderText(typeGlyph,word,&x,&y,position,treat)
 			typeGlyph=GLYPH_ENTER
 			word=""
 			position=int32(currentpos)
 		} else if typeGlyph !=GLYPH_WORD { // word
-			self.renderText(typeGlyph,word,&x,&y,position)
+			self.renderText(typeGlyph,word,&x,&y,position,treat)
 			typeGlyph=GLYPH_WORD
 			word=""
 			position=int32(currentpos)
 		}
 		word=word+string(char)
 	}
-	self.renderText(typeGlyph,word,&x,&y,position)
+	self.renderText(typeGlyph,word,&x,&y,position,treat)
 	// for the cursor at the end
-	self.renderText(GLYPH_END,"",&x,&y,int32(len(self.text)))
+	self.renderText(GLYPH_END,"",&x,&y,int32(len(self.text)),treat)
+	// replace cursor (if it is at the end)
+	if (self.yCursor>=y) {
+		if (self.xCursor>=x) {
+			self.yCursor=y
+			self.xCursor=x
+		} else {
+			self.xCursor=x
+			self.yCursor=y
+		}
+	}
+}
+
+
+func (self *SWS_TextAreaWidget) Repaint() {
+	self.SWS_CoreWidget.Repaint()
+
+	self.parseText(renderWord)
 
 	// write boundaries
 	self.SetDrawColor(0, 0, 0, 255)
