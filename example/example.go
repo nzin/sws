@@ -126,6 +126,10 @@ func main() {
 	b3.SetImage("idea.png")
 	corewidget2.AddChild(b3)
 	b3.Move(100, 0)
+	
+	ta := sws.CreateTextAreaWidget(100,100,"initial text another line t\tt\tt")
+        corewidget2.AddChild(ta)
+	ta.Move(100,100)
 
 	main1 := sws.CreateMainWidget(200, 100, "main1", false, true)
 	main1.Move(400, 300)
