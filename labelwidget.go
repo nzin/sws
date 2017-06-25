@@ -7,9 +7,14 @@ import (
 
 type SWS_Label struct {
 	SWS_CoreWidget
-	label    string
-	image    *sdl.Surface
-	centered bool
+	label     string
+	image     *sdl.Surface
+	textcolor sdl.Color
+	centered  bool
+}
+
+func (self *SWS_Label) SetTextColor(color sdl.Color) {
+	self.textcolor=color
 }
 
 func (self *SWS_Label) SetCentered(centered bool) {
@@ -35,7 +40,7 @@ func (self *SWS_Label) Repaint() {
 	var text *sdl.Surface
 	var err error
 	if (self.label!="") {
-		if text, err = self.Font().RenderUTF8_Blended(self.label, sdl.Color{0, 0, 0,       255}); err != nil {
+		if text, err = self.Font().RenderUTF8_Blended(self.label, self.textcolor); err != nil {
 		//      fmt.Fprint(os.Stderr, "Failed to render text: %s\n", err)
 		}
 		defer text.Free()
@@ -82,6 +87,7 @@ func (self *SWS_Label) Repaint() {
 func CreateLabel(w, h int32, s string) *SWS_Label {
 	corewidget := CreateCoreWidget(w, h)
 	widget := &SWS_Label{SWS_CoreWidget: *corewidget,
-		label: s}
+		label: s,
+		textcolor:    sdl.Color{0, 0, 0, 255}}
 	return widget
 }
