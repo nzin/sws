@@ -310,11 +310,11 @@ func (self *SWS_TextAreaWidget) renderText(typeGlyph int32, word string, x,y *in
 			*y+=int32(self.Font().Height())
 		}
 		// the word is longer than the line
-		for int32(width) > self.Width()-4 {
+		for int32(width) > self.Width()-4 && self.Width()>0 {
 			subword:=""
 			for i,c := range (word) {
 				subwidth,_,_:=self.Font().SizeUTF8(word[:i+1])
-				if (int32(subwidth)<self.Width()-4) {
+				if (int32(subwidth)<self.Width()-4 || len(subword)==0) {
 					subword=subword+string(c)
 				} else {
 					break
