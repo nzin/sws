@@ -279,6 +279,7 @@ func (self *SWS_CoreWidget) Height() int32 {
 
 func (self *SWS_CoreWidget) SetColor(color uint32) {
 	self.bgColor = color
+	PostUpdate()
 }
 
 func (self *SWS_CoreWidget) Move(x, y int32) {
