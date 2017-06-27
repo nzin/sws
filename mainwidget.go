@@ -256,8 +256,10 @@ func (self *SWS_MainWidget) MousePressDown(x, y int32, button uint8) {
 	if x < 40+int32(wText) && y < 20 {
 		self.inmove = true
 	}
-	if (x >= self.Width()-25 && y >= self.Height()-6) || (x >= self.Width()-6 && y >= self.Height()-25) {
-		self.onResize = true
+	if self.resizable {
+		if (x >= self.Width()-25 && y >= self.Height()-6) || (x >= self.Width()-6 && y >= self.Height()-25) {
+			self.onResize = true
+		}
 	}
 }
 
