@@ -18,16 +18,24 @@ type SWS_ButtonWidget struct {
 
 func (self *SWS_ButtonWidget) SetTextColor(color sdl.Color) {
 	self.textcolor=color
+	PostUpdate()
+}
+
+func (self *SWS_ButtonWidget) SetText(text string) {
+	self.label=text
+	PostUpdate()
 }
 
 func (self *SWS_ButtonWidget) SetCentered(centered bool) {
 	self.centered=centered
+	PostUpdate()
 }
 
 func (self *SWS_ButtonWidget) SetImage(image string) {
 	if img,err := img.Load(image); err==nil {
 		self.image=img
 	}
+	PostUpdate()
 }
 
 func (self *SWS_ButtonWidget) SetClicked(callback func()) {
