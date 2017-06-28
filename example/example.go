@@ -144,6 +144,16 @@ func main() {
 	
 	root.AddChild(main1)
 
+	tabs := sws.CreateTabWidget(100,100)
+	ta3 := sws.CreateTextAreaWidget(100,100,"text area3 ")
+	ta4 := sws.CreateTextAreaWidget(100,100,"text area4 ")
+	tabs.AddTab("text area 3",ta3)
+	tabs.AddTab("text area 4",ta4)
+	main2 := sws.CreateMainWidget(300, 200, "tab", false, true)
+	main2.SetInnerWidget(tabs)
+	main2.Move(500, 400)
+	root.AddChild(main2)
+
 	for sws.PoolEvent() == false {
 	}
 
