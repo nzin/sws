@@ -19,7 +19,7 @@ package sws
 import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
-	"github.com/veandco/go-sdl2/sdl_ttf"
+	"github.com/veandco/go-sdl2/ttf"
 	"time"
 )
 
