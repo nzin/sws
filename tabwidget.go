@@ -72,7 +72,7 @@ func (self *SWS_TabWidget) Repaint() {
 	self.DrawLine(0,30,self.Width(),30)
 	if (len(self.tabs)==0) {
 		self.DrawLine(5,7,5,29)
-		self.DrawLine(6,6,29,1)
+		self.DrawLine(6,6,24,6)
 		self.SetDrawColor(0x88, 0x88, 0x88, 255)
 		self.DrawLine(25,7,25,29)
 
