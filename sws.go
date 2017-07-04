@@ -158,6 +158,7 @@ type SWS_RootWidget struct {
 	SWS_CoreWidget
 	window        *sdl.Window
 	windowsurface *sdl.Surface
+	modalwidget   SWS_Widget
 }
 
 //
@@ -167,6 +168,28 @@ type SWS_RootWidget struct {
 func (self *SWS_RootWidget) RaiseToTop(widget SWS_Widget) {
 	self.RemoveChild(widget)
 	self.AddChild(widget)
+}
+
+func (self *SWS_RootWidget) RemoveChild(child SWS_Widget) {
+	self.SWS_CoreWidget.RemoveChild(child)
+	if self.modalwidget==child {
+		self.modalwidget=nil
+		mainwindowfocus=nil
+		previousmainwindowfocus=nil
+	}
+}
+
+func (self *SWS_RootWidget) SetModal(widget *SWS_MainWidget) {
+	// just to be sure to raise it
+	self.SWS_CoreWidget.RemoveChild(widget)
+        self.SWS_CoreWidget.AddChild(widget)
+	// set it as modal
+	self.modalwidget=widget
+
+	// this is an ugly hack
+	mainwindowfocus.HasFocus(false)
+	self.modalwidget.HasFocus(true)
+	mainwindowfocus=self.modalwidget
 }
 
 func (self *SWS_RootWidget) WindowSurface() *sdl.Surface {
@@ -189,7 +212,9 @@ func CreateRootWidget(window *sdl.Window) *SWS_RootWidget {
 	rootwidget := &SWS_RootWidget{
 		SWS_CoreWidget: *corewidget,
 		window:         window,
-		windowsurface:  surface}
+		windowsurface:  surface,
+		modalwidget:    nil,
+	}
 
 	return rootwidget
 }
@@ -295,7 +320,7 @@ func PoolEvent() bool {
 				// if we click outside of a menu -> destroy the menu
 				menu := findMenu(t.X, t.Y)
 
-				if menu == nil {
+				if menu == nil && root.modalwidget==nil {
 					// special case for main window
 					mainwindowfocus = findMainWidget(t.X, t.Y, root)
 					if previousmainwindowfocus != mainwindowfocus {
@@ -312,6 +337,9 @@ func PoolEvent() bool {
 
 				// else find the widget
 				focus, xTarget, yTarget = findWidget(t.X, t.Y, root)
+				if root.modalwidget!=nil {
+					focus, xTarget, yTarget = findWidget(t.X-root.X(), t.Y-root.Y(), root.modalwidget)
+				}
 				if previousFocus != focus {
 					if previousFocus != nil && previousFocus != mainwindowfocus {
 						previousFocus.HasFocus(false)
@@ -362,8 +390,10 @@ func PoolEvent() bool {
 					}
 				} else {
 					// button down
-					xTarget, yTarget = focus.TranslateXYToWidget(t.X, t.Y)
-					focus.MouseMove(xTarget, yTarget, t.XRel, t.YRel)
+					if focus!=nil {
+						xTarget, yTarget = focus.TranslateXYToWidget(t.X, t.Y)
+						focus.MouseMove(xTarget, yTarget, t.XRel, t.YRel)
+					}
 				}
 			}
 		case *sdl.KeyDownEvent:

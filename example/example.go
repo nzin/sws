@@ -18,6 +18,8 @@ import (
 
 func a() {
 	fmt.Println("clicked!!!")
+
+	
 	sub := sws.CreateMenuWidget()
 	sub.AddItem(sws.CreateMenuItemLabel("sub bla bla", nil))
 	sub.AddItem(sws.CreateMenuItemLabel("sub bla bla 2", nil))
@@ -60,7 +62,14 @@ func main() {
 	c.Move(-10, 85)
 
 	b := sws.CreateButtonWidget(100, 25, "click")
-	b.SetClicked(a)
+	b.SetClicked(func() {
+		modal := sws.CreateMainWidget(200, 100, "modal", false, true)
+		modal.SetCloseCallback(func() {
+			root.RemoveChild(modal)
+		})
+		root.AddChild(modal)
+		root.SetModal(modal)
+	})
 	b.Move(10, 10)
 	corewidget.AddChild(b)
 
