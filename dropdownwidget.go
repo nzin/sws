@@ -21,6 +21,16 @@ func (self *SWS_DropdownWidget) SetChoices(choices []string) {
 	PostUpdate()
 }
 
+func (self *SWS_DropdownWidget) SetActiveChoice(choice int32) {
+	if (choice<int32(len(self.Choices))) {
+		self.ActiveChoice=choice
+		if self.clicked!=nil {
+			self.clicked()
+		}
+		PostUpdate()
+	}
+}
+
 func (self *SWS_DropdownWidget) HasFocus(hasfocus bool) {
 	self.hasfocus = hasfocus
 	if hasfocus == false {
