@@ -57,9 +57,13 @@ func main() {
 	//f.SetColor(0xffff0000)
 	f.Move(100, 10)
 
-	c := sws.CreateLabel(100, 50, "Footcheball")
+	c := sws.CreateLabel(100, 25, "Footcheball")
+	c.Move(25, 70)
 	corewidget.AddChild(c)
-	c.Move(-10, 85)
+
+	cb := sws.CreateCheckboxWidget()
+	cb.Move(0, 70)
+	corewidget.AddChild(cb)
 
 	b := sws.CreateButtonWidget(100, 25, "click")
 	b.SetClicked(func() {
