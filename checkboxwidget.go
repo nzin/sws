@@ -67,12 +67,12 @@ func (self *SWS_CheckboxWidget) Repaint() {
 	self.DrawLine(19,5,5,5)
 	
 	if selected {
-		self.DrawLine(7,11,9,13)
-		self.DrawLine(7,12,9,14)
-		self.DrawLine(7,13,9,15)
-		self.DrawLine(9,13,19,3)
-		self.DrawLine(9,14,19,4)
-		self.DrawLine(9,15,19,5)
+		self.DrawLine(8,11,10,13)
+		self.DrawLine(8,12,10,14)
+		self.DrawLine(8,13,10,15)
+		self.DrawLine(10,13,20,3)
+		self.DrawLine(10,14,20,4)
+		self.DrawLine(10,15,20,5)
 	}
 	
 }
