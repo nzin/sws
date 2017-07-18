@@ -31,6 +31,11 @@ type SWS_MainWidget struct {
 	menubar            *SWS_MenuBarWidget
 }
 
+func (self *SWS_MainWidget) SetTitle(label string) {
+	self.label=label
+	PostUpdate()
+}
+
 func (self *SWS_MainWidget) SetCloseCallback(callback func()) {
     self.closeCallback=callback
 }

@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
+	"github.com/veandco/go-sdl2/img"
 	"time"
 )
 
@@ -35,6 +36,10 @@ var needUpdate bool
 //
 func PostUpdate() {
 	needUpdate = true
+}
+
+type DragPayload interface {
+	GetType() int32
 }
 
 //
@@ -65,6 +70,10 @@ type SWS_Widget interface {
 	HasFocus(focus bool)
 	Font() *ttf.Font
 	Destroy()
+	DragMove(x, y int32, payload DragPayload)
+	DragEnter(x,y int32, payload DragPayload)
+	DragLeave()
+	DragDrop(x,y int32, payload DragPayload)
 }
 
 //
@@ -78,6 +87,7 @@ func findMainWidget(x, y int32, root *SWS_RootWidget) (target SWS_Widget) {
 
 	// we take the closest
 	for _, child := range root.GetChildren() {
+		if child==dragwidget { continue }
 		maxX := child.X() + child.Width()
 		maxY := child.Y() + child.Height()
 		if maxX > root.Width() {
@@ -117,6 +127,7 @@ func findWidget(x, y int32, root SWS_Widget) (target SWS_Widget, xTarget, yTarge
 
 	// we take the closest
 	for _, child := range root.GetChildren() {
+		if child==dragwidget { continue }
 		maxX := child.X() + child.Width()
 		maxY := child.Y() + child.Height()
 		if maxX > root.Width() {
@@ -149,6 +160,25 @@ func findWidget(x, y int32, root SWS_Widget) (target SWS_Widget, xTarget, yTarge
 }
 
 var root *SWS_RootWidget
+var dragwidget SWS_Widget
+var dragpayload DragPayload
+
+//
+// usually in a MouseButtonDown 
+//
+func NewDragEvent(x,y int32, image string, payload DragPayload) {
+	dragpayload=payload
+	
+	draglabel:=CreateLabel(25,25,"")
+	draglabel.SetColor(0)
+	if img,err := img.Load(image); err==nil {
+                draglabel.Resize(img.W,img.H)
+        }
+	draglabel.SetImage(image)
+	draglabel.Move(x,y)
+	dragwidget=draglabel
+	root.AddChild(dragwidget)
+}
 
 //
 // The SWS_RootWidget is the background widget that fill up all the
@@ -370,6 +400,14 @@ func PoolEvent() bool {
 					xTarget, yTarget = focus.TranslateXYToWidget(t.X, t.Y)
 					focus.MousePressUp(xTarget, yTarget, t.Button)
 				}
+				if (dragwidget!=nil) {
+					afterW, axTarget, ayTarget := findWidget(t.X, t.Y, root)
+					if afterW!=nil {
+						afterW.DragDrop(axTarget, ayTarget,dragpayload)
+					}
+					root.RemoveChild(dragwidget)
+					dragwidget=nil
+				}
 			}
 		case *sdl.MouseMotionEvent:
 			//                        fmt.Printf("[%d ms] MouseMotion\ttype:%d\tid:%d\tx:%d\ty:%d\txrel:%d\tyrel:%d\n",
@@ -393,6 +431,23 @@ func PoolEvent() bool {
 					if focus!=nil {
 						xTarget, yTarget = focus.TranslateXYToWidget(t.X, t.Y)
 						focus.MouseMove(xTarget, yTarget, t.XRel, t.YRel)
+					}
+					// specific case: button is down AND we are dragging something
+					if (dragwidget!=nil) {
+						beforeW, _, _ := findWidget(t.X-t.XRel, t.Y-t.YRel, root)
+						afterW, axTarget, ayTarget := findWidget(t.X, t.Y, root)
+						dragwidget.Move(dragwidget.X()+t.XRel,dragwidget.Y()+t.YRel)
+						if (beforeW==afterW) && beforeW!=nil {
+							afterW.DragMove(axTarget, ayTarget,dragpayload)
+						} else {
+							if (beforeW!=nil) {
+								beforeW.DragLeave()
+							}
+							if (afterW!=nil) {
+								afterW.DragEnter(axTarget, ayTarget,dragpayload)
+							}
+						}
+						PostUpdate()
 					}
 				}
 			}

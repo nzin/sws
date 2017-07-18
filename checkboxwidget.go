@@ -11,6 +11,10 @@ type SWS_CheckboxWidget struct {
 	Selected     bool
 	clicked      func()
 }
+func (self *SWS_CheckboxWidget) SetSelected(selected bool) {
+	self.Selected = selected
+	PostUpdate()
+}
 
 func (self *SWS_CheckboxWidget) SetClicked(callback func()) {
 	self.clicked = callback

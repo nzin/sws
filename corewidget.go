@@ -287,6 +287,19 @@ func (self *SWS_CoreWidget) Move(x, y int32) {
 	self.y = y
 }
 
+func (self *SWS_CoreWidget) DragMove(x, y int32, payload DragPayload) {
+}
+
+func (self *SWS_CoreWidget) DragEnter(x,y int32, payload DragPayload) {
+}
+
+func (self *SWS_CoreWidget) DragLeave() {
+}
+
+func (self *SWS_CoreWidget) DragDrop(x,y int32, payload DragPayload) {
+}
+
+
 //
 // One of the main window: how do we want to write to our widget
 // content
