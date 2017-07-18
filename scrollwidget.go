@@ -87,7 +87,7 @@ func (self *SWS_ScrollWidget) SetInnerWidget(widget SWS_Widget) bool {
 	}
 	self.subwidget = widget
 	self.AddChild(widget)
-	widget.SetParent(self)
+	//widget.SetParent(self)
 	self.Resize(self.Width(), self.Height()) // to refresh the scroll bars
 
 	return true

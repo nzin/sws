@@ -175,7 +175,7 @@ func NewDragEvent(x,y int32, image string, payload DragPayload) {
                 draglabel.Resize(img.W,img.H)
         }
 	draglabel.SetImage(image)
-	draglabel.Move(x,y)
+	draglabel.Move(x-draglabel.Width()/2,y-draglabel.Height()/2)
 	dragwidget=draglabel
 	root.AddChild(dragwidget)
 }
