@@ -9,8 +9,13 @@ type SWS_Label struct {
 	SWS_CoreWidget
 	label     string
 	image     *sdl.Surface
+	imageleft bool
 	textcolor sdl.Color
 	centered  bool
+}
+
+func (self *SWS_Label) AlignImageLeft(alignleft bool) {
+	self.imageleft=alignleft
 }
 
 func (self *SWS_Label) SetTextColor(color sdl.Color) {
@@ -66,20 +71,37 @@ func (self *SWS_Label) Repaint() {
 		if err = self.image.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
 		}
 	} else if (text!=nil && self.image !=nil) {
-		wTGap := self.Width() - text.W
-		wIGap := self.Width() - self.image.W
-		hGap := self.Height() - self.image.H - text.H
-		if self.centered==false {
-			wTGap=0
-			wIGap=0
-		}
-		rectSrc := sdl.Rect{0, 0, self.image.W, self.image.H}
-		rectDst := sdl.Rect{(wIGap/2), (hGap/2), self.Width()-(wIGap/2), self.     Height()-(hGap/2)}
-		if err = self.image.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
-		}
-		rectSrc = sdl.Rect{0, 0, text.W, text.H}
-		rectDst = sdl.Rect{(wTGap/2), (hGap/2)+self.image.H, self.Width()-(wTGap/  2), self.Height()-(hGap/2)-self.image.H}
-		if err = text.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
+		if (self.imageleft==false) {
+			wTGap := self.Width() - text.W
+			wIGap := self.Width() - self.image.W
+			hGap := self.Height() - self.image.H - text.H
+			if self.centered==false {
+				wTGap=0
+				wIGap=0
+			}
+			rectSrc := sdl.Rect{0, 0, self.image.W, self.image.H}
+			rectDst := sdl.Rect{(wIGap/2), (hGap/2), self.Width()-(wIGap/2), self.     Height()-(hGap/2)}
+			if err = self.image.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
+			}
+			rectSrc = sdl.Rect{0, 0, text.W, text.H}
+			rectDst = sdl.Rect{(wTGap/2), (hGap/2)+self.image.H, self.Width()-(wTGap/  2), self.Height()-(hGap/2)-self.image.H}
+			if err = text.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
+			}
+		} else {
+			hTGap := self.Height() - text.H
+			hIGap := self.Height() - self.image.H
+			wGap := self.Width() - self.image.W - text.W
+			if self.centered==false {
+				wGap=0
+			}
+			rectSrc := sdl.Rect{0, 0, self.image.W, self.image.H}
+			rectDst := sdl.Rect{2+(wGap/2), 2+(hIGap/2), self.Width()-2- (wGap/2), self.Height()-2-(hIGap/2)}
+			if err = self.image.Blit(&rectSrc, self.Surface(),           &rectDst); err != nil {
+			}
+			rectSrc = sdl.Rect{0, 0, text.W, text.H}
+			rectDst = sdl.Rect{2+(wGap/2)+self.image.W, 2+(hTGap/2),self.Width()-2-(wGap/2)-self.image.W, self.Height()-2-(hTGap/2)}
+			if err = text.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
+			}
 		}
 	}
 }
