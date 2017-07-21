@@ -296,7 +296,8 @@ func (self *SWS_CoreWidget) DragEnter(x,y int32, payload DragPayload) {
 func (self *SWS_CoreWidget) DragLeave() {
 }
 
-func (self *SWS_CoreWidget) DragDrop(x,y int32, payload DragPayload) {
+func (self *SWS_CoreWidget) DragDrop(x,y int32, payload DragPayload) bool{
+	return false
 }
 
 

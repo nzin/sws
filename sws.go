@@ -40,6 +40,7 @@ func PostUpdate() {
 
 type DragPayload interface {
 	GetType() int32
+	PayloadAccepted(bool)
 }
 
 //
@@ -73,7 +74,7 @@ type SWS_Widget interface {
 	DragMove(x, y int32, payload DragPayload)
 	DragEnter(x,y int32, payload DragPayload)
 	DragLeave()
-	DragDrop(x,y int32, payload DragPayload)
+	DragDrop(x,y int32, payload DragPayload) bool
 }
 
 //
@@ -403,7 +404,9 @@ func PoolEvent() bool {
 				if (dragwidget!=nil) {
 					afterW, axTarget, ayTarget := findWidget(t.X, t.Y, root)
 					if afterW!=nil {
-						afterW.DragDrop(axTarget, ayTarget,dragpayload)
+						dragpayload.PayloadAccepted(afterW.DragDrop(axTarget, ayTarget,dragpayload))
+					} else {
+						dragpayload.PayloadAccepted(false)
 					}
 					root.RemoveChild(dragwidget)
 					dragwidget=nil
