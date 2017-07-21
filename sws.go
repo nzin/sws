@@ -73,7 +73,7 @@ type SWS_Widget interface {
 	Destroy()
 	DragMove(x, y int32, payload DragPayload)
 	DragEnter(x,y int32, payload DragPayload)
-	DragLeave()
+	DragLeave(payload DragPayload)
 	DragDrop(x,y int32, payload DragPayload) bool
 }
 
@@ -179,6 +179,12 @@ func NewDragEvent(x,y int32, image string, payload DragPayload) {
 	draglabel.Move(x-draglabel.Width()/2,y-draglabel.Height()/2)
 	dragwidget=draglabel
 	root.AddChild(dragwidget)
+	
+	widget, _, _ := findWidget(x,y, root)
+	if widget!=nil {
+		localx,localy := widget.TranslateXYToWidget(x,y)
+		widget.DragEnter(localx, localy,payload)
+	}
 }
 
 //
@@ -342,8 +348,8 @@ func PoolEvent() bool {
 		case *sdl.QuitEvent:
 			quit = true
 		case *sdl.MouseButtonEvent:
-			fmt.Printf("[%d ms] MouseButton\ttype:%d\tid:%d\tx:%d\ty:%d\tbutton:%d\tstate:%d\n",
-				t.Timestamp, t.Type, t.Which, t.X, t.Y, t.Button, t.State)
+			//fmt.Printf("[%d ms] MouseButton\ttype:%d\tid:%d\tx:%d\ty:%d\tbutton:%d\tstate:%d\n",
+			//	t.Timestamp, t.Type, t.Which, t.X, t.Y, t.Button, t.State)
 			//fmt.Println(findWidget(t.X,t.Y,root))
 			if t.Type == sdl.MOUSEBUTTONDOWN {
 				buttonDown = true
@@ -444,7 +450,7 @@ func PoolEvent() bool {
 							afterW.DragMove(axTarget, ayTarget,dragpayload)
 						} else {
 							if (beforeW!=nil) {
-								beforeW.DragLeave()
+								beforeW.DragLeave(dragpayload)
 							}
 							if (afterW!=nil) {
 								afterW.DragEnter(axTarget, ayTarget,dragpayload)
