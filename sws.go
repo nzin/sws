@@ -6,21 +6,21 @@
 // It means that this Windowing System is far to be complete, the
 // most fast, low-memory that exist, but should be complete enough for me :-).
 //
-// - The base "class" for all widget is the SWS_Widget interface.
+// - The base "class" for all widget is the Widget interface.
 //
-// - And the base implementation is SWS_CoreWidget.
+// - And the base implementation is CoreWidget.
 //
-// - the root widget (background widget) is the SWS_RootWidget.
+// - the root widget (background widget) is the RootWidget.
 //
-// - and main widget that floats on top of the root widget are SWS_MainWidget.
+// - and main widget that floats on top of the root widget are MainWidget.
 //
 package sws
 
 import (
 	"fmt"
+	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
-	"github.com/veandco/go-sdl2/img"
 	"time"
 )
 
@@ -46,16 +46,16 @@ type DragPayload interface {
 //
 // "Abstract" class of all widget
 //
-type SWS_Widget interface {
-	AddChild(child SWS_Widget)
-	RemoveChild(child SWS_Widget)
+type Widget interface {
+	AddChild(child Widget)
+	RemoveChild(child Widget)
 	Move(x, y int32)
 	Resize(width, height int32)
 	Surface() *sdl.Surface
 	Renderer() *sdl.Renderer
-	GetChildren() []SWS_Widget
-	Parent() SWS_Widget
-	SetParent(SWS_Widget)
+	GetChildren() []Widget
+	Parent() Widget
+	SetParent(Widget)
 	Repaint()
 	X() int32
 	Y() int32
@@ -72,15 +72,15 @@ type SWS_Widget interface {
 	Font() *ttf.Font
 	Destroy()
 	DragMove(x, y int32, payload DragPayload)
-	DragEnter(x,y int32, payload DragPayload)
+	DragEnter(x, y int32, payload DragPayload)
 	DragLeave(payload DragPayload)
-	DragDrop(x,y int32, payload DragPayload) bool
+	DragDrop(x, y int32, payload DragPayload) bool
 }
 
 //
 // special function to deal with MainWindow focus
 //
-func findMainWidget(x, y int32, root *SWS_RootWidget) (target SWS_Widget) {
+func findMainWidget(x, y int32, root *RootWidget) (target Widget) {
 	target = nil
 
 	x -= root.X()
@@ -88,7 +88,9 @@ func findMainWidget(x, y int32, root *SWS_RootWidget) (target SWS_Widget) {
 
 	// we take the closest
 	for _, child := range root.GetChildren() {
-		if child==dragwidget { continue }
+		if child == dragwidget {
+			continue
+		}
 		maxX := child.X() + child.Width()
 		maxY := child.Y() + child.Height()
 		if maxX > root.Width() {
@@ -109,7 +111,7 @@ func findMainWidget(x, y int32, root *SWS_RootWidget) (target SWS_Widget) {
 
 	// we found a child
 	switch target.(type) {
-	case *SWS_MainWidget:
+	case *MainWidget:
 		{
 			return target
 		}
@@ -120,7 +122,7 @@ func findMainWidget(x, y int32, root *SWS_RootWidget) (target SWS_Widget) {
 //
 // function used to find the end widget where the mouse is over
 //
-func findWidget(x, y int32, root SWS_Widget) (target SWS_Widget, xTarget, yTarget int32) {
+func findWidget(x, y int32, root Widget) (target Widget, xTarget, yTarget int32) {
 	target = nil
 
 	x -= root.X()
@@ -128,7 +130,9 @@ func findWidget(x, y int32, root SWS_Widget) (target SWS_Widget, xTarget, yTarge
 
 	// we take the closest
 	for _, child := range root.GetChildren() {
-		if child==dragwidget { continue }
+		if child == dragwidget {
+			continue
+		}
 		maxX := child.X() + child.Width()
 		maxY := child.Y() + child.Height()
 		if maxX > root.Width() {
@@ -160,84 +164,84 @@ func findWidget(x, y int32, root SWS_Widget) (target SWS_Widget, xTarget, yTarge
 	return nil, -1, -1
 }
 
-var root *SWS_RootWidget
-var dragwidget SWS_Widget
+var root *RootWidget
+var dragwidget Widget
 var dragpayload DragPayload
 
 //
-// usually in a MouseButtonDown 
+// usually in a MouseButtonDown
 //
-func NewDragEvent(x,y int32, image string, payload DragPayload) {
-	dragpayload=payload
-	
-	draglabel:=CreateLabel(25,25,"")
+func NewDragEvent(x, y int32, image string, payload DragPayload) {
+	dragpayload = payload
+
+	draglabel := NewLabelWidget(25, 25, "")
 	draglabel.SetColor(0)
-	if img,err := img.Load(image); err==nil {
-                draglabel.Resize(img.W,img.H)
-        }
+	if img, err := img.Load(image); err == nil {
+		draglabel.Resize(img.W, img.H)
+	}
 	draglabel.SetImage(image)
-	draglabel.Move(x-draglabel.Width()/2,y-draglabel.Height()/2)
-	dragwidget=draglabel
+	draglabel.Move(x-draglabel.Width()/2, y-draglabel.Height()/2)
+	dragwidget = draglabel
 	root.AddChild(dragwidget)
-	
-	widget, _, _ := findWidget(x,y, root)
-	if widget!=nil {
-		localx,localy := widget.TranslateXYToWidget(x,y)
-		widget.DragEnter(localx, localy,payload)
+
+	widget, _, _ := findWidget(x, y, root)
+	if widget != nil {
+		localx, localy := widget.TranslateXYToWidget(x, y)
+		widget.DragEnter(localx, localy, payload)
 	}
 }
 
 //
-// The SWS_RootWidget is the background widget that fill up all the
+// The RootWidget is the background widget that fill up all the
 // desktop window
 //
-type SWS_RootWidget struct {
-	SWS_CoreWidget
+type RootWidget struct {
+	CoreWidget
 	window        *sdl.Window
 	windowsurface *sdl.Surface
-	modalwidget   SWS_Widget
+	modalwidget   Widget
 }
 
 //
 // to put on top of the widget stack a particular widget
-// Mainly used for SWS_MainWidget
+// Mainly used for MainWidget
 //
-func (self *SWS_RootWidget) RaiseToTop(widget SWS_Widget) {
+func (self *RootWidget) RaiseToTop(widget Widget) {
 	self.RemoveChild(widget)
 	self.AddChild(widget)
 }
 
-func (self *SWS_RootWidget) RemoveChild(child SWS_Widget) {
-	self.SWS_CoreWidget.RemoveChild(child)
-	if self.modalwidget==child {
-		self.modalwidget=nil
-		mainwindowfocus=nil
-		previousmainwindowfocus=nil
+func (self *RootWidget) RemoveChild(child Widget) {
+	self.CoreWidget.RemoveChild(child)
+	if self.modalwidget == child {
+		self.modalwidget = nil
+		mainwindowfocus = nil
+		previousmainwindowfocus = nil
 	}
 }
 
-func (self *SWS_RootWidget) SetModal(widget *SWS_MainWidget) {
+func (self *RootWidget) SetModal(widget *MainWidget) {
 	// just to be sure to raise it
-	self.SWS_CoreWidget.RemoveChild(widget)
-        self.SWS_CoreWidget.AddChild(widget)
+	self.CoreWidget.RemoveChild(widget)
+	self.CoreWidget.AddChild(widget)
 	// set it as modal
-	self.modalwidget=widget
+	self.modalwidget = widget
 
 	// this is an ugly hack
 	mainwindowfocus.HasFocus(false)
 	self.modalwidget.HasFocus(true)
-	mainwindowfocus=self.modalwidget
+	mainwindowfocus = self.modalwidget
 }
 
-func (self *SWS_RootWidget) WindowSurface() *sdl.Surface {
+func (self *RootWidget) WindowSurface() *sdl.Surface {
 	return self.windowsurface
 }
 
-func (self *SWS_RootWidget) WindowUpdateSurface() {
+func (self *RootWidget) WindowUpdateSurface() {
 	self.window.UpdateSurface()
 }
 
-func CreateRootWidget(window *sdl.Window) *SWS_RootWidget {
+func NewRootWidget(window *sdl.Window) *RootWidget {
 	surface, err := window.GetSurface()
 	if err != nil {
 		panic(err)
@@ -245,12 +249,12 @@ func CreateRootWidget(window *sdl.Window) *SWS_RootWidget {
 
 	w, h := window.GetSize()
 
-	corewidget := CreateCoreWidget(int32(w), int32(h))
-	rootwidget := &SWS_RootWidget{
-		SWS_CoreWidget: *corewidget,
-		window:         window,
-		windowsurface:  surface,
-		modalwidget:    nil,
+	corewidget := NewCoreWidget(int32(w), int32(h))
+	rootwidget := &RootWidget{
+		CoreWidget:    *corewidget,
+		window:        window,
+		windowsurface: surface,
+		modalwidget:   nil,
 	}
 
 	return rootwidget
@@ -258,7 +262,7 @@ func CreateRootWidget(window *sdl.Window) *SWS_RootWidget {
 
 //
 // When we start the program, we must call this function
-// to initialize SDL and provide the resulting SWS_RootWidget
+// to initialize SDL and provide the resulting RootWidget
 //
 // The minimum program you can write is:
 //    func main() {
@@ -267,7 +271,7 @@ func CreateRootWidget(window *sdl.Window) *SWS_RootWidget {
 //        }
 //    }
 //
-func Init(width, height int32) *SWS_RootWidget {
+func Init(width, height int32) *RootWidget {
 	sdl.Init(sdl.INIT_EVERYTHING)
 
 	window, err := sdl.CreateWindow("test", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
@@ -286,7 +290,7 @@ func Init(width, height int32) *SWS_RootWidget {
 
 	PostUpdate()
 
-	root = CreateRootWidget(window)
+	root = NewRootWidget(window)
 	root.SetColor(0xff111111)
 	return root
 }
@@ -295,14 +299,14 @@ func Init(width, height int32) *SWS_RootWidget {
 // When we need to get keyboard event (especially), we need to get
 // the focus
 //
-func (root *SWS_RootWidget) SetFocus(widget SWS_Widget) {
+func (root *RootWidget) SetFocus(widget Widget) {
 	mainwidget := widget
-	for mainwidget.Parent() != nil && mainwidget.Parent() != SWS_Widget(root) {
+	for mainwidget.Parent() != nil && mainwidget.Parent() != Widget(root) {
 		mainwidget = mainwidget.Parent()
 	}
 	if mainwidget != nil {
 		switch mainwidget.(type) {
-		case *SWS_MainWidget:
+		case *MainWidget:
 			{
 				mainwindowfocus = mainwidget
 				if previousmainwindowfocus != mainwindowfocus {
@@ -331,8 +335,8 @@ func (root *SWS_RootWidget) SetFocus(widget SWS_Widget) {
 	}
 }
 
-var previousFocus, focus SWS_Widget
-var previousmainwindowfocus, mainwindowfocus SWS_Widget
+var previousFocus, focus Widget
+var previousmainwindowfocus, mainwindowfocus Widget
 var buttonDown = false
 
 //
@@ -357,7 +361,7 @@ func PoolEvent() bool {
 				// if we click outside of a menu -> destroy the menu
 				menu := findMenu(t.X, t.Y)
 
-				if menu == nil && root.modalwidget==nil {
+				if menu == nil && root.modalwidget == nil {
 					// special case for main window
 					mainwindowfocus = findMainWidget(t.X, t.Y, root)
 					if previousmainwindowfocus != mainwindowfocus {
@@ -374,7 +378,7 @@ func PoolEvent() bool {
 
 				// else find the widget
 				focus, xTarget, yTarget = findWidget(t.X, t.Y, root)
-				if root.modalwidget!=nil {
+				if root.modalwidget != nil {
 					focus, xTarget, yTarget = findWidget(t.X-root.X(), t.Y-root.Y(), root.modalwidget)
 				}
 				if previousFocus != focus {
@@ -407,15 +411,15 @@ func PoolEvent() bool {
 					xTarget, yTarget = focus.TranslateXYToWidget(t.X, t.Y)
 					focus.MousePressUp(xTarget, yTarget, t.Button)
 				}
-				if (dragwidget!=nil) {
+				if dragwidget != nil {
 					afterW, axTarget, ayTarget := findWidget(t.X, t.Y, root)
-					if afterW!=nil {
-						dragpayload.PayloadAccepted(afterW.DragDrop(axTarget, ayTarget,dragpayload))
+					if afterW != nil {
+						dragpayload.PayloadAccepted(afterW.DragDrop(axTarget, ayTarget, dragpayload))
 					} else {
 						dragpayload.PayloadAccepted(false)
 					}
 					root.RemoveChild(dragwidget)
-					dragwidget=nil
+					dragwidget = nil
 				}
 			}
 		case *sdl.MouseMotionEvent:
@@ -437,23 +441,23 @@ func PoolEvent() bool {
 					}
 				} else {
 					// button down
-					if focus!=nil {
+					if focus != nil {
 						xTarget, yTarget = focus.TranslateXYToWidget(t.X, t.Y)
 						focus.MouseMove(xTarget, yTarget, t.XRel, t.YRel)
 					}
 					// specific case: button is down AND we are dragging something
-					if (dragwidget!=nil) {
+					if dragwidget != nil {
 						beforeW, _, _ := findWidget(t.X-t.XRel, t.Y-t.YRel, root)
 						afterW, axTarget, ayTarget := findWidget(t.X, t.Y, root)
-						dragwidget.Move(dragwidget.X()+t.XRel,dragwidget.Y()+t.YRel)
-						if (beforeW==afterW) && beforeW!=nil {
-							afterW.DragMove(axTarget, ayTarget,dragpayload)
+						dragwidget.Move(dragwidget.X()+t.XRel, dragwidget.Y()+t.YRel)
+						if (beforeW == afterW) && beforeW != nil {
+							afterW.DragMove(axTarget, ayTarget, dragpayload)
 						} else {
-							if (beforeW!=nil) {
+							if beforeW != nil {
 								beforeW.DragLeave(dragpayload)
 							}
-							if (afterW!=nil) {
-								afterW.DragEnter(axTarget, ayTarget,dragpayload)
+							if afterW != nil {
+								afterW.DragEnter(axTarget, ayTarget, dragpayload)
 							}
 						}
 						PostUpdate()

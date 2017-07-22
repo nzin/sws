@@ -14,8 +14,8 @@ import (
 //
 // You can also set (or not) a menu bar (SetMenuBar() )
 //
-type SWS_MainWidget struct {
-	SWS_CoreWidget
+type MainWidget struct {
+	CoreWidget
 	label              string // title
 	hasfocus           bool
 	expandable         bool // can we full screen
@@ -27,27 +27,27 @@ type SWS_MainWidget struct {
 	buttonOnExpand     bool // to know if we click down on the fullscreen button
 	cursorInsideExpand bool // to know if we are over the full screen button
 	onResize           bool // to know if we are resizing
-	subwidget          SWS_Widget
-	menubar            *SWS_MenuBarWidget
+	subwidget          Widget
+	menubar            *MenuBarWidget
 }
 
-func (self *SWS_MainWidget) SetTitle(label string) {
-	self.label=label
+func (self *MainWidget) SetTitle(label string) {
+	self.label = label
 	PostUpdate()
 }
 
-func (self *SWS_MainWidget) SetCloseCallback(callback func()) {
-    self.closeCallback=callback
+func (self *MainWidget) SetCloseCallback(callback func()) {
+	self.closeCallback = callback
 }
 
-func (self *SWS_MainWidget) SetInnerWidget(widget SWS_Widget) bool {
+func (self *MainWidget) SetInnerWidget(widget Widget) bool {
 	if widget == nil {
 		return false
 	}
 	self.RemoveChild(self.subwidget)
 	self.subwidget = widget
-	self.SWS_CoreWidget.AddChild(widget)
-	if self.menubar==nil {
+	self.CoreWidget.AddChild(widget)
+	if self.menubar == nil {
 		widget.Move(6, 26)
 		widget.Resize(self.Width()-12, self.Height()-32)
 	} else {
@@ -58,12 +58,12 @@ func (self *SWS_MainWidget) SetInnerWidget(widget SWS_Widget) bool {
 	return true
 }
 
-func (self *SWS_MainWidget) SetMenuBar(menubar *SWS_MenuBarWidget) {
+func (self *MainWidget) SetMenuBar(menubar *MenuBarWidget) {
 	if self.menubar != nil {
 		self.RemoveChild(self.menubar)
 	}
 	self.menubar = menubar
-	self.SWS_CoreWidget.AddChild(menubar)
+	self.CoreWidget.AddChild(menubar)
 	menubar.Move(6, 26)
 	menubar.Resize(self.Width()-12, menubar.Height())
 	self.subwidget.Resize(self.Width()-12, self.Height()-32-menubar.Height())
@@ -71,14 +71,14 @@ func (self *SWS_MainWidget) SetMenuBar(menubar *SWS_MenuBarWidget) {
 	PostUpdate()
 }
 
-func (self *SWS_MainWidget) HasFocus(focus bool) {
+func (self *MainWidget) HasFocus(focus bool) {
 	if self.hasfocus != focus {
 		self.hasfocus = focus
 		PostUpdate()
 	}
 }
 
-func (self *SWS_MainWidget) IsInside(x, y int32) bool {
+func (self *MainWidget) IsInside(x, y int32) bool {
 	if y < 20 {
 		wText, _, _ := self.font.SizeUTF8(self.label)
 		return x >= 0 && y >= 0 && x < int32(wText)+40
@@ -87,7 +87,7 @@ func (self *SWS_MainWidget) IsInside(x, y int32) bool {
 	}
 }
 
-func (self *SWS_MainWidget) Repaint() {
+func (self *MainWidget) Repaint() {
 	// paint header
 	var solid *sdl.Surface
 	var err error
@@ -222,13 +222,19 @@ func (self *SWS_MainWidget) Repaint() {
 		rectDst = sdl.Rect{self.menubar.X(), self.menubar.Y(), self.menubar.Width(), self.menubar.Height()}
 		self.menubar.Surface().Blit(&rectSrc, self.Surface(), &rectDst)
 	}
-	maxwidth:=self.subwidget.Width()
-	if maxwidth>self.Width()-12 { maxwidth=self.Width()-12 }
-	maxheight:=self.subwidget.Height()
-	if self.menubar!=nil {
-		if maxheight>self.Height()-32-self.menubar.Height() { maxheight=self.Height()-32-self.menubar.Height() }
+	maxwidth := self.subwidget.Width()
+	if maxwidth > self.Width()-12 {
+		maxwidth = self.Width() - 12
+	}
+	maxheight := self.subwidget.Height()
+	if self.menubar != nil {
+		if maxheight > self.Height()-32-self.menubar.Height() {
+			maxheight = self.Height() - 32 - self.menubar.Height()
+		}
 	} else {
-		if maxheight>self.Height()-32 { maxheight=self.Height()-32 }
+		if maxheight > self.Height()-32 {
+			maxheight = self.Height() - 32
+		}
 	}
 	self.subwidget.Repaint()
 	rectSrc = sdl.Rect{0, 0, maxwidth, maxheight}
@@ -236,11 +242,11 @@ func (self *SWS_MainWidget) Repaint() {
 	self.subwidget.Surface().Blit(&rectSrc, self.Surface(), &rectDst)
 }
 
-func (self *SWS_MainWidget) AddChild(child SWS_Widget) {
+func (self *MainWidget) AddChild(child Widget) {
 	self.subwidget.AddChild(child)
 }
 
-func (self *SWS_MainWidget) MousePressDown(x, y int32, button uint8) {
+func (self *MainWidget) MousePressDown(x, y int32, button uint8) {
 	wText, _, _ := self.font.SizeUTF8(self.label)
 	maxW := int32(wText) + 40
 	if maxW > self.Width() {
@@ -268,12 +274,12 @@ func (self *SWS_MainWidget) MousePressDown(x, y int32, button uint8) {
 	}
 }
 
-func (self *SWS_MainWidget) MousePressUp(x, y int32, button uint8) {
+func (self *MainWidget) MousePressUp(x, y int32, button uint8) {
 	self.onResize = false
 	self.inmove = false
 	if self.buttonOnClose == true {
 		self.buttonOnClose = false
-		if self.closeCallback!=nil {
+		if self.closeCallback != nil {
 			self.closeCallback()
 		}
 		PostUpdate()
@@ -284,7 +290,7 @@ func (self *SWS_MainWidget) MousePressUp(x, y int32, button uint8) {
 	}
 }
 
-func (self *SWS_MainWidget) MouseMove(x, y, xrel, yrel int32) {
+func (self *MainWidget) MouseMove(x, y, xrel, yrel int32) {
 
 	if self.inmove {
 		self.x += xrel
@@ -320,14 +326,14 @@ func (self *SWS_MainWidget) MouseMove(x, y, xrel, yrel int32) {
 	}
 }
 
-func (self *SWS_MainWidget) Resize(width, height int32) {
+func (self *MainWidget) Resize(width, height int32) {
 	if width < 60 {
 		width = 60
 	}
 	if height < 80 {
 		height = 80
 	}
-	self.SWS_CoreWidget.Resize(width, height)
+	self.CoreWidget.Resize(width, height)
 	if self.menubar == nil {
 		self.subwidget.Resize(width-12, height-32)
 	} else {
@@ -337,12 +343,12 @@ func (self *SWS_MainWidget) Resize(width, height int32) {
 	PostUpdate()
 }
 
-func CreateMainWidget(w, h int32, s string, expandable bool, resizable bool) *SWS_MainWidget {
-	corewidget := CreateCoreWidget(w, h)
-	subwidget := CreateCoreWidget(w-12, h-32)
+func NewMainWidget(w, h int32, s string, expandable bool, resizable bool) *MainWidget {
+	corewidget := NewCoreWidget(w, h)
+	subwidget := NewCoreWidget(w-12, h-32)
 	subwidget.Move(6, 26)
 	corewidget.AddChild(subwidget)
-	widget := &SWS_MainWidget{SWS_CoreWidget: *corewidget,
+	widget := &MainWidget{CoreWidget: *corewidget,
 		label:              s,
 		hasfocus:           false,
 		expandable:         expandable,

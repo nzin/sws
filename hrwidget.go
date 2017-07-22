@@ -1,18 +1,17 @@
 package sws
 
-type SWS_Hr struct {
-	SWS_CoreWidget
+type Hr struct {
+	CoreWidget
 }
 
-func (self *SWS_Hr) Repaint() {
-	self.SWS_CoreWidget.Repaint()
+func (self *Hr) Repaint() {
+	self.CoreWidget.Repaint()
 	self.SetDrawColorHex(0xff888888)
-	self.DrawLine(0,0,self.Width(),0)
+	self.DrawLine(0, 0, self.Width(), 0)
 }
 
-func CreateHr(w int32) *SWS_Hr {
-	corewidget := CreateCoreWidget(w, 2)
-	widget := &SWS_Hr{SWS_CoreWidget: *corewidget,
-	}
+func NewHr(w int32) *Hr {
+	corewidget := NewCoreWidget(w, 2)
+	widget := &Hr{CoreWidget: *corewidget}
 	return widget
 }

@@ -5,8 +5,8 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type SWS_InputWidget struct {
-	SWS_CoreWidget
+type InputWidget struct {
+	CoreWidget
 	text                  string
 	initialCursorPosition int
 	endCursorPosition     int
@@ -15,13 +15,13 @@ type SWS_InputWidget struct {
 	writeOffset           int32
 }
 
-func (self *SWS_InputWidget) HasFocus(focus bool) {
+func (self *InputWidget) HasFocus(focus bool) {
 	fmt.Println("HasFocus")
 	self.hasfocus = focus
 	PostUpdate()
 }
 
-func (self *SWS_InputWidget) MousePressDown(x, y int32, button uint8) {
+func (self *InputWidget) MousePressDown(x, y int32, button uint8) {
 
 	if button == sdl.BUTTON_LEFT {
 		self.leftButtonDown = true
@@ -41,31 +41,31 @@ func (self *SWS_InputWidget) MousePressDown(x, y int32, button uint8) {
 	}
 }
 
-func (self *SWS_InputWidget) MousePressUp(x, y int32, button uint8) {
+func (self *InputWidget) MousePressUp(x, y int32, button uint8) {
 	if button == sdl.BUTTON_LEFT {
 		self.leftButtonDown = false
 	}
 }
 
-func (self *SWS_InputWidget) MouseMove(x, y, xrel, yrel int32) {
+func (self *InputWidget) MouseMove(x, y, xrel, yrel int32) {
 	if self.leftButtonDown == true {
-		if (self.writeOffset>0 && x<0) {
-			self.writeOffset+=x/2
-			if self.writeOffset<0 {
-				self.writeOffset=0
+		if self.writeOffset > 0 && x < 0 {
+			self.writeOffset += x / 2
+			if self.writeOffset < 0 {
+				self.writeOffset = 0
 			}
 		}
 		w, _, err := self.Font().SizeUTF8(self.text)
 		if err != nil {
 			panic(err)
 		}
-		if (self.writeOffset<int32(w)-self.Width()+4 && x>self.Width()) {
-			self.writeOffset+=(x-self.Width())/2
-			if self.writeOffset>int32(w)-self.Width()+4 {
-				self.writeOffset=int32(w)-self.Width()+4
+		if self.writeOffset < int32(w)-self.Width()+4 && x > self.Width() {
+			self.writeOffset += (x - self.Width()) / 2
+			if self.writeOffset > int32(w)-self.Width()+4 {
+				self.writeOffset = int32(w) - self.Width() + 4
 			}
 		}
-		
+
 		self.initialCursorPosition = 0
 		for i := 1; i <= len(self.text); i++ {
 			w, _, err := self.Font().SizeUTF8(self.text[:i])
@@ -81,15 +81,15 @@ func (self *SWS_InputWidget) MouseMove(x, y, xrel, yrel int32) {
 	}
 }
 
-func (self *SWS_InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
+func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 	if key == sdl.K_UP {
 		if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
 			if self.initialCursorPosition > 0 {
-				self.initialCursorPosition=0
+				self.initialCursorPosition = 0
 			}
 		} else {
 			if self.initialCursorPosition > 0 {
-				self.initialCursorPosition=0
+				self.initialCursorPosition = 0
 			}
 			self.endCursorPosition = self.initialCursorPosition
 		}
@@ -125,11 +125,11 @@ func (self *SWS_InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 	if key == sdl.K_DOWN {
 		if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
 			if self.initialCursorPosition < len(self.text) {
-				self.initialCursorPosition=len(self.text)
+				self.initialCursorPosition = len(self.text)
 			}
 		} else {
 			if self.initialCursorPosition < len(self.text) {
-				self.initialCursorPosition=len(self.text)
+				self.initialCursorPosition = len(self.text)
 			}
 			self.endCursorPosition = self.initialCursorPosition
 		}
@@ -155,7 +155,7 @@ func (self *SWS_InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 	}
 
 	if mod == sdl.KMOD_LCTRL || mod == sdl.KMOD_RCTRL {
-		if key=='a' {
+		if key == 'a' {
 			self.endCursorPosition = 0
 			self.initialCursorPosition = len(self.text)
 			PostUpdate()
@@ -185,18 +185,18 @@ func (self *SWS_InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 	if err != nil {
 		panic(err)
 	}
-	if self.writeOffset>int32(w) {
-		self.writeOffset=int32(w)
+	if self.writeOffset > int32(w) {
+		self.writeOffset = int32(w)
 		PostUpdate()
 	}
-	if self.writeOffset+self.Width()-4<int32(w) {
-		self.writeOffset=int32(w)-self.Width()+4
+	if self.writeOffset+self.Width()-4 < int32(w) {
+		self.writeOffset = int32(w) - self.Width() + 4
 		PostUpdate()
 	}
 }
 
-func (self *SWS_InputWidget) Repaint() {
-	self.SWS_CoreWidget.Repaint()
+func (self *InputWidget) Repaint() {
+	self.CoreWidget.Repaint()
 	// write text and cursor
 	i := self.initialCursorPosition
 	e := self.endCursorPosition
@@ -260,12 +260,11 @@ func (self *SWS_InputWidget) Repaint() {
 	self.DrawPoint(self.Width()-1, self.Height()-2)
 	self.DrawPoint(self.Width()-2, self.Height()-1)
 
-
 }
 
-func CreateInputWidget(w, h int32, s string) *SWS_InputWidget {
-	corewidget := CreateCoreWidget(w, h)
-	widget := &SWS_InputWidget{SWS_CoreWidget: *corewidget,
+func NewInputWidget(w, h int32, s string) *InputWidget {
+	corewidget := NewCoreWidget(w, h)
+	widget := &InputWidget{CoreWidget: *corewidget,
 		text: s,
 		initialCursorPosition: 0,
 		hasfocus:              false,

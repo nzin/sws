@@ -4,34 +4,34 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type SWS_DropdownWidget struct {
-	SWS_CoreWidget
+type DropdownWidget struct {
+	CoreWidget
 	Choices      []string
 	ActiveChoice int32
 	buttonState  bool
 	cursorInside bool
 	clicked      func()
-	menu         *SWS_MenuWidget
+	menu         *MenuWidget
 	hasfocus     bool
 }
 
-func (self *SWS_DropdownWidget) SetChoices(choices []string) {
-	self.Choices=choices
-	self.ActiveChoice=0
+func (self *DropdownWidget) SetChoices(choices []string) {
+	self.Choices = choices
+	self.ActiveChoice = 0
 	PostUpdate()
 }
 
-func (self *SWS_DropdownWidget) SetActiveChoice(choice int32) {
-	if (choice<int32(len(self.Choices))) {
-		self.ActiveChoice=choice
-		if self.clicked!=nil {
+func (self *DropdownWidget) SetActiveChoice(choice int32) {
+	if choice < int32(len(self.Choices)) {
+		self.ActiveChoice = choice
+		if self.clicked != nil {
 			self.clicked()
 		}
 		PostUpdate()
 	}
 }
 
-func (self *SWS_DropdownWidget) HasFocus(hasfocus bool) {
+func (self *DropdownWidget) HasFocus(hasfocus bool) {
 	self.hasfocus = hasfocus
 	if hasfocus == false {
 		menuInitiator = nil
@@ -43,21 +43,21 @@ func (self *SWS_DropdownWidget) HasFocus(hasfocus bool) {
 	PostUpdate()
 }
 
-func (self *SWS_DropdownWidget) SetClicked(callback func()) {
+func (self *DropdownWidget) SetClicked(callback func()) {
 	self.clicked = callback
 }
 
-func (self *SWS_DropdownWidget) MousePressDown(x, y int32, button uint8) {
+func (self *DropdownWidget) MousePressDown(x, y int32, button uint8) {
 	if button == sdl.BUTTON_LEFT {
 		self.buttonState = true
 		self.cursorInside = true
 		if self.menu != nil && self.menu.Parent() != nil {
 			hideMenu(nil)
 		} else {
-			self.menu = CreateMenuWidget()
+			self.menu = NewMenuWidget()
 			for i, choice := range self.Choices {
 				index := i
-				self.menu.AddItem(CreateMenuItemLabel(choice, func() {
+				self.menu.AddItem(NewMenuItemLabel(choice, func() {
 					self.ActiveChoice = int32(index)
 					if self.clicked != nil {
 						self.clicked()
@@ -66,7 +66,7 @@ func (self *SWS_DropdownWidget) MousePressDown(x, y int32, button uint8) {
 			}
 			var xx int32
 			yy := self.height
-			var widget SWS_Widget
+			var widget Widget
 			widget = self
 			for widget != nil {
 				xx += widget.X()
@@ -80,7 +80,7 @@ func (self *SWS_DropdownWidget) MousePressDown(x, y int32, button uint8) {
 	}
 }
 
-func (self *SWS_DropdownWidget) MousePressUp(x, y int32, button uint8) {
+func (self *DropdownWidget) MousePressUp(x, y int32, button uint8) {
 	if button == sdl.BUTTON_LEFT {
 		self.buttonState = false
 		if self.cursorInside == true {
@@ -90,7 +90,7 @@ func (self *SWS_DropdownWidget) MousePressUp(x, y int32, button uint8) {
 			if self.menu != nil && self.menu.Parent() != nil {
 				var xx int32
 				yy := self.height
-				var widget SWS_Widget
+				var widget Widget
 				widget = self
 				for widget != nil {
 					xx += widget.X()
@@ -106,7 +106,7 @@ func (self *SWS_DropdownWidget) MousePressUp(x, y int32, button uint8) {
 	}
 }
 
-func (self *SWS_DropdownWidget) MouseMove(x, y, xrel, yrel int32) {
+func (self *DropdownWidget) MouseMove(x, y, xrel, yrel int32) {
 	oldCursorInside := self.cursorInside
 	if self.buttonState == true {
 		if x >= 0 && x < self.Width() && y >= 0 && y < self.Height() {
@@ -120,7 +120,7 @@ func (self *SWS_DropdownWidget) MouseMove(x, y, xrel, yrel int32) {
 	}
 }
 
-func (self *SWS_DropdownWidget) Repaint() {
+func (self *DropdownWidget) Repaint() {
 	label := ""
 	if self.ActiveChoice >= int32(len(self.Choices)) {
 		self.ActiveChoice = int32(len(self.Choices) - 1)
@@ -129,7 +129,7 @@ func (self *SWS_DropdownWidget) Repaint() {
 		label = self.Choices[self.ActiveChoice]
 	}
 
-	self.SWS_CoreWidget.Repaint()
+	self.CoreWidget.Repaint()
 	self.FillRect(2, 2, self.width-4, self.height-4, 0xffdddddd)
 	self.SetDrawColor(0, 0, 0, 255)
 	self.DrawLine(0, 1, 0, self.Height()-2)
@@ -160,9 +160,9 @@ func (self *SWS_DropdownWidget) Repaint() {
 	self.DrawLine(2, self.Height()-3, self.Width()-3, self.Height()-3)
 }
 
-func CreateDropdownWidget(w, h int32, choices []string) *SWS_DropdownWidget {
-	corewidget := CreateCoreWidget(w, h)
-	widget := &SWS_DropdownWidget{SWS_CoreWidget: *corewidget,
+func NewDropdownWidget(w, h int32, choices []string) *DropdownWidget {
+	corewidget := NewCoreWidget(w, h)
+	widget := &DropdownWidget{CoreWidget: *corewidget,
 		buttonState:  false,
 		cursorInside: false,
 		Choices:      choices,
