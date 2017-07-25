@@ -248,6 +248,9 @@ func (self *CoreWidget) TranslateXYToWidget(globalX, globalY int32) (x, y int32)
 	return self.Parent().TranslateXYToWidget(globalX-self.X(), globalY-self.Y())
 }
 
+func (self *CoreWidget) MouseDoubleClick(x, y int32) {
+}
+
 func (self *CoreWidget) MousePressDown(x, y int32, button uint8) {
 }
 

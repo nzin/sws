@@ -61,6 +61,7 @@ type Widget interface {
 	Y() int32
 	Width() int32
 	Height() int32
+	MouseDoubleClick(x, y int32)
 	MousePressDown(x, y int32, button uint8)
 	MousePressUp(x, y int32, button uint8)
 	MouseMove(x, y, xrel, yrel int32)
@@ -338,6 +339,7 @@ func (root *RootWidget) SetFocus(widget Widget) {
 var previousFocus, focus Widget
 var previousmainwindowfocus, mainwindowfocus Widget
 var buttonDown = false
+var lastleftclick time.Time
 
 //
 // main loop event function.
@@ -420,6 +422,14 @@ func PoolEvent() bool {
 					}
 					root.RemoveChild(dragwidget)
 					dragwidget = nil
+				}
+				
+				// left double click
+				if time.Since(lastleftclick).Seconds()<=1 && t.Button == sdl.BUTTON_LEFT && focus != nil {
+					focus.MouseDoubleClick(xTarget,yTarget)
+				}
+				if t.Button == sdl.BUTTON_LEFT {
+					lastleftclick = time.Now()
 				}
 			}
 		case *sdl.MouseMotionEvent:
