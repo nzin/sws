@@ -62,13 +62,13 @@ func (self *ScrollWidget) Resize(width, height int32) {
 			self.vScrollbar.Move(self.Width()-SCROLLBAR_WIDTH, 0)
 			self.AddChild(self.corner)
 			self.corner.Move(self.Width()-SCROLLBAR_WIDTH, self.Height()-SCROLLBAR_WIDTH)
-		} else if self.subwidget.Width() > self.Width()-SCROLLBAR_WIDTH && self.showH == true {
-			self.hScrollbar.SetMaximum(self.subwidget.Width() - (self.Width() - SCROLLBAR_WIDTH))
+		} else if self.subwidget.Width() > self.Width() && self.showH == true {
+			self.hScrollbar.SetMaximum(self.subwidget.Width() - self.Width())
 			self.AddChild(self.hScrollbar)
 			self.hScrollbar.Move(0, self.Height()-SCROLLBAR_WIDTH)
 			self.hScrollbar.Resize(self.Width(), SCROLLBAR_WIDTH)
-		} else if self.subwidget.Height() > self.Height()-SCROLLBAR_WIDTH && self.showV == true {
-			self.vScrollbar.SetMaximum(self.subwidget.Height() - (self.Height() - SCROLLBAR_WIDTH))
+		} else if self.subwidget.Height() > self.Height() && self.showV == true {
+			self.vScrollbar.SetMaximum(self.subwidget.Height() - self.Height())
 			self.AddChild(self.vScrollbar)
 			self.vScrollbar.Resize(SCROLLBAR_WIDTH, self.Height())
 			self.vScrollbar.Move(self.Width()-SCROLLBAR_WIDTH, 0)
