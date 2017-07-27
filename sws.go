@@ -422,6 +422,7 @@ func PoolEvent() bool {
 					}
 					root.RemoveChild(dragwidget)
 					dragwidget = nil
+					PostUpdate()
 				}
 				
 				// left double click
