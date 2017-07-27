@@ -314,6 +314,13 @@ func (self *CoreWidget) DragDrop(x, y int32, payload DragPayload) bool {
 func (self *CoreWidget) Repaint() {
 	if self.bgColor != 0 {
 		self.FillRect(0, 0, self.width, self.height, self.bgColor)
+	} else {
+		surface, err := sdl.CreateRGBSurface(0, self.Surface().W, self.Surface().H, 32, 0x00ff0000, 0x0000ff00, 0x000000ff,  0xff000000)
+		if err != nil {
+			panic(err)
+		}
+		self.surface.Free()
+		self.surface = surface
 	}
 	for _, child := range self.children {
 		// adjust the clipping to the current child
