@@ -70,6 +70,9 @@ func (self *TreeViewWidget) Repaint() {
 		item.walkTreeView(0, false, func(level int32, i *TreeViewItem) {
 			i.Repaint(25 * level)
 
+			if i.focus == true {
+				self.FillRect(0,y,self.Width(),25,0xffcccccc)
+			}
 			rectSrc := sdl.Rect{0, 0, i.Surface().W, i.Surface().H}
 			rectDst := sdl.Rect{0, y, i.Surface().W, i.Surface().H}
 			if err := i.Surface().Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
