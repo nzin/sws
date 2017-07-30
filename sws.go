@@ -229,7 +229,9 @@ func (self *RootWidget) SetModal(widget *MainWidget) {
 	self.modalwidget = widget
 
 	// this is an ugly hack
-	mainwindowfocus.HasFocus(false)
+	if mainwindowfocus!=nil {
+		mainwindowfocus.HasFocus(false)
+	}
 	self.modalwidget.HasFocus(true)
 	mainwindowfocus = self.modalwidget
 }
