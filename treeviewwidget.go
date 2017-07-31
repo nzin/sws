@@ -16,10 +16,11 @@ type TreeViewWidget struct {
 
 func NewTreeViewWidget() *TreeViewWidget {
 	tree := &TreeViewWidget{
-		CoreWidget:   *NewCoreWidget(100, 100),
+		CoreWidget:   *NewCoreWidget(100,100),
 		items:        make([]*TreeViewItem, 0),
 		currentfocus: nil,
 	}
+	tree.SetColor(0xffffffff)
 	return tree
 }
 
@@ -46,7 +47,9 @@ func (self *TreeViewWidget) computeSize() {
 			height += 25
 		})
 	}
-	self.CoreWidget.Resize(width, height)
+	if width > self.Width() || height > self.Height() {
+		self.CoreWidget.Resize(width, height)
+	}
 	PostUpdate()
 }
 
@@ -71,7 +74,7 @@ func (self *TreeViewWidget) Repaint() {
 			i.Repaint(25 * level)
 
 			if i.focus == true {
-				self.FillRect(0,y,self.Width(),25,0xffcccccc)
+				self.FillRect(0,y,self.Width(),25,0xff8888ff)
 			}
 			rectSrc := sdl.Rect{0, 0, i.Surface().W, i.Surface().H}
 			rectDst := sdl.Rect{0, y, i.Surface().W, i.Surface().H}
@@ -83,6 +86,7 @@ func (self *TreeViewWidget) Repaint() {
 }
 
 func (self *TreeViewWidget) Resize(width, height int32) {
+	self.CoreWidget.Resize(width,height)
 }
 
 func (self *TreeViewWidget) AddItem(item *TreeViewItem) {
@@ -125,6 +129,7 @@ func NewTreeViewItem(label string, icon string, callback func()) *TreeViewItem {
 		computedwidth: -1,
 		textcolor:     sdl.Color{0, 0, 0, 255},
 	}
+	item.SetColor(0xffffffff)
 	if img, err := img.Load(icon); err == nil {
 		item.icon = img
 	}
@@ -245,11 +250,11 @@ func (self *TreeViewItem) MousePressDown(shift, x, y int32, button uint8) {
 func (self *TreeViewItem) SetFocus(focus bool) {
 	self.focus = focus
 	if focus {
-		self.bgColor = 0xffcccccc
+		self.bgColor = 0xff8888ff
 		if self.callback != nil {
 			self.callback()
 		}
 	} else {
-		self.bgColor = 0xffdddddd
+		self.bgColor = 0xffffffff
 	}
 }
