@@ -21,6 +21,18 @@ func (self *InputWidget) HasFocus(focus bool) {
 	PostUpdate()
 }
 
+func (self *InputWidget) GetText() string {
+	return self.text
+}
+
+func (self *InputWidget) SetText(str string) {
+	self.text = str
+	self.initialCursorPosition = 0
+	self.endCursorPosition = 0
+	self.writeOffset = 0
+	PostUpdate()
+}
+
 func (self *InputWidget) MousePressDown(x, y int32, button uint8) {
 
 	if button == sdl.BUTTON_LEFT {
