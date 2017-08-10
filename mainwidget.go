@@ -246,6 +246,10 @@ func (self *MainWidget) AddChild(child Widget) {
 	self.subwidget.AddChild(child)
 }
 
+func (self *MainWidget) RemoveChild(child Widget) {
+	self.subwidget.RemoveChild(child)
+}
+
 func (self *MainWidget) MousePressDown(x, y int32, button uint8) {
 	wText, _, _ := self.font.SizeUTF8(self.label)
 	maxW := int32(wText) + 40

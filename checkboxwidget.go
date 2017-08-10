@@ -64,6 +64,8 @@ func (self *CheckboxWidget) Repaint() {
 	if self.cursorInside {
 		selected = !selected
 	}
+	
+	self.FillRect(6, 6, 12, 12, 0xffffffff)
 
 	self.SetDrawColor(0, 0, 0, 255)
 	self.DrawLine(5, 5, 5, 19)
