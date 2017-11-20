@@ -53,6 +53,10 @@ func NewCoreWidget(w, h int32) *CoreWidget {
 	return widget
 }
 
+//
+// method used (internaly) to specify that this
+// widget's content changed and needs to be refreshed. 
+//
 func (self *CoreWidget) PostUpdate() {
 	self.dirty = true
 	if self.Parent() != nil {
@@ -60,6 +64,10 @@ func (self *CoreWidget) PostUpdate() {
 	}
 }
 
+//
+// to know if the widget has to be repaint (i.e.
+// PostUpdate() has been called)
+//
 func (self *CoreWidget) IsDirty() bool {
 	return self.dirty
 }
