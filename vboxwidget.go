@@ -23,7 +23,7 @@ func (self *VBoxWidget) Resize(width, height int32) {
 	for _, child := range self.children {
 		child.Resize(width, child.Height())
 	}
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *VBoxWidget) AddChild(child Widget) {
@@ -39,7 +39,7 @@ func (self *VBoxWidget) AddChild(child Widget) {
 	self.height = height
 	self.width = width
 	self.CoreWidget.Resize(width, height)
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *VBoxWidget) RemoveChild(child Widget) {
@@ -54,7 +54,7 @@ func (self *VBoxWidget) RemoveChild(child Widget) {
 	}
 	self.height = height
 	self.width = width
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func NewVBoxWidget(w, h int32) *VBoxWidget {

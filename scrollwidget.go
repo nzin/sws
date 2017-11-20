@@ -74,7 +74,7 @@ func (self *ScrollWidget) Resize(width, height int32) {
 			self.vScrollbar.Move(self.Width()-SCROLLBAR_WIDTH, 0)
 		}
 	}
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *ScrollWidget) SetInnerWidget(widget Widget) bool {

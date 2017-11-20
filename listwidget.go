@@ -50,7 +50,7 @@ func (self *ListWidget) SetCurrentItem(child *FlatButtonWidget) {
 			c.(*FlatButtonWidget).SetColor(0xffdddddd)
 		}
 	}
-	PostUpdate()
+	self.PostUpdate()
 }
 
 // not so usefull for the moment

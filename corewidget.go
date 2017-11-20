@@ -27,6 +27,7 @@ type CoreWidget struct {
 	width    int32
 	height   int32
 	font     *ttf.Font
+	dirty    bool
 }
 
 func NewCoreWidget(w, h int32) *CoreWidget {
@@ -46,8 +47,21 @@ func NewCoreWidget(w, h int32) *CoreWidget {
 		bgColor:  0xffdddddd,
 		surface:  surface,
 		renderer: renderer,
-		font:     defaultFont}
+		font:     defaultFont,
+		dirty:    true,
+	}
 	return widget
+}
+
+func (self *CoreWidget) PostUpdate() {
+	self.dirty = true
+	if self.Parent() != nil {
+		self.Parent().PostUpdate()
+	}
+}
+
+func (self *CoreWidget) IsDirty() bool {
+	return self.dirty
 }
 
 func (self *CoreWidget) Destroy() {
@@ -81,7 +95,7 @@ func (self *CoreWidget) Resize(width, height int32) {
 	self.renderer = renderer
 	self.width = width
 	self.height = height
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *CoreWidget) FillRect(x, y, w, h int32, c uint32) {
@@ -286,7 +300,7 @@ func (self *CoreWidget) Height() int32 {
 
 func (self *CoreWidget) SetColor(color uint32) {
 	self.bgColor = color
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *CoreWidget) Move(x, y int32) {
@@ -324,9 +338,12 @@ func (self *CoreWidget) Repaint() {
 	}
 	for _, child := range self.children {
 		// adjust the clipping to the current child
-		child.Repaint()
+		if child.IsDirty() {
+			child.Repaint()
+		}
 		rectSrc := sdl.Rect{0, 0, child.Width(), child.Height()}
 		rectDst := sdl.Rect{child.X(), child.Y(), child.Width(), child.Height()}
 		child.Surface().Blit(&rectSrc, self.Surface(), &rectDst)
 	}
+	self.dirty = false
 }

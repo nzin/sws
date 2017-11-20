@@ -24,20 +24,6 @@ import (
 	"time"
 )
 
-var needUpdate bool
-
-//
-// Currently when a widget needs to refresh its content it calls
-// this PostUpdate() function, that ask all windows to repaint
-// This is not smart, we should at least have in each widget a
-// boolean to know if the window is dirty (and its parent)
-//
-// Would be nice to implement it :-)
-//
-func PostUpdate() {
-	needUpdate = true
-}
-
 type DragPayload interface {
 	GetType() int32
 	PayloadAccepted(bool)
@@ -76,6 +62,8 @@ type Widget interface {
 	DragEnter(x, y int32, payload DragPayload)
 	DragLeave(payload DragPayload)
 	DragDrop(x, y int32, payload DragPayload) bool
+	IsDirty() bool
+	PostUpdate()
 }
 
 //
@@ -291,8 +279,6 @@ func Init(width, height int32) *RootWidget {
 	InitSprites()
 	InitFonts()
 
-	PostUpdate()
-
 	root = NewRootWidget(window)
 	root.SetColor(0xff111111)
 	return root
@@ -424,7 +410,7 @@ func PoolEvent() bool {
 					}
 					root.RemoveChild(dragwidget)
 					dragwidget = nil
-					PostUpdate()
+					root.PostUpdate()
 				}
 				
 				// left double click
@@ -473,7 +459,7 @@ func PoolEvent() bool {
 								afterW.DragEnter(axTarget, ayTarget, dragpayload)
 							}
 						}
-						PostUpdate()
+						root.PostUpdate()
 					}
 				}
 			}
@@ -493,8 +479,7 @@ func PoolEvent() bool {
 
 		}
 	}
-	if needUpdate == true {
-		needUpdate = false
+	if root.IsDirty() == true {
 		root.Repaint()
 		rectSrc := sdl.Rect{0, 0, root.Width(), root.Height()}
 		rectDst := sdl.Rect{root.X(), root.Y(), root.Width(), root.Height()}

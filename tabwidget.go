@@ -19,7 +19,7 @@ func (self *TabWidget) AddTab(label string, tab Widget) {
 	}
 	self.labels = append(self.labels, label)
 	self.tabs = append(self.tabs, tab)
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *TabWidget) Resize(width, height int32) {
@@ -38,7 +38,7 @@ func (self *TabWidget) SelectTab(index int32) {
 		self.active = index
 		self.AddChild(self.tabs[self.active])
 		self.tabs[self.active].Resize(self.Width()-10, self.Height()-40)
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -59,7 +59,7 @@ func (self *TabWidget) MousePressDown(x, y int32, button uint8) {
 			self.active = active
 			self.AddChild(self.tabs[self.active])
 			self.tabs[self.active].Resize(self.Width()-10, self.Height()-40)
-			PostUpdate()
+			self.PostUpdate()
 		}
 	}
 }

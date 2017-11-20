@@ -184,7 +184,7 @@ func (self *MenuWidget) MouseMove(x, y, xrel, yrel int32) {
 				self.lastSubActive = -1
 			}
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -256,7 +256,7 @@ func ShowMenu(menu *MenuWidget) {
 		menuStack = append(menuStack, menu)
 	}
 	root.AddChild(menu)
-	PostUpdate()
+	root.PostUpdate()
 }
 
 func findMenu(x int32, y int32) *MenuWidget {
@@ -288,7 +288,7 @@ func hideMenu(menu *MenuWidget) {
 			m.SetParent(nil)
 		}
 		menuStack = nil
-		PostUpdate()
+		root.PostUpdate()
 		return
 	}
 	// destroy submenu
@@ -299,7 +299,7 @@ func hideMenu(menu *MenuWidget) {
 				root.RemoveChild(s)
 			}
 			menuStack = menuStack[:i]
-			PostUpdate()
+			root.PostUpdate()
 			return
 		}
 	}
@@ -329,7 +329,7 @@ func (self *MenuBarWidget) HasFocus(hasfocus bool) {
 
 	//menuStack=append(make([]*MenuWidget,0,0),&(self.MenuWidget))
 
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *MenuBarWidget) Repaint() {
@@ -389,7 +389,7 @@ func (self *MenuBarWidget) MousePressUp(x, y int32, button uint8) {
 			self.items[self.activeItem].Clicked()
 		}
 	}
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *MenuBarWidget) MouseMove(x, y, xrel, yrel int32) {
@@ -444,7 +444,7 @@ func (self *MenuBarWidget) MouseMove(x, y, xrel, yrel int32) {
 				self.lastSubActive = -1
 			}
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 

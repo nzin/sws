@@ -18,7 +18,7 @@ type DropdownWidget struct {
 func (self *DropdownWidget) SetChoices(choices []string) {
 	self.Choices = choices
 	self.ActiveChoice = 0
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *DropdownWidget) SetActiveChoice(choice int32) {
@@ -27,7 +27,7 @@ func (self *DropdownWidget) SetActiveChoice(choice int32) {
 		if self.clicked != nil {
 			self.clicked()
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -40,7 +40,7 @@ func (self *DropdownWidget) HasFocus(hasfocus bool) {
 		menuInitiator = self
 	}
 
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *DropdownWidget) SetClicked(callback func()) {
@@ -75,7 +75,7 @@ func (self *DropdownWidget) MousePressDown(x, y int32, button uint8) {
 			}
 			self.menu.Move(xx, yy-2)
 			ShowMenu(self.menu)
-			PostUpdate()
+			self.PostUpdate()
 		}
 	}
 }
@@ -102,7 +102,7 @@ func (self *DropdownWidget) MousePressUp(x, y int32, button uint8) {
 			}
 		}
 		self.cursorInside = false
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -115,7 +115,7 @@ func (self *DropdownWidget) MouseMove(x, y, xrel, yrel int32) {
 			self.cursorInside = false
 		}
 		if oldCursorInside != self.cursorInside {
-			PostUpdate()
+			self.PostUpdate()
 		}
 	}
 }

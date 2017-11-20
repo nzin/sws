@@ -23,24 +23,24 @@ func (self *ButtonWidget) AlignImageLeft(alignleft bool) {
 
 func (self *ButtonWidget) SetTextColor(color sdl.Color) {
 	self.textcolor = color
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *ButtonWidget) SetText(text string) {
 	self.label = text
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *ButtonWidget) SetCentered(centered bool) {
 	self.centered = centered
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *ButtonWidget) SetImage(image string) {
 	if img, err := img.Load(image); err == nil {
 		self.image = img
 	}
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *ButtonWidget) SetClicked(callback func()) {
@@ -51,7 +51,7 @@ func (self *ButtonWidget) MousePressDown(x, y int32, button uint8) {
 	if button == sdl.BUTTON_LEFT {
 		self.buttonState = true
 		self.cursorInside = true
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -64,7 +64,7 @@ func (self *ButtonWidget) MousePressUp(x, y int32, button uint8) {
 			}
 		}
 		self.cursorInside = false
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -77,7 +77,7 @@ func (self *ButtonWidget) MouseMove(x, y, xrel, yrel int32) {
 			self.cursorInside = false
 		}
 		if oldCursorInside != self.cursorInside {
-			PostUpdate()
+			self.PostUpdate()
 		}
 	}
 }

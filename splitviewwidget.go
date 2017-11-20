@@ -46,7 +46,7 @@ func (self *SplitviewWidget) Resize(width, height int32) {
 			self.rightwidget.Resize(width, height-(self.splitwidget.Y()+self.splitwidget.Height()))
 		}
 	}
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *SplitviewWidget) SetLeftWidget(widget Widget) bool {
@@ -65,7 +65,7 @@ func (self *SplitviewWidget) SetLeftWidget(widget Widget) bool {
 	} else {
 		widget.Resize(self.Width(), self.splitwidget.Y())
 	}
-	PostUpdate()
+	self.PostUpdate()
 
 	return true
 }
@@ -88,7 +88,7 @@ func (self *SplitviewWidget) SetRightWidget(widget Widget) bool {
 		widget.Resize(self.Width(), self.Height()-(self.splitwidget.Y()+self.splitwidget.Height()))
 		widget.Move(0, self.splitwidget.Y()+self.splitwidget.Height())
 	}
-	PostUpdate()
+	self.PostUpdate()
 
 	return true
 }
@@ -116,7 +116,7 @@ func NewSplitviewWidget(w, h int32, horizontal bool) *SplitviewWidget {
 				widget.rightwidget.Move(widget.splitwidget.X()+widget.splitwidget.Width(), 0)
 				widget.rightwidget.Resize(rightwidth, widget.Height())
 			}
-			PostUpdate()
+//			self.PostUpdate()
 		})
 	} else {
 		widget.splitwidget.Move(0, h/2)
@@ -132,7 +132,7 @@ func NewSplitviewWidget(w, h int32, horizontal bool) *SplitviewWidget {
 				widget.rightwidget.Move(0, widget.splitwidget.Y()+widget.splitwidget.Height())
 				widget.rightwidget.Resize(widget.Width(), rightheight)
 			}
-			PostUpdate()
+//			self.PostUpdate()
 		})
 	}
 	return widget
@@ -149,7 +149,7 @@ type SplitWidget struct {
 
 func (self *SplitWidget) SetMovable(movable bool) {
 	self.movable = movable
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *SplitWidget) Repaint() {
@@ -199,7 +199,7 @@ func (self *SplitWidget) MouseMove(x, y, xrel, yrel int32) {
 		if self.callback != nil {
 			self.callback()
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 

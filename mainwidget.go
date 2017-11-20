@@ -33,7 +33,7 @@ type MainWidget struct {
 
 func (self *MainWidget) SetTitle(label string) {
 	self.label = label
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *MainWidget) SetCloseCallback(callback func()) {
@@ -54,7 +54,7 @@ func (self *MainWidget) SetInnerWidget(widget Widget) bool {
 		widget.Move(6, 26+self.menubar.Height())
 		widget.Resize(self.Width()-12, self.Height()-32-self.menubar.Height())
 	}
-	PostUpdate()
+	self.PostUpdate()
 	return true
 }
 
@@ -68,13 +68,13 @@ func (self *MainWidget) SetMenuBar(menubar *MenuBarWidget) {
 	menubar.Resize(self.Width()-12, menubar.Height())
 	self.subwidget.Resize(self.Width()-12, self.Height()-32-menubar.Height())
 	self.subwidget.Move(6, 26+self.menubar.Height())
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *MainWidget) HasFocus(focus bool) {
 	if self.hasfocus != focus {
 		self.hasfocus = focus
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -259,13 +259,13 @@ func (self *MainWidget) MousePressDown(x, y int32, button uint8) {
 	if x > 2 && x < 18 && y > 2 && y < 18 {
 		self.buttonOnClose = true
 		self.cursorInsideClose = true
-		PostUpdate()
+		self.PostUpdate()
 		return
 	}
 	if self.expandable && x > maxW-19 && x < maxW-3 && y > 2 && y < 18 {
 		self.buttonOnExpand = true
 		self.cursorInsideExpand = true
-		PostUpdate()
+		self.PostUpdate()
 		return
 	}
 	if x < 40+int32(wText) && y < 20 {
@@ -286,11 +286,11 @@ func (self *MainWidget) MousePressUp(x, y int32, button uint8) {
 		if self.closeCallback != nil {
 			self.closeCallback()
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 	if self.buttonOnExpand == true {
 		self.buttonOnExpand = false
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -299,7 +299,7 @@ func (self *MainWidget) MouseMove(x, y, xrel, yrel int32) {
 	if self.inmove {
 		self.x += xrel
 		self.y += yrel
-		PostUpdate()
+		self.PostUpdate()
 		return
 	}
 	if self.onResize {
@@ -318,7 +318,7 @@ func (self *MainWidget) MouseMove(x, y, xrel, yrel int32) {
 		} else {
 			self.cursorInsideClose = false
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 	if self.buttonOnExpand {
 		if x > maxW-19 && x < maxW-3 && y > 2 && y < 18 {
@@ -326,7 +326,7 @@ func (self *MainWidget) MouseMove(x, y, xrel, yrel int32) {
 		} else {
 			self.cursorInsideExpand = false
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -344,7 +344,7 @@ func (self *MainWidget) Resize(width, height int32) {
 		self.menubar.Resize(width-12, self.menubar.Height())
 		self.subwidget.Resize(width-12, height-32-self.menubar.Height())
 	}
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func NewMainWidget(w, h int32, s string, expandable bool, resizable bool) *MainWidget {
