@@ -29,6 +29,10 @@ type MainWidget struct {
 	onResize           bool // to know if we are resizing
 	subwidget          Widget
 	menubar            *MenuBarWidget
+	xBeforeFull        int32
+	yBeforeFull        int32
+	widthBeforeFull    int32
+	heightBeforeFull   int32
 }
 
 func (self *MainWidget) SetTitle(label string) {
@@ -289,6 +293,21 @@ func (self *MainWidget) MousePressUp(x, y int32, button uint8) {
 		self.PostUpdate()
 	}
 	if self.buttonOnExpand == true {
+		if self.widthBeforeFull != -1 {
+			self.Move(self.xBeforeFull,self.yBeforeFull)
+			self.Resize(self.widthBeforeFull,self.heightBeforeFull)
+			self.xBeforeFull = -1
+			self.yBeforeFull = -1
+			self.widthBeforeFull = -1
+			self.heightBeforeFull = -1
+		} else {
+			self.xBeforeFull = self.X()
+			self.yBeforeFull = self.Y()
+			self.widthBeforeFull = self.Width()
+			self.heightBeforeFull = self.Height()
+			self.Move(0,0)
+			self.Resize(root.Width(),root.Height())
+		}
 		self.buttonOnExpand = false
 		self.PostUpdate()
 	}
@@ -299,6 +318,10 @@ func (self *MainWidget) MouseMove(x, y, xrel, yrel int32) {
 	if self.inmove {
 		self.x += xrel
 		self.y += yrel
+		self.xBeforeFull = -1
+		self.yBeforeFull = -1
+		self.widthBeforeFull = -1
+		self.heightBeforeFull = -1
 		self.PostUpdate()
 		return
 	}
@@ -364,7 +387,12 @@ func NewMainWidget(w, h int32, s string, expandable bool, resizable bool) *MainW
 		cursorInsideExpand: false,
 		onResize:           false,
 		subwidget:          subwidget,
-		menubar:            nil}
+		menubar:            nil,
+		xBeforeFull:        -1,
+		yBeforeFull:        -1,
+		widthBeforeFull:    -1,
+		heightBeforeFull:   -1,
+	}
 	subwidget.SetParent(widget)
 	return widget
 }
