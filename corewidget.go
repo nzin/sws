@@ -211,7 +211,6 @@ func (self *CoreWidget) Renderer() *sdl.Renderer {
 }
 
 func (self *CoreWidget) RemoveChild(child Widget) {
-
 	//fmt.Println("todestroy:",child)
 	for i, c := range self.children {
 		//fmt.Println("child:",c)
@@ -222,6 +221,7 @@ func (self *CoreWidget) RemoveChild(child Widget) {
 			} else {
 				self.children = append(self.children[:i], self.children[i+1:]...)
 			}
+			self.PostUpdate()
 			return
 		}
 	}
@@ -240,6 +240,7 @@ func (self *CoreWidget) AddChild(child Widget) {
 	}
 	self.children = append(self.children, child)
 	child.SetParent(self)
+	self.PostUpdate()
 }
 
 func (self *CoreWidget) SetParent(father Widget) {

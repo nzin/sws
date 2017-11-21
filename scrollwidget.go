@@ -22,18 +22,22 @@ type ScrollWidget struct {
 
 func (self *ScrollWidget) SetHorizontalPosition(position int32) {
 	self.hScrollbar.SetPosition(position)
+	self.PostUpdate()
 }
 
 func (self *ScrollWidget) SetVerticalPosition(position int32) {
 	self.vScrollbar.SetPosition(position)
+	self.PostUpdate()
 }
 
 func (self *ScrollWidget) ShowVerticalScrollbar(showV bool) {
 	self.showV = showV
+	self.PostUpdate()
 }
 
 func (self *ScrollWidget) ShowHorizontalScrollbar(showH bool) {
 	self.showH = showH
+	self.PostUpdate()
 }
 
 func (self *ScrollWidget) Resize(width, height int32) {
