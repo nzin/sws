@@ -59,6 +59,7 @@ func (self *DropdownWidget) MousePressDown(x, y int32, button uint8) {
 				index := i
 				self.menu.AddItem(NewMenuItemLabel(choice, func() {
 					self.ActiveChoice = int32(index)
+					self.PostUpdate()
 					if self.clicked != nil {
 						self.clicked()
 					}
