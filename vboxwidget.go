@@ -1,8 +1,6 @@
 package sws
 
-import (
 //	"github.com/veandco/go-sdl2/sdl"
-)
 
 //
 // a simple vertical box container
@@ -54,6 +52,15 @@ func (self *VBoxWidget) RemoveChild(child Widget) {
 	}
 	self.height = height
 	self.width = width
+	self.PostUpdate()
+}
+
+func (self *VBoxWidget) RemoveAllChildren() {
+	for _, child := range self.children {
+		self.CoreWidget.RemoveChild(child)
+	}
+	self.width = 0
+	self.height = 0
 	self.PostUpdate()
 }
 
