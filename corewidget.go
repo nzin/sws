@@ -187,6 +187,10 @@ func (self *CoreWidget) DrawPoint(x, y int32) {
 	self.Renderer().DrawPoint(int(x), int(y))
 }
 
+func (self *CoreWidget) InputText(text string) {
+
+}
+
 func (self *CoreWidget) KeyDown(key sdl.Keycode, mod uint16) {
 }
 

@@ -2,6 +2,7 @@ package sws
 
 import (
 	"fmt"
+
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -17,7 +18,7 @@ type InputWidget struct {
 }
 
 func (self *InputWidget) SetEnterCallback(callback func()) {
-	self.enterCallback=callback
+	self.enterCallback = callback
 }
 
 func (self *InputWidget) HasFocus(focus bool) {
@@ -94,6 +95,35 @@ func (self *InputWidget) MouseMove(x, y, xrel, yrel int32) {
 			}
 			self.initialCursorPosition++
 		}
+		self.PostUpdate()
+	}
+}
+
+func (self *InputWidget) InputText(text string) {
+	if self.initialCursorPosition == self.endCursorPosition {
+		self.text = self.text[:self.initialCursorPosition] + text + self.text[self.initialCursorPosition:]
+		self.initialCursorPosition++
+	} else {
+		i, e := self.initialCursorPosition, self.endCursorPosition
+		if i > e {
+			i, e = e, i
+		}
+		self.text = self.text[:i] + text + self.text[e:]
+		self.initialCursorPosition = i + 1
+	}
+	self.endCursorPosition = self.initialCursorPosition
+	self.PostUpdate()
+
+	w, _, err := self.Font().SizeUTF8(self.text[:self.initialCursorPosition])
+	if err != nil {
+		panic(err)
+	}
+	if self.writeOffset > int32(w) {
+		self.writeOffset = int32(w)
+		self.PostUpdate()
+	}
+	if self.writeOffset+self.Width()-4 < int32(w) {
+		self.writeOffset = int32(w) - self.Width() + 4
 		self.PostUpdate()
 	}
 }
@@ -180,26 +210,8 @@ func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 			self.initialCursorPosition = len(self.text)
 			self.PostUpdate()
 		}
-	} else if (key >= 'a' && key <= 'z') || (key >= '0' && key <= '9') || key == ' ' {
-		if key >= 'a' && key <= 'z' {
-			if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
-				key += 'A' - 'a'
-			}
-		}
-		if self.initialCursorPosition == self.endCursorPosition {
-			self.text = self.text[:self.initialCursorPosition] + string(key) + self.text[self.initialCursorPosition:]
-			self.initialCursorPosition++
-		} else {
-			i, e := self.initialCursorPosition, self.endCursorPosition
-			if i > e {
-				i, e = e, i
-			}
-			self.text = self.text[:i] + string(key) + self.text[e:]
-			self.initialCursorPosition = i + 1
-		}
-		self.endCursorPosition = self.initialCursorPosition
-		self.PostUpdate()
 	}
+
 	// replace cursor
 	w, _, err := self.Font().SizeUTF8(self.text[:self.initialCursorPosition])
 	if err != nil {

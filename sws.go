@@ -17,7 +17,6 @@
 package sws
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/veandco/go-sdl2/img"
@@ -54,6 +53,7 @@ type Widget interface {
 	MouseMove(x, y, xrel, yrel int32)
 	KeyDown(key sdl.Keycode, mod uint16)
 	KeyUp(key sdl.Keycode, mod uint16)
+	InputText(string)
 	TranslateXYToWidget(globalX, globalY int32) (x, y int32)
 	IsInside(x, y int32) bool
 	HasFocus(focus bool)
@@ -265,7 +265,7 @@ func NewRootWidget(window *sdl.Window) *RootWidget {
 //
 func Init(width, height int32) *RootWidget {
 	sdl.Init(sdl.INIT_EVERYTHING)
-
+	sdl.StartTextInput()
 	window, err := sdl.CreateWindow("test", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
 		800, 600, sdl.WINDOW_SHOWN|sdl.WINDOW_FULLSCREEN_DESKTOP)
 	if err != nil {
@@ -465,8 +465,8 @@ func PoolEvent() bool {
 				}
 			}
 		case *sdl.KeyDownEvent:
-			fmt.Printf("[%d ms] Keyboard\ttype:%d\tsym:%c\tmodifiers:%d\tstate:%d\trepeat:%d\n",
-				t.Timestamp, t.Type, t.Keysym.Sym, t.Keysym.Mod, t.State, t.Repeat)
+			//			fmt.Printf("[%d ms] Keyboard\ttype:%d\tsym:%c\tmodifiers:%d\tstate:%d\trepeat:%d\tunicode:%d\n",
+			//				t.Timestamp, t.Type, t.Keysym.Sym, t.Keysym.Mod, t.State, t.Repeat, t.Keysym.Unicode)
 			if focus != nil {
 				focus.KeyDown(t.Keysym.Sym, t.Keysym.Mod)
 			}
@@ -478,6 +478,18 @@ func PoolEvent() bool {
 				focus.KeyUp(t.Keysym.Sym, t.Keysym.Mod)
 			}
 
+		case *sdl.TextInputEvent:
+			endString := 0
+			for i := range t.Text {
+				if t.Text[i] == 0 {
+					break
+				}
+				endString++
+			}
+			focus.InputText(string(t.Text[:endString]))
+			//		case *sdl.TextEditingEvent:
+			//			fmt.Println("TextEditingEvent")
+			//			fmt.Println(t.Text)
 		}
 	}
 	if root.IsDirty() == true {
