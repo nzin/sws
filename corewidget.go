@@ -2,9 +2,10 @@ package sws
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
-	"os"
 )
 
 //
@@ -49,17 +50,18 @@ func NewCoreWidget(w, h int32) *CoreWidget {
 		renderer: renderer,
 		font:     defaultFont,
 		dirty:    true,
+		parent:   nil,
 	}
 	return widget
 }
 
 //
 // method used (internaly) to specify that this
-// widget's content changed and needs to be refreshed. 
+// widget's content changed and needs to be refreshed.
 //
 func (self *CoreWidget) PostUpdate() {
 	self.dirty = true
-	if self.Parent() != nil {
+	if self.Parent() != nil && self.Parent() != self {
 		self.Parent().PostUpdate()
 	}
 }
@@ -211,11 +213,11 @@ func (self *CoreWidget) Renderer() *sdl.Renderer {
 }
 
 func (self *CoreWidget) RemoveChild(child Widget) {
-	//fmt.Println("todestroy:",child)
+	//fmt.Println("todestroy:", child)
 	for i, c := range self.children {
-		//fmt.Println("child:",c)
+		//fmt.Println("child:", c)
 		if c == child {
-			//fmt.Println("found")
+			//fmt.Println("found", child)
 			if i == 0 {
 				self.children = self.children[1:]
 			} else {
@@ -338,7 +340,7 @@ func (self *CoreWidget) Repaint() {
 	if self.bgColor != 0 {
 		self.FillRect(0, 0, self.width, self.height, self.bgColor)
 	} else {
-		surface, err := sdl.CreateRGBSurface(0, self.Surface().W, self.Surface().H, 32, 0x00ff0000, 0x0000ff00, 0x000000ff,  0xff000000)
+		surface, err := sdl.CreateRGBSurface(0, self.Surface().W, self.Surface().H, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000)
 		if err != nil {
 			panic(err)
 		}

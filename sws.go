@@ -18,10 +18,11 @@ package sws
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
-	"time"
 )
 
 type DragPayload interface {
@@ -217,7 +218,7 @@ func (self *RootWidget) SetModal(widget *MainWidget) {
 	self.modalwidget = widget
 
 	// this is an ugly hack
-	if mainwindowfocus!=nil {
+	if mainwindowfocus != nil {
 		mainwindowfocus.HasFocus(false)
 	}
 	self.modalwidget.HasFocus(true)
@@ -412,10 +413,10 @@ func PoolEvent() bool {
 					dragwidget = nil
 					root.PostUpdate()
 				}
-				
+
 				// left double click
-				if time.Since(lastleftclick).Seconds()<=1 && t.Button == sdl.BUTTON_LEFT && focus != nil {
-					focus.MouseDoubleClick(xTarget,yTarget)
+				if time.Since(lastleftclick).Seconds() <= 1 && t.Button == sdl.BUTTON_LEFT && focus != nil {
+					focus.MouseDoubleClick(xTarget, yTarget)
 				}
 				if t.Button == sdl.BUTTON_LEFT {
 					lastleftclick = time.Now()

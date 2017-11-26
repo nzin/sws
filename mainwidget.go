@@ -2,8 +2,9 @@ package sws
 
 import (
 	"fmt"
-	"github.com/veandco/go-sdl2/sdl"
 	"os"
+
+	"github.com/veandco/go-sdl2/sdl"
 )
 
 //
@@ -48,7 +49,7 @@ func (self *MainWidget) SetInnerWidget(widget Widget) bool {
 	if widget == nil {
 		return false
 	}
-	self.RemoveChild(self.subwidget)
+	self.CoreWidget.RemoveChild(self.subwidget)
 	self.subwidget = widget
 	self.CoreWidget.AddChild(widget)
 	if self.menubar == nil {
@@ -294,8 +295,8 @@ func (self *MainWidget) MousePressUp(x, y int32, button uint8) {
 	}
 	if self.buttonOnExpand == true {
 		if self.widthBeforeFull != -1 {
-			self.Move(self.xBeforeFull,self.yBeforeFull)
-			self.Resize(self.widthBeforeFull,self.heightBeforeFull)
+			self.Move(self.xBeforeFull, self.yBeforeFull)
+			self.Resize(self.widthBeforeFull, self.heightBeforeFull)
 			self.xBeforeFull = -1
 			self.yBeforeFull = -1
 			self.widthBeforeFull = -1
@@ -305,8 +306,8 @@ func (self *MainWidget) MousePressUp(x, y int32, button uint8) {
 			self.yBeforeFull = self.Y()
 			self.widthBeforeFull = self.Width()
 			self.heightBeforeFull = self.Height()
-			self.Move(0,0)
-			self.Resize(root.Width(),root.Height())
+			self.Move(0, 0)
+			self.Resize(root.Width(), root.Height())
 		}
 		self.buttonOnExpand = false
 		self.PostUpdate()
@@ -374,7 +375,6 @@ func NewMainWidget(w, h int32, s string, expandable bool, resizable bool) *MainW
 	corewidget := NewCoreWidget(w, h)
 	subwidget := NewCoreWidget(w-12, h-32)
 	subwidget.Move(6, 26)
-	corewidget.AddChild(subwidget)
 	widget := &MainWidget{CoreWidget: *corewidget,
 		label:              s,
 		hasfocus:           false,
@@ -394,5 +394,6 @@ func NewMainWidget(w, h int32, s string, expandable bool, resizable bool) *MainW
 		heightBeforeFull:   -1,
 	}
 	subwidget.SetParent(widget)
+	widget.CoreWidget.AddChild(subwidget)
 	return widget
 }
