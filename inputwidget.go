@@ -13,6 +13,11 @@ type InputWidget struct {
 	hasfocus              bool
 	leftButtonDown        bool
 	writeOffset           int32
+	enterCallback         func()
+}
+
+func (self *InputWidget) SetEnterCallback(callback func()) {
+	self.enterCallback=callback
 }
 
 func (self *InputWidget) HasFocus(focus bool) {
@@ -94,6 +99,9 @@ func (self *InputWidget) MouseMove(x, y, xrel, yrel int32) {
 }
 
 func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
+	if key == sdl.K_RETURN {
+		self.enterCallback()
+	}
 	if key == sdl.K_UP {
 		if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
 			if self.initialCursorPosition > 0 {
