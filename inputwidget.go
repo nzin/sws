@@ -22,7 +22,6 @@ func (self *InputWidget) SetEnterCallback(callback func()) {
 }
 
 func (self *InputWidget) HasFocus(focus bool) {
-	fmt.Println("HasFocus")
 	self.hasfocus = focus
 	self.PostUpdate()
 }
