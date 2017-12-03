@@ -237,6 +237,8 @@ func NewButtonWidget(w, h int32, s string) *ButtonWidget {
 		buttonState:  false,
 		cursorInside: false,
 		centered:     true,
-		textcolor:    sdl.Color{0, 0, 0, 255}}
+		textcolor:    sdl.Color{0, 0, 0, 255},
+	}
+	widget.bgColor = 0xffdddddd
 	return widget
 }
