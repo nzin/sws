@@ -161,15 +161,13 @@ var dragpayload DragPayload
 //
 // usually in a MouseButtonDown
 //
-func NewDragEvent(x, y int32, image string, payload DragPayload) {
+func NewDragEventSprite(x, y int32, sprite *sdl.Surface, payload DragPayload) {
 	dragpayload = payload
 
 	draglabel := NewLabelWidget(25, 25, "")
 	draglabel.SetColor(0)
-	if img, err := img.Load(image); err == nil {
-		draglabel.Resize(img.W, img.H)
-	}
-	draglabel.SetImage(image)
+	draglabel.Resize(sprite.W, sprite.H)
+	draglabel.SetImageSurface(sprite)
 	draglabel.Move(x-draglabel.Width()/2, y-draglabel.Height()/2)
 	dragwidget = draglabel
 	root.AddChild(dragwidget)
@@ -178,6 +176,12 @@ func NewDragEvent(x, y int32, image string, payload DragPayload) {
 	if widget != nil {
 		localx, localy := widget.TranslateXYToWidget(x, y)
 		widget.DragEnter(localx, localy, payload)
+	}
+}
+
+func NewDragEvent(x, y int32, image string, payload DragPayload) {
+	if img, err := img.Load(image); err == nil {
+		NewDragEventSprite(x, y, img, payload)
 	}
 }
 

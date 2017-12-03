@@ -39,6 +39,11 @@ func (self *LabelWidget) SetImage(image string) {
 	self.PostUpdate()
 }
 
+func (self *LabelWidget) SetImageSurface(img *sdl.Surface) {
+	self.image = img
+	self.PostUpdate()
+}
+
 func (self *LabelWidget) Repaint() {
 	self.CoreWidget.Repaint()
 	// text
