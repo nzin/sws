@@ -17,26 +17,12 @@
 package sws
 
 import (
-	"fmt"
+	"time"
+
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
-	"time"
 )
-
-var needUpdate bool
-
-//
-// Currently when a widget needs to refresh its content it calls
-// this PostUpdate() function, that ask all windows to repaint
-// This is not smart, we should at least have in each widget a
-// boolean to know if the window is dirty (and its parent)
-//
-// Would be nice to implement it :-)
-//
-func PostUpdate() {
-	needUpdate = true
-}
 
 type DragPayload interface {
 	GetType() int32
@@ -67,6 +53,7 @@ type Widget interface {
 	MouseMove(x, y, xrel, yrel int32)
 	KeyDown(key sdl.Keycode, mod uint16)
 	KeyUp(key sdl.Keycode, mod uint16)
+	InputText(string)
 	TranslateXYToWidget(globalX, globalY int32) (x, y int32)
 	IsInside(x, y int32) bool
 	HasFocus(focus bool)
@@ -76,6 +63,8 @@ type Widget interface {
 	DragEnter(x, y int32, payload DragPayload)
 	DragLeave(payload DragPayload)
 	DragDrop(x, y int32, payload DragPayload) bool
+	IsDirty() bool
+	PostUpdate()
 }
 
 //
@@ -172,15 +161,13 @@ var dragpayload DragPayload
 //
 // usually in a MouseButtonDown
 //
-func NewDragEvent(x, y int32, image string, payload DragPayload) {
+func NewDragEventSprite(x, y int32, sprite *sdl.Surface, payload DragPayload) {
 	dragpayload = payload
 
 	draglabel := NewLabelWidget(25, 25, "")
 	draglabel.SetColor(0)
-	if img, err := img.Load(image); err == nil {
-		draglabel.Resize(img.W, img.H)
-	}
-	draglabel.SetImage(image)
+	draglabel.Resize(sprite.W, sprite.H)
+	draglabel.SetImageSurface(sprite)
 	draglabel.Move(x-draglabel.Width()/2, y-draglabel.Height()/2)
 	dragwidget = draglabel
 	root.AddChild(dragwidget)
@@ -189,6 +176,12 @@ func NewDragEvent(x, y int32, image string, payload DragPayload) {
 	if widget != nil {
 		localx, localy := widget.TranslateXYToWidget(x, y)
 		widget.DragEnter(localx, localy, payload)
+	}
+}
+
+func NewDragEvent(x, y int32, image string, payload DragPayload) {
+	if img, err := img.Load(image); err == nil {
+		NewDragEventSprite(x, y, img, payload)
 	}
 }
 
@@ -229,7 +222,7 @@ func (self *RootWidget) SetModal(widget *MainWidget) {
 	self.modalwidget = widget
 
 	// this is an ugly hack
-	if mainwindowfocus!=nil {
+	if mainwindowfocus != nil {
 		mainwindowfocus.HasFocus(false)
 	}
 	self.modalwidget.HasFocus(true)
@@ -276,7 +269,7 @@ func NewRootWidget(window *sdl.Window) *RootWidget {
 //
 func Init(width, height int32) *RootWidget {
 	sdl.Init(sdl.INIT_EVERYTHING)
-
+	sdl.StartTextInput()
 	window, err := sdl.CreateWindow("test", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
 		800, 600, sdl.WINDOW_SHOWN|sdl.WINDOW_FULLSCREEN_DESKTOP)
 	if err != nil {
@@ -290,8 +283,6 @@ func Init(width, height int32) *RootWidget {
 
 	InitSprites()
 	InitFonts()
-
-	PostUpdate()
 
 	root = NewRootWidget(window)
 	root.SetColor(0xff111111)
@@ -424,12 +415,12 @@ func PoolEvent() bool {
 					}
 					root.RemoveChild(dragwidget)
 					dragwidget = nil
-					PostUpdate()
+					root.PostUpdate()
 				}
-				
+
 				// left double click
-				if time.Since(lastleftclick).Seconds()<=1 && t.Button == sdl.BUTTON_LEFT && focus != nil {
-					focus.MouseDoubleClick(xTarget,yTarget)
+				if time.Since(lastleftclick).Seconds() <= 1 && t.Button == sdl.BUTTON_LEFT && focus != nil {
+					focus.MouseDoubleClick(xTarget, yTarget)
 				}
 				if t.Button == sdl.BUTTON_LEFT {
 					lastleftclick = time.Now()
@@ -473,13 +464,13 @@ func PoolEvent() bool {
 								afterW.DragEnter(axTarget, ayTarget, dragpayload)
 							}
 						}
-						PostUpdate()
+						root.PostUpdate()
 					}
 				}
 			}
 		case *sdl.KeyDownEvent:
-			fmt.Printf("[%d ms] Keyboard\ttype:%d\tsym:%c\tmodifiers:%d\tstate:%d\trepeat:%d\n",
-				t.Timestamp, t.Type, t.Keysym.Sym, t.Keysym.Mod, t.State, t.Repeat)
+			//			fmt.Printf("[%d ms] Keyboard\ttype:%d\tsym:%c\tmodifiers:%d\tstate:%d\trepeat:%d\tunicode:%d\n",
+			//				t.Timestamp, t.Type, t.Keysym.Sym, t.Keysym.Mod, t.State, t.Repeat, t.Keysym.Unicode)
 			if focus != nil {
 				focus.KeyDown(t.Keysym.Sym, t.Keysym.Mod)
 			}
@@ -491,10 +482,21 @@ func PoolEvent() bool {
 				focus.KeyUp(t.Keysym.Sym, t.Keysym.Mod)
 			}
 
+		case *sdl.TextInputEvent:
+			endString := 0
+			for i := range t.Text {
+				if t.Text[i] == 0 {
+					break
+				}
+				endString++
+			}
+			focus.InputText(string(t.Text[:endString]))
+			//		case *sdl.TextEditingEvent:
+			//			fmt.Println("TextEditingEvent")
+			//			fmt.Println(t.Text)
 		}
 	}
-	if needUpdate == true {
-		needUpdate = false
+	if root.IsDirty() == true {
 		root.Repaint()
 		rectSrc := sdl.Rect{0, 0, root.Width(), root.Height()}
 		rectDst := sdl.Rect{root.X(), root.Y(), root.Width(), root.Height()}

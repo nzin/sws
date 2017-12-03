@@ -24,19 +24,24 @@ func (self *LabelWidget) SetTextColor(color sdl.Color) {
 
 func (self *LabelWidget) SetCentered(centered bool) {
 	self.centered = centered
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *LabelWidget) SetText(label string) {
 	self.label = label
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *LabelWidget) SetImage(image string) {
 	if img, err := img.Load(image); err == nil {
 		self.image = img
 	}
-	PostUpdate()
+	self.PostUpdate()
+}
+
+func (self *LabelWidget) SetImageSurface(img *sdl.Surface) {
+	self.image = img
+	self.PostUpdate()
 }
 
 func (self *LabelWidget) Repaint() {

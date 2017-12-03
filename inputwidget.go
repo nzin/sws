@@ -1,7 +1,6 @@
 package sws
 
 import (
-	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -13,12 +12,16 @@ type InputWidget struct {
 	hasfocus              bool
 	leftButtonDown        bool
 	writeOffset           int32
+	enterCallback         func()
+}
+
+func (self *InputWidget) SetEnterCallback(callback func()) {
+	self.enterCallback = callback
 }
 
 func (self *InputWidget) HasFocus(focus bool) {
-	fmt.Println("HasFocus")
 	self.hasfocus = focus
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *InputWidget) GetText() string {
@@ -30,7 +33,7 @@ func (self *InputWidget) SetText(str string) {
 	self.initialCursorPosition = 0
 	self.endCursorPosition = 0
 	self.writeOffset = 0
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *InputWidget) MousePressDown(x, y int32, button uint8) {
@@ -49,7 +52,7 @@ func (self *InputWidget) MousePressDown(x, y int32, button uint8) {
 			self.initialCursorPosition++
 		}
 		self.endCursorPosition = self.initialCursorPosition
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -89,11 +92,43 @@ func (self *InputWidget) MouseMove(x, y, xrel, yrel int32) {
 			}
 			self.initialCursorPosition++
 		}
-		PostUpdate()
+		self.PostUpdate()
+	}
+}
+
+func (self *InputWidget) InputText(text string) {
+	if self.initialCursorPosition == self.endCursorPosition {
+		self.text = self.text[:self.initialCursorPosition] + text + self.text[self.initialCursorPosition:]
+		self.initialCursorPosition++
+	} else {
+		i, e := self.initialCursorPosition, self.endCursorPosition
+		if i > e {
+			i, e = e, i
+		}
+		self.text = self.text[:i] + text + self.text[e:]
+		self.initialCursorPosition = i + 1
+	}
+	self.endCursorPosition = self.initialCursorPosition
+	self.PostUpdate()
+
+	w, _, err := self.Font().SizeUTF8(self.text[:self.initialCursorPosition])
+	if err != nil {
+		panic(err)
+	}
+	if self.writeOffset > int32(w) {
+		self.writeOffset = int32(w)
+		self.PostUpdate()
+	}
+	if self.writeOffset+self.Width()-4 < int32(w) {
+		self.writeOffset = int32(w) - self.Width() + 4
+		self.PostUpdate()
 	}
 }
 
 func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
+	if key == sdl.K_RETURN {
+		self.enterCallback()
+	}
 	if key == sdl.K_UP {
 		if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
 			if self.initialCursorPosition > 0 {
@@ -105,7 +140,7 @@ func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 			}
 			self.endCursorPosition = self.initialCursorPosition
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 	if key == sdl.K_LEFT {
 		if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
@@ -118,7 +153,7 @@ func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 			}
 			self.endCursorPosition = self.initialCursorPosition
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 	if key == sdl.K_RIGHT {
 		if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
@@ -131,7 +166,7 @@ func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 			}
 			self.endCursorPosition = self.initialCursorPosition
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 
 	if key == sdl.K_DOWN {
@@ -145,7 +180,7 @@ func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 			}
 			self.endCursorPosition = self.initialCursorPosition
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 
 	if key == sdl.K_BACKSPACE {
@@ -163,35 +198,17 @@ func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 			self.initialCursorPosition = i
 		}
 		self.endCursorPosition = self.initialCursorPosition
-		PostUpdate()
+		self.PostUpdate()
 	}
 
 	if mod == sdl.KMOD_LCTRL || mod == sdl.KMOD_RCTRL {
 		if key == 'a' {
 			self.endCursorPosition = 0
 			self.initialCursorPosition = len(self.text)
-			PostUpdate()
+			self.PostUpdate()
 		}
-	} else if (key >= 'a' && key <= 'z') || (key >= '0' && key <= '9') || key == ' ' {
-		if key >= 'a' && key <= 'z' {
-			if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
-				key += 'A' - 'a'
-			}
-		}
-		if self.initialCursorPosition == self.endCursorPosition {
-			self.text = self.text[:self.initialCursorPosition] + string(key) + self.text[self.initialCursorPosition:]
-			self.initialCursorPosition++
-		} else {
-			i, e := self.initialCursorPosition, self.endCursorPosition
-			if i > e {
-				i, e = e, i
-			}
-			self.text = self.text[:i] + string(key) + self.text[e:]
-			self.initialCursorPosition = i + 1
-		}
-		self.endCursorPosition = self.initialCursorPosition
-		PostUpdate()
 	}
+
 	// replace cursor
 	w, _, err := self.Font().SizeUTF8(self.text[:self.initialCursorPosition])
 	if err != nil {
@@ -199,11 +216,11 @@ func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 	}
 	if self.writeOffset > int32(w) {
 		self.writeOffset = int32(w)
-		PostUpdate()
+		self.PostUpdate()
 	}
 	if self.writeOffset+self.Width()-4 < int32(w) {
 		self.writeOffset = int32(w) - self.Width() + 4
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 

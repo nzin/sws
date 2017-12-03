@@ -14,6 +14,7 @@ type ButtonWidget struct {
 	cursorInside bool
 	centered     bool
 	textcolor    sdl.Color
+	buttonColor  uint32
 	clicked      func()
 }
 
@@ -21,26 +22,31 @@ func (self *ButtonWidget) AlignImageLeft(alignleft bool) {
 	self.imageleft = alignleft
 }
 
+func (self *ButtonWidget) SetButtonColor(color uint32) {
+	self.buttonColor = color
+	self.PostUpdate()
+}
+
 func (self *ButtonWidget) SetTextColor(color sdl.Color) {
 	self.textcolor = color
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *ButtonWidget) SetText(text string) {
 	self.label = text
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *ButtonWidget) SetCentered(centered bool) {
 	self.centered = centered
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *ButtonWidget) SetImage(image string) {
 	if img, err := img.Load(image); err == nil {
 		self.image = img
 	}
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *ButtonWidget) SetClicked(callback func()) {
@@ -51,7 +57,7 @@ func (self *ButtonWidget) MousePressDown(x, y int32, button uint8) {
 	if button == sdl.BUTTON_LEFT {
 		self.buttonState = true
 		self.cursorInside = true
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -64,7 +70,7 @@ func (self *ButtonWidget) MousePressUp(x, y int32, button uint8) {
 			}
 		}
 		self.cursorInside = false
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -77,14 +83,16 @@ func (self *ButtonWidget) MouseMove(x, y, xrel, yrel int32) {
 			self.cursorInside = false
 		}
 		if oldCursorInside != self.cursorInside {
-			PostUpdate()
+			self.PostUpdate()
 		}
 	}
 }
 
 func (self *ButtonWidget) Repaint() {
 	self.CoreWidget.Repaint()
-	self.FillRect(2, 2, self.width-4, self.height-4, 0xffdddddd)
+	if self.buttonColor != 0 {
+		self.FillRect(2, 2, self.width-4, self.height-4, self.buttonColor)
+	}
 	self.SetDrawColor(0, 0, 0, 255)
 	self.DrawLine(0, 1, 0, self.Height()-2)
 	self.DrawLine(self.Width()-1, 1, self.Width()-1, self.Height()-2)
@@ -235,6 +243,8 @@ func NewButtonWidget(w, h int32, s string) *ButtonWidget {
 		buttonState:  false,
 		cursorInside: false,
 		centered:     true,
-		textcolor:    sdl.Color{0, 0, 0, 255}}
+		textcolor:    sdl.Color{0, 0, 0, 255},
+	}
+	widget.buttonColor = 0xffdddddd
 	return widget
 }

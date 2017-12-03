@@ -33,7 +33,7 @@ func (self *TreeViewWidget) SetFocusOn(item *TreeViewItem) {
 	if self.currentfocus != nil {
 		self.currentfocus.SetFocus(true)
 	}
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *TreeViewWidget) computeSize() {
@@ -50,7 +50,7 @@ func (self *TreeViewWidget) computeSize() {
 	if width > self.Width() || height > self.Height() {
 		self.CoreWidget.Resize(width, height)
 	}
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *TreeViewWidget) MousePressDown(x, y int32, button uint8) {

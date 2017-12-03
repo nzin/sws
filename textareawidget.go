@@ -27,18 +27,18 @@ const (
 
 func (self *TextAreaWidget) SetText(text string) {
 	self.text = text
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *TextAreaWidget) SetReadonly(readonly bool) {
 	self.readonly = readonly
 	self.SetColor(0xffdddddd)
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *TextAreaWidget) HasFocus(focus bool) {
 	self.hasfocus = focus
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *TextAreaWidget) MousePressDown(x, y int32, button uint8) {
@@ -50,7 +50,7 @@ func (self *TextAreaWidget) MousePressDown(x, y int32, button uint8) {
 		self.leftButtonDown = true
 		self.UpdatePosition(x, y)
 		self.endCursorPosition = self.initialCursorPosition
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -75,7 +75,7 @@ func (self *TextAreaWidget) MouseMove(x, y, xrel, yrel int32) {
 		}
 		self.UpdatePosition(x, y)
 
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -88,7 +88,7 @@ func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		if mod != sdl.KMOD_LSHIFT && mod != sdl.KMOD_RSHIFT {
 			self.endCursorPosition = self.initialCursorPosition
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 	if key == sdl.K_LEFT {
 		if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
@@ -101,7 +101,7 @@ func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 			}
 			self.endCursorPosition = self.initialCursorPosition
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 	if key == sdl.K_RIGHT {
 		if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
@@ -114,7 +114,7 @@ func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 			}
 			self.endCursorPosition = self.initialCursorPosition
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 
 	if key == sdl.K_DOWN {
@@ -122,7 +122,7 @@ func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		if mod != sdl.KMOD_LSHIFT && mod != sdl.KMOD_RSHIFT {
 			self.endCursorPosition = self.initialCursorPosition
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 
 	if key == sdl.K_BACKSPACE {
@@ -140,14 +140,14 @@ func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 			self.initialCursorPosition = i
 		}
 		self.endCursorPosition = self.initialCursorPosition
-		PostUpdate()
+		self.PostUpdate()
 	}
 
 	if mod == sdl.KMOD_LCTRL || mod == sdl.KMOD_RCTRL {
 		if key == 'a' {
 			self.endCursorPosition = 0
 			self.initialCursorPosition = len(self.text)
-			PostUpdate()
+			self.PostUpdate()
 		}
 	} else if (key >= 'a' && key <= 'z') || (key >= '0' && key <= '9') || key == ' ' || key == sdl.K_TAB || key == sdl.K_RETURN {
 		if key >= 'a' && key <= 'z' {
@@ -170,7 +170,7 @@ func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 			self.initialCursorPosition = i + 1
 		}
 		self.endCursorPosition = self.initialCursorPosition
-		PostUpdate()
+		self.PostUpdate()
 	}
 
 	// recompute self.xCursor, self.yCursor
@@ -185,7 +185,7 @@ func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 	if self.yCursor > self.Height()-2 {
 		self.writeOffset += int32(self.Font().Height())
 	}
-	PostUpdate()
+	self.PostUpdate()
 }
 
 type treatWord func(ta *TextAreaWidget, typeGlyph, x, y int32, word string, position int32)
@@ -219,7 +219,7 @@ func (self *TextAreaWidget) UpdatePosition(x, y int32) {
 		self.yCursor = y
 		self.parseText(updatePositionWord)
 	}
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func renderWord(self *TextAreaWidget, typeGlyph, x, y int32, word string, position int32) {

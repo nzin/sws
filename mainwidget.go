@@ -2,8 +2,9 @@ package sws
 
 import (
 	"fmt"
-	"github.com/veandco/go-sdl2/sdl"
 	"os"
+
+	"github.com/veandco/go-sdl2/sdl"
 )
 
 //
@@ -29,11 +30,15 @@ type MainWidget struct {
 	onResize           bool // to know if we are resizing
 	subwidget          Widget
 	menubar            *MenuBarWidget
+	xBeforeFull        int32
+	yBeforeFull        int32
+	widthBeforeFull    int32
+	heightBeforeFull   int32
 }
 
 func (self *MainWidget) SetTitle(label string) {
 	self.label = label
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *MainWidget) SetCloseCallback(callback func()) {
@@ -44,7 +49,7 @@ func (self *MainWidget) SetInnerWidget(widget Widget) bool {
 	if widget == nil {
 		return false
 	}
-	self.RemoveChild(self.subwidget)
+	self.CoreWidget.RemoveChild(self.subwidget)
 	self.subwidget = widget
 	self.CoreWidget.AddChild(widget)
 	if self.menubar == nil {
@@ -54,7 +59,7 @@ func (self *MainWidget) SetInnerWidget(widget Widget) bool {
 		widget.Move(6, 26+self.menubar.Height())
 		widget.Resize(self.Width()-12, self.Height()-32-self.menubar.Height())
 	}
-	PostUpdate()
+	self.PostUpdate()
 	return true
 }
 
@@ -68,13 +73,13 @@ func (self *MainWidget) SetMenuBar(menubar *MenuBarWidget) {
 	menubar.Resize(self.Width()-12, menubar.Height())
 	self.subwidget.Resize(self.Width()-12, self.Height()-32-menubar.Height())
 	self.subwidget.Move(6, 26+self.menubar.Height())
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *MainWidget) HasFocus(focus bool) {
 	if self.hasfocus != focus {
 		self.hasfocus = focus
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -246,6 +251,10 @@ func (self *MainWidget) AddChild(child Widget) {
 	self.subwidget.AddChild(child)
 }
 
+func (self *MainWidget) RemoveChild(child Widget) {
+	self.subwidget.RemoveChild(child)
+}
+
 func (self *MainWidget) MousePressDown(x, y int32, button uint8) {
 	wText, _, _ := self.font.SizeUTF8(self.label)
 	maxW := int32(wText) + 40
@@ -255,13 +264,13 @@ func (self *MainWidget) MousePressDown(x, y int32, button uint8) {
 	if x > 2 && x < 18 && y > 2 && y < 18 {
 		self.buttonOnClose = true
 		self.cursorInsideClose = true
-		PostUpdate()
+		self.PostUpdate()
 		return
 	}
 	if self.expandable && x > maxW-19 && x < maxW-3 && y > 2 && y < 18 {
 		self.buttonOnExpand = true
 		self.cursorInsideExpand = true
-		PostUpdate()
+		self.PostUpdate()
 		return
 	}
 	if x < 40+int32(wText) && y < 20 {
@@ -282,11 +291,26 @@ func (self *MainWidget) MousePressUp(x, y int32, button uint8) {
 		if self.closeCallback != nil {
 			self.closeCallback()
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 	if self.buttonOnExpand == true {
+		if self.widthBeforeFull != -1 {
+			self.Move(self.xBeforeFull, self.yBeforeFull)
+			self.Resize(self.widthBeforeFull, self.heightBeforeFull)
+			self.xBeforeFull = -1
+			self.yBeforeFull = -1
+			self.widthBeforeFull = -1
+			self.heightBeforeFull = -1
+		} else {
+			self.xBeforeFull = self.X()
+			self.yBeforeFull = self.Y()
+			self.widthBeforeFull = self.Width()
+			self.heightBeforeFull = self.Height()
+			self.Move(0, 0)
+			self.Resize(root.Width(), root.Height())
+		}
 		self.buttonOnExpand = false
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -295,7 +319,11 @@ func (self *MainWidget) MouseMove(x, y, xrel, yrel int32) {
 	if self.inmove {
 		self.x += xrel
 		self.y += yrel
-		PostUpdate()
+		self.xBeforeFull = -1
+		self.yBeforeFull = -1
+		self.widthBeforeFull = -1
+		self.heightBeforeFull = -1
+		self.PostUpdate()
 		return
 	}
 	if self.onResize {
@@ -314,7 +342,7 @@ func (self *MainWidget) MouseMove(x, y, xrel, yrel int32) {
 		} else {
 			self.cursorInsideClose = false
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 	if self.buttonOnExpand {
 		if x > maxW-19 && x < maxW-3 && y > 2 && y < 18 {
@@ -322,7 +350,7 @@ func (self *MainWidget) MouseMove(x, y, xrel, yrel int32) {
 		} else {
 			self.cursorInsideExpand = false
 		}
-		PostUpdate()
+		self.PostUpdate()
 	}
 }
 
@@ -340,14 +368,13 @@ func (self *MainWidget) Resize(width, height int32) {
 		self.menubar.Resize(width-12, self.menubar.Height())
 		self.subwidget.Resize(width-12, height-32-self.menubar.Height())
 	}
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func NewMainWidget(w, h int32, s string, expandable bool, resizable bool) *MainWidget {
 	corewidget := NewCoreWidget(w, h)
 	subwidget := NewCoreWidget(w-12, h-32)
 	subwidget.Move(6, 26)
-	corewidget.AddChild(subwidget)
 	widget := &MainWidget{CoreWidget: *corewidget,
 		label:              s,
 		hasfocus:           false,
@@ -360,7 +387,13 @@ func NewMainWidget(w, h int32, s string, expandable bool, resizable bool) *MainW
 		cursorInsideExpand: false,
 		onResize:           false,
 		subwidget:          subwidget,
-		menubar:            nil}
+		menubar:            nil,
+		xBeforeFull:        -1,
+		yBeforeFull:        -1,
+		widthBeforeFull:    -1,
+		heightBeforeFull:   -1,
+	}
 	subwidget.SetParent(widget)
+	widget.CoreWidget.AddChild(subwidget)
 	return widget
 }

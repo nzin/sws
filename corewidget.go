@@ -2,9 +2,10 @@ package sws
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
-	"os"
 )
 
 //
@@ -27,6 +28,7 @@ type CoreWidget struct {
 	width    int32
 	height   int32
 	font     *ttf.Font
+	dirty    bool
 }
 
 func NewCoreWidget(w, h int32) *CoreWidget {
@@ -46,8 +48,30 @@ func NewCoreWidget(w, h int32) *CoreWidget {
 		bgColor:  0xffdddddd,
 		surface:  surface,
 		renderer: renderer,
-		font:     defaultFont}
+		font:     defaultFont,
+		dirty:    true,
+		parent:   nil,
+	}
 	return widget
+}
+
+//
+// method used (internaly) to specify that this
+// widget's content changed and needs to be refreshed.
+//
+func (self *CoreWidget) PostUpdate() {
+	self.dirty = true
+	if self.Parent() != nil && self.Parent() != self {
+		self.Parent().PostUpdate()
+	}
+}
+
+//
+// to know if the widget has to be repaint (i.e.
+// PostUpdate() has been called)
+//
+func (self *CoreWidget) IsDirty() bool {
+	return self.dirty
 }
 
 func (self *CoreWidget) Destroy() {
@@ -81,7 +105,7 @@ func (self *CoreWidget) Resize(width, height int32) {
 	self.renderer = renderer
 	self.width = width
 	self.height = height
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *CoreWidget) FillRect(x, y, w, h int32, c uint32) {
@@ -163,6 +187,10 @@ func (self *CoreWidget) DrawPoint(x, y int32) {
 	self.Renderer().DrawPoint(int(x), int(y))
 }
 
+func (self *CoreWidget) InputText(text string) {
+
+}
+
 func (self *CoreWidget) KeyDown(key sdl.Keycode, mod uint16) {
 }
 
@@ -189,17 +217,17 @@ func (self *CoreWidget) Renderer() *sdl.Renderer {
 }
 
 func (self *CoreWidget) RemoveChild(child Widget) {
-
-	//fmt.Println("todestroy:",child)
+	//fmt.Println("todestroy:", child)
 	for i, c := range self.children {
-		//fmt.Println("child:",c)
+		//fmt.Println("child:", c)
 		if c == child {
-			//fmt.Println("found")
+			//fmt.Println("found", child)
 			if i == 0 {
 				self.children = self.children[1:]
 			} else {
 				self.children = append(self.children[:i], self.children[i+1:]...)
 			}
+			self.PostUpdate()
 			return
 		}
 	}
@@ -218,6 +246,7 @@ func (self *CoreWidget) AddChild(child Widget) {
 	}
 	self.children = append(self.children, child)
 	child.SetParent(self)
+	self.PostUpdate()
 }
 
 func (self *CoreWidget) SetParent(father Widget) {
@@ -249,15 +278,27 @@ func (self *CoreWidget) TranslateXYToWidget(globalX, globalY int32) (x, y int32)
 }
 
 func (self *CoreWidget) MouseDoubleClick(x, y int32) {
+	if self.Parent() != nil {
+		self.Parent().MouseDoubleClick(x+self.X(), y+self.Y())
+	}
 }
 
 func (self *CoreWidget) MousePressDown(x, y int32, button uint8) {
+	if self.Parent() != nil {
+		self.Parent().MousePressDown(x+self.X(), y+self.Y(), button)
+	}
 }
 
 func (self *CoreWidget) MousePressUp(x, y int32, button uint8) {
+	if self.Parent() != nil {
+		self.Parent().MousePressUp(x+self.X(), y+self.Y(), button)
+	}
 }
 
 func (self *CoreWidget) MouseMove(x, y, xrel, yrel int32) {
+	if self.Parent() != nil {
+		self.Parent().MouseMove(x+self.X(), y+self.Y(), xrel, yrel)
+	}
 }
 
 //
@@ -286,7 +327,7 @@ func (self *CoreWidget) Height() int32 {
 
 func (self *CoreWidget) SetColor(color uint32) {
 	self.bgColor = color
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *CoreWidget) Move(x, y int32) {
@@ -315,18 +356,23 @@ func (self *CoreWidget) Repaint() {
 	if self.bgColor != 0 {
 		self.FillRect(0, 0, self.width, self.height, self.bgColor)
 	} else {
-		surface, err := sdl.CreateRGBSurface(0, self.Surface().W, self.Surface().H, 32, 0x00ff0000, 0x0000ff00, 0x000000ff,  0xff000000)
+		surface, err := sdl.CreateRGBSurface(0, self.Surface().W, self.Surface().H, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000)
 		if err != nil {
 			panic(err)
 		}
-		self.surface.Free()
+		if self.surface != nil {
+			self.surface.Free()
+		}
 		self.surface = surface
 	}
 	for _, child := range self.children {
 		// adjust the clipping to the current child
-		child.Repaint()
+		if child.IsDirty() {
+			child.Repaint()
+		}
 		rectSrc := sdl.Rect{0, 0, child.Width(), child.Height()}
 		rectDst := sdl.Rect{child.X(), child.Y(), child.Width(), child.Height()}
 		child.Surface().Blit(&rectSrc, self.Surface(), &rectDst)
 	}
+	self.dirty = false
 }

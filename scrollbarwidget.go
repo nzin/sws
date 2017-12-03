@@ -31,7 +31,7 @@ func (self *ScrollbarWidget) SetPosition(position int32) {
 	if self.callback != nil {
 		self.callback(self.Currentposition)
 	}
-	PostUpdate()
+	self.PostUpdate()
 }
 
 func (self *ScrollbarWidget) SetCallback(callback Scrollbarcallback) {
@@ -76,7 +76,7 @@ func (self *ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 				if self.callback != nil {
 					self.callback(self.Currentposition)
 				}
-				PostUpdate()
+				self.PostUpdate()
 				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
 					self.Currentposition -= self.Width() / 2
 					if self.Currentposition < self.minimum {
@@ -85,7 +85,7 @@ func (self *ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 					if self.callback != nil {
 						self.callback(self.Currentposition)
 					}
-					PostUpdate()
+					self.PostUpdate()
 				})
 			} else if x > offset+w {
 				// click after
@@ -96,7 +96,7 @@ func (self *ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 				if self.callback != nil {
 					self.callback(self.Currentposition)
 				}
-				PostUpdate()
+				self.PostUpdate()
 				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
 					self.Currentposition += self.Width() / 2
 					if self.Currentposition > self.maximum {
@@ -105,7 +105,7 @@ func (self *ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 					if self.callback != nil {
 						self.callback(self.Currentposition)
 					}
-					PostUpdate()
+					self.PostUpdate()
 				})
 			} else {
 				self.onelevator = true
@@ -129,7 +129,7 @@ func (self *ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 				if self.callback != nil {
 					self.callback(self.Currentposition)
 				}
-				PostUpdate()
+				self.PostUpdate()
 				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
 					self.Currentposition -= self.Height() / 2
 					if self.Currentposition < self.minimum {
@@ -138,7 +138,7 @@ func (self *ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 					if self.callback != nil {
 						self.callback(self.Currentposition)
 					}
-					PostUpdate()
+					self.PostUpdate()
 				})
 			} else if y > offset+h {
 				// click after
@@ -149,7 +149,7 @@ func (self *ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 				if self.callback != nil {
 					self.callback(self.Currentposition)
 				}
-				PostUpdate()
+				self.PostUpdate()
 				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
 					self.Currentposition += self.Height() / 2
 					if self.Currentposition > self.maximum {
@@ -158,7 +158,7 @@ func (self *ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 					if self.callback != nil {
 						self.callback(self.Currentposition)
 					}
-					PostUpdate()
+					self.PostUpdate()
 				})
 			} else {
 				self.onelevator = true
@@ -198,7 +198,7 @@ func (self *ScrollbarWidget) MouseMove(x, y, xrel, yrel int32) {
 			if self.callback != nil {
 				self.callback(self.Currentposition)
 			}
-			PostUpdate()
+			self.PostUpdate()
 		} else {
 			h := self.Height() * self.Height() / (self.maximum - self.minimum + self.Height())
 			if h < 25 {
@@ -216,7 +216,7 @@ func (self *ScrollbarWidget) MouseMove(x, y, xrel, yrel int32) {
 			if self.callback != nil {
 				self.callback(self.Currentposition)
 			}
-			PostUpdate()
+			self.PostUpdate()
 		}
 	}
 }
