@@ -84,7 +84,9 @@ func (self *ButtonWidget) MouseMove(x, y, xrel, yrel int32) {
 
 func (self *ButtonWidget) Repaint() {
 	self.CoreWidget.Repaint()
-	self.FillRect(2, 2, self.width-4, self.height-4, 0xffdddddd)
+	if self.bgColor != 0 {
+		self.FillRect(2, 2, self.width-4, self.height-4, self.bgColor)
+	}
 	self.SetDrawColor(0, 0, 0, 255)
 	self.DrawLine(0, 1, 0, self.Height()-2)
 	self.DrawLine(self.Width()-1, 1, self.Width()-1, self.Height()-2)

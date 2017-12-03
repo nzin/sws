@@ -360,7 +360,9 @@ func (self *CoreWidget) Repaint() {
 		if err != nil {
 			panic(err)
 		}
-		self.surface.Free()
+		if self.surface != nil {
+			self.surface.Free()
+		}
 		self.surface = surface
 	}
 	for _, child := range self.children {
