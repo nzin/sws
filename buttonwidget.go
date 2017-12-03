@@ -14,11 +14,17 @@ type ButtonWidget struct {
 	cursorInside bool
 	centered     bool
 	textcolor    sdl.Color
+	buttonColor  uint32
 	clicked      func()
 }
 
 func (self *ButtonWidget) AlignImageLeft(alignleft bool) {
 	self.imageleft = alignleft
+}
+
+func (self *ButtonWidget) SetButtonColor(color uint32) {
+	self.buttonColor = color
+	self.PostUpdate()
 }
 
 func (self *ButtonWidget) SetTextColor(color sdl.Color) {
@@ -84,8 +90,8 @@ func (self *ButtonWidget) MouseMove(x, y, xrel, yrel int32) {
 
 func (self *ButtonWidget) Repaint() {
 	self.CoreWidget.Repaint()
-	if self.bgColor != 0 {
-		self.FillRect(2, 2, self.width-4, self.height-4, self.bgColor)
+	if self.buttonColor != 0 {
+		self.FillRect(2, 2, self.width-4, self.height-4, self.buttonColor)
 	}
 	self.SetDrawColor(0, 0, 0, 255)
 	self.DrawLine(0, 1, 0, self.Height()-2)
@@ -239,6 +245,6 @@ func NewButtonWidget(w, h int32, s string) *ButtonWidget {
 		centered:     true,
 		textcolor:    sdl.Color{0, 0, 0, 255},
 	}
-	widget.bgColor = 0xffdddddd
+	widget.buttonColor = 0xffdddddd
 	return widget
 }
