@@ -278,15 +278,27 @@ func (self *CoreWidget) TranslateXYToWidget(globalX, globalY int32) (x, y int32)
 }
 
 func (self *CoreWidget) MouseDoubleClick(x, y int32) {
+	if self.Parent() != nil {
+		self.Parent().MouseDoubleClick(x+self.X(), y+self.Y())
+	}
 }
 
 func (self *CoreWidget) MousePressDown(x, y int32, button uint8) {
+	if self.Parent() != nil {
+		self.Parent().MousePressDown(x+self.X(), y+self.Y(), button)
+	}
 }
 
 func (self *CoreWidget) MousePressUp(x, y int32, button uint8) {
+	if self.Parent() != nil {
+		self.Parent().MousePressUp(x+self.X(), y+self.Y(), button)
+	}
 }
 
 func (self *CoreWidget) MouseMove(x, y, xrel, yrel int32) {
+	if self.Parent() != nil {
+		self.Parent().MouseMove(x+self.X(), y+self.Y(), xrel, yrel)
+	}
 }
 
 //
