@@ -295,7 +295,7 @@ func Init(width, height int32) *RootWidget {
 //
 func (root *RootWidget) SetFocus(widget Widget) {
 	mainwidget := widget
-	for mainwidget.Parent() != nil && mainwidget.Parent() != Widget(root) {
+	for mainwidget.Parent() != nil && mainwidget.Parent() != Widget(&root.CoreWidget) {
 		mainwidget = mainwidget.Parent()
 	}
 	if mainwidget != nil {
