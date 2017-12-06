@@ -40,6 +40,11 @@ func (self *ScrollWidget) ShowHorizontalScrollbar(showH bool) {
 	self.PostUpdate()
 }
 
+func (self *ScrollWidget) PostUpdate() {
+	self.Resize(self.Width(),self.Height())
+	self.CoreWidget.PostUpdate()
+}
+
 func (self *ScrollWidget) Resize(width, height int32) {
 	if width < 45 {
 		width = 45
@@ -78,7 +83,7 @@ func (self *ScrollWidget) Resize(width, height int32) {
 			self.vScrollbar.Move(self.Width()-SCROLLBAR_WIDTH, 0)
 		}
 	}
-	self.PostUpdate()
+	self.CoreWidget.PostUpdate()
 }
 
 func (self *ScrollWidget) SetInnerWidget(widget Widget) bool {
