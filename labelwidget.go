@@ -50,7 +50,7 @@ func (self *LabelWidget) Repaint() {
 	var text *sdl.Surface
 	var err error
 	if self.label != "" {
-		if text, err = self.Font().RenderUTF8_Blended(self.label, self.textcolor); err != nil {
+		if text, err = self.Font().RenderUTF8Blended(self.label, self.textcolor); err != nil {
 		}
 		defer text.Free()
 	}

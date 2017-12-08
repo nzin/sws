@@ -2,9 +2,10 @@ package sws
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
-	"os"
 )
 
 type MenuItem interface {
@@ -45,7 +46,7 @@ func (self *MenuItemLabel) Repaint(selected bool) *sdl.Surface {
 			color = sdl.Color{255, 255, 255, 255}
 		}
 
-		if solid, err = self.font.RenderUTF8_Blended(self.Label, color); err != nil {
+		if solid, err = self.font.RenderUTF8Blended(self.Label, color); err != nil {
 			fmt.Fprint(os.Stderr, "Failed to render text: %s\n", err)
 			return self.surface
 		}
@@ -200,11 +201,11 @@ func (self *MenuWidget) Repaint() {
 	renderer.SetDrawColor(0, 0, 0, 255)
 	renderer.DrawRect(&rect)
 	renderer.SetDrawColor(255, 255, 255, 255)
-	renderer.DrawLine(1, 1, int(self.width-2), 1)
-	renderer.DrawLine(1, 1, 1, int(self.height)-2)
+	renderer.DrawLine(1, 1, self.width-2, 1)
+	renderer.DrawLine(1, 1, 1, self.height-2)
 	renderer.SetDrawColor(0x88, 0x88, 0x88, 255)
-	renderer.DrawLine(int(self.width)-2, 2, int(self.width)-2, int(self.height)-2)
-	renderer.DrawLine(2, int(self.height)-2, int(self.width)-2, int(self.height)-2)
+	renderer.DrawLine(self.width-2, 2, self.width-2, self.height-2)
+	renderer.DrawLine(2, self.height-2, self.width-2, self.height-2)
 
 	for i, item := range self.items {
 		w, h := item.WidthHeight()
@@ -357,7 +358,7 @@ func (self *MenuBarWidget) Repaint() {
 		x += w
 	}
 	renderer.SetDrawColor(255, 255, 255, 255)
-	renderer.DrawLine(0, int(self.height-1), int(self.width-1), int(self.height-1))
+	renderer.DrawLine(0, self.height-1, self.width-1, self.height-1)
 }
 
 func (self *MenuBarWidget) MousePressDown(x, y int32, button uint8) {

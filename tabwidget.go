@@ -84,7 +84,7 @@ func (self *TabWidget) Repaint() {
 		var offset int32
 		offset = 5
 		for i, label := range self.labels {
-			text, err := self.Font().RenderUTF8_Blended(label, sdl.Color{0, 0, 0, 255})
+			text, err := self.Font().RenderUTF8Blended(label, sdl.Color{0, 0, 0, 255})
 			if err == nil {
 				rectSrc := sdl.Rect{0, 0, text.W, text.H}
 				rectDst := sdl.Rect{offset + 10, 7, text.W, text.H}

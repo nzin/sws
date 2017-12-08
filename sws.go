@@ -468,18 +468,16 @@ func PoolEvent() bool {
 					}
 				}
 			}
-		case *sdl.KeyDownEvent:
+		case *sdl.KeyboardEvent:
 			//			fmt.Printf("[%d ms] Keyboard\ttype:%d\tsym:%c\tmodifiers:%d\tstate:%d\trepeat:%d\tunicode:%d\n",
 			//				t.Timestamp, t.Type, t.Keysym.Sym, t.Keysym.Mod, t.State, t.Repeat, t.Keysym.Unicode)
 			if focus != nil {
-				focus.KeyDown(t.Keysym.Sym, t.Keysym.Mod)
-			}
-
-		case *sdl.KeyUpEvent:
-			//fmt.Printf("[%d ms] Keyboard\ttype:%d\tsym:%c\tmodifiers:%d\tstate:%d\trepeat:%d\n",
-			//t.Timestamp, t.Type, t.Keysym.Sym, t.Keysym.Mod, t.State, t.Repeat)
-			if focus != nil {
-				focus.KeyUp(t.Keysym.Sym, t.Keysym.Mod)
+				if t.State == sdl.PRESSED {
+					focus.KeyDown(t.Keysym.Sym, t.Keysym.Mod)
+				}
+				if t.State == sdl.RELEASED {
+					focus.KeyUp(t.Keysym.Sym, t.Keysym.Mod)
+				}
 			}
 
 		case *sdl.TextInputEvent:

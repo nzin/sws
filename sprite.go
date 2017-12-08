@@ -1,8 +1,9 @@
 package sws
 
 import (
-	"github.com/veandco/go-sdl2/sdl"
 	"unsafe"
+
+	"github.com/veandco/go-sdl2/sdl"
 )
 
 var mainlefths *sdl.Surface
@@ -457,15 +458,15 @@ var mainright = []byte("\x42\x4d\x8a\x04\x00\x00\x00\x00\x00\x00\x8a\x00\x00\x00
 
 func InitSprites() {
 	rwops := sdl.RWFromMem(unsafe.Pointer(&mainlefth[0]), len(mainlefth))
-	mainlefths, _ = sdl.LoadBMP_RW(rwops, 1)
+	mainlefths, _ = sdl.LoadBMPRW(rwops, 1)
 	rwops = sdl.RWFromMem(unsafe.Pointer(&mainlefthclicked[0]), len(mainlefthclicked))
-	mainlefthclickeds, _ = sdl.LoadBMP_RW(rwops, 1)
+	mainlefthclickeds, _ = sdl.LoadBMPRW(rwops, 1)
 	rwops = sdl.RWFromMem(unsafe.Pointer(&mainrighth[0]), len(mainrighth))
-	mainrighths, _ = sdl.LoadBMP_RW(rwops, 1)
+	mainrighths, _ = sdl.LoadBMPRW(rwops, 1)
 	rwops = sdl.RWFromMem(unsafe.Pointer(&mainrighthclicked[0]), len(mainrighthclicked))
-	mainrighthclickeds, _ = sdl.LoadBMP_RW(rwops, 1)
+	mainrighthclickeds, _ = sdl.LoadBMPRW(rwops, 1)
 	rwops = sdl.RWFromMem(unsafe.Pointer(&mainleft[0]), len(mainleft))
-	mainlefts, _ = sdl.LoadBMP_RW(rwops, 1)
+	mainlefts, _ = sdl.LoadBMPRW(rwops, 1)
 	rwops = sdl.RWFromMem(unsafe.Pointer(&mainright[0]), len(mainright))
-	mainrights, _ = sdl.LoadBMP_RW(rwops, 1)
+	mainrights, _ = sdl.LoadBMPRW(rwops, 1)
 }

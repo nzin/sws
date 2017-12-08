@@ -126,7 +126,7 @@ func (self *CoreWidget) WriteText(x, y int32, str string, color sdl.Color) (int3
 		return 0, 0
 	}
 
-	if solid, err = self.Font().RenderUTF8_Blended(str, color); err != nil {
+	if solid, err = self.Font().RenderUTF8Blended(str, color); err != nil {
 		fmt.Fprint(os.Stderr, "Failed to render text: %s\n", err)
 		return 0, 0
 	}
@@ -148,7 +148,7 @@ func (self *CoreWidget) WriteTextCenter(x, y int32, str string, color sdl.Color)
 	var solid *sdl.Surface
 	var err error
 
-	if solid, err = self.Font().RenderUTF8_Blended(str, color); err != nil {
+	if solid, err = self.Font().RenderUTF8Blended(str, color); err != nil {
 		fmt.Fprint(os.Stderr, "Failed to render text: %s\n", err)
 		return
 	}
@@ -165,7 +165,7 @@ func (self *CoreWidget) WriteTextCenter(x, y int32, str string, color sdl.Color)
 }
 
 func (self *CoreWidget) DrawLine(x1, y1, x2, y2 int32) {
-	self.Renderer().DrawLine(int(x1), int(y1), int(x2), int(y2))
+	self.Renderer().DrawLine(x1, y1, x2, y2)
 }
 
 //
@@ -184,7 +184,7 @@ func (self *CoreWidget) SetDrawColor(r, g, b, c uint8) {
 }
 
 func (self *CoreWidget) DrawPoint(x, y int32) {
-	self.Renderer().DrawPoint(int(x), int(y))
+	self.Renderer().DrawPoint(x, y)
 }
 
 func (self *CoreWidget) InputText(text string) {

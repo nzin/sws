@@ -119,7 +119,7 @@ func (self *MainWidget) Repaint() {
 	if self.label == "" {
 		self.label = "unnamed"
 	}
-	if solid, err = self.Font().RenderUTF8_Blended(self.label, color); err != nil {
+	if solid, err = self.Font().RenderUTF8Blended(self.label, color); err != nil {
 		fmt.Fprint(os.Stderr, "Failed to render text: %s\n", err)
 	}
 	defer solid.Free()

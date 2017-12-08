@@ -16,7 +16,7 @@ type TreeViewWidget struct {
 
 func NewTreeViewWidget() *TreeViewWidget {
 	tree := &TreeViewWidget{
-		CoreWidget:   *NewCoreWidget(100,100),
+		CoreWidget:   *NewCoreWidget(100, 100),
 		items:        make([]*TreeViewItem, 0),
 		currentfocus: nil,
 	}
@@ -74,7 +74,7 @@ func (self *TreeViewWidget) Repaint() {
 			i.Repaint(25 * level)
 
 			if i.focus == true {
-				self.FillRect(0,y,self.Width(),25,0xff8888ff)
+				self.FillRect(0, y, self.Width(), 25, 0xff8888ff)
 			}
 			rectSrc := sdl.Rect{0, 0, i.Surface().W, i.Surface().H}
 			rectDst := sdl.Rect{0, y, i.Surface().W, i.Surface().H}
@@ -86,7 +86,7 @@ func (self *TreeViewWidget) Repaint() {
 }
 
 func (self *TreeViewWidget) Resize(width, height int32) {
-	self.CoreWidget.Resize(width,height)
+	self.CoreWidget.Resize(width, height)
 }
 
 func (self *TreeViewWidget) AddItem(item *TreeViewItem) {
@@ -225,7 +225,7 @@ func (self *TreeViewItem) Repaint(shift int32) {
 	}
 	var text *sdl.Surface
 	var err error
-	if text, err = self.Font().RenderUTF8_Blended(self.label, self.textcolor); err != nil {
+	if text, err = self.Font().RenderUTF8Blended(self.label, self.textcolor); err != nil {
 	}
 	defer text.Free()
 	rectSrc := sdl.Rect{0, 0, text.W, text.H}
