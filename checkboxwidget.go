@@ -9,7 +9,13 @@ type CheckboxWidget struct {
 	buttonState  bool
 	cursorInside bool
 	Selected     bool
+	disabled     bool
 	clicked      func()
+}
+
+func (self *CheckboxWidget) SetDisabled(disabled bool) {
+	self.disabled = disabled
+	self.PostUpdate()
 }
 
 func (self *CheckboxWidget) SetSelected(selected bool) {
@@ -22,6 +28,9 @@ func (self *CheckboxWidget) SetClicked(callback func()) {
 }
 
 func (self *CheckboxWidget) MousePressDown(x, y int32, button uint8) {
+	if self.disabled {
+		return
+	}
 	if button == sdl.BUTTON_LEFT {
 		self.buttonState = true
 		self.cursorInside = true
@@ -30,6 +39,9 @@ func (self *CheckboxWidget) MousePressDown(x, y int32, button uint8) {
 }
 
 func (self *CheckboxWidget) MousePressUp(x, y int32, button uint8) {
+	if self.disabled {
+		return
+	}
 	if button == sdl.BUTTON_LEFT {
 		self.buttonState = false
 		if self.cursorInside == true {
@@ -65,7 +77,11 @@ func (self *CheckboxWidget) Repaint() {
 		selected = !selected
 	}
 
-	self.FillRect(6, 6, 12, 12, 0xffffffff)
+	bgcheckbox := uint32(0xffffffff)
+	if self.disabled {
+		bgcheckbox = self.bgColor
+	}
+	self.FillRect(6, 6, 12, 12, bgcheckbox)
 
 	self.SetDrawColor(0, 0, 0, 255)
 	self.DrawLine(5, 5, 5, 19)
