@@ -69,7 +69,7 @@ type Widget interface {
 	// to know if this widget receive input (checkbox, input text, slider, button, ...)
 	IsInputWidget() bool
 	// when we press tab and want to switch to the next input widget
-	SetCallbackFocusOnNextInputWidget(callback func())
+	SetCallbackFocusOnNextInputWidget(callback func(forward bool))
 }
 
 //

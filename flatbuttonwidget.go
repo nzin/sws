@@ -82,6 +82,13 @@ func (self *FlatButtonWidget) Repaint() {
 			}
 		}
 	}
+	if self.hasfocus {
+		self.SetDrawColor(0x46, 0xc8, 0xe8, 255)
+		self.DrawLine(0, 0, 0, self.Height()-1)
+		self.DrawLine(0, self.Height()-1, self.Width()-1, self.Height()-1)
+		self.DrawLine(self.Width()-1, self.Height()-1, self.Width()-1, 0)
+		self.DrawLine(self.Width()-1, 0, 0, 0)
+	}
 }
 
 func NewFlatButtonWidget(w, h int32, s string) *FlatButtonWidget {

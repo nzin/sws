@@ -24,7 +24,7 @@ func (self *DropdownWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		if self.focusOnNextInputWidgetCallback != nil {
 			self.menu = nil
 			hideMenu(nil)
-			self.focusOnNextInputWidgetCallback()
+			self.focusOnNextInputWidgetCallback(!(mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT))
 		}
 	}
 	if key == sdl.K_UP || key == sdl.K_DOWN {

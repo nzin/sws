@@ -27,6 +27,9 @@ const (
 )
 
 func (self *TextAreaWidget) IsInputWidget() bool {
+	if self.disabled == true {
+		return false
+	}
 	return true
 }
 
@@ -105,9 +108,9 @@ func (self *TextAreaWidget) InputText(text string) {
 }
 
 func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
-	if key == sdl.K_TAB && (mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT) {
+	if key == sdl.K_TAB && (mod == sdl.KMOD_CTRL || mod == sdl.KMOD_RCTRL || mod == sdl.KMOD_LCTRL || mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT) {
 		if self.focusOnNextInputWidgetCallback != nil {
-			self.focusOnNextInputWidgetCallback()
+			self.focusOnNextInputWidgetCallback(!(mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT))
 			return
 		}
 	}

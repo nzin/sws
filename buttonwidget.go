@@ -34,7 +34,7 @@ func (self *ButtonWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		self.cursorInside = false
 		self.PostUpdate()
 		if self.focusOnNextInputWidgetCallback != nil {
-			self.focusOnNextInputWidgetCallback()
+			self.focusOnNextInputWidgetCallback(!(mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT))
 		}
 	}
 	if key == sdl.K_SPACE {
