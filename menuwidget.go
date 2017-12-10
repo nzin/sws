@@ -310,7 +310,7 @@ func findMenu(x int32, y int32) *MenuWidget {
 }
 
 func findMenuForKeyboard() *MenuWidget {
-	if menuStack == nil {
+	if menuStack == nil || len(menuStack) == 0 {
 		return nil
 	}
 	return menuStack[len(menuStack)-1]
