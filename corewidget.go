@@ -118,6 +118,7 @@ func (self *CoreWidget) FillRect(x, y, w, h int32, c uint32) {
 
 //
 // Write text into the surface
+// return (width,height) written
 //
 func (self *CoreWidget) WriteText(x, y int32, str string, color sdl.Color) (int32, int32) {
 	var solid *sdl.Surface
