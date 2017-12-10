@@ -404,6 +404,83 @@ func (self *MenuBarWidget) Repaint() {
 	renderer.DrawLine(0, self.height-1, self.width-1, self.height-1)
 }
 
+func (self *MenuBarWidget) KeyDown(key sdl.Keycode, mod uint16) {
+	if key == sdl.K_LEFT {
+		if self.lastSubActive != -1 && self.activeItem != -1 {
+			submenu := self.items[self.lastSubActive].SubMenu()
+			if submenu != nil {
+				hideMenu(submenu)
+			}
+			self.lastSubActive = -1
+		}
+		if self.activeItem == -1 {
+			self.activeItem = len(self.items) - 1
+		} else {
+			self.activeItem--
+			if self.activeItem == -1 {
+				self.activeItem = len(self.items) - 1
+			}
+		}
+		self.PostUpdate()
+	}
+	if key == sdl.K_RIGHT {
+		if self.lastSubActive != -1 && self.activeItem != -1 {
+			submenu := self.items[self.lastSubActive].SubMenu()
+			if submenu != nil {
+				hideMenu(submenu)
+			}
+			self.lastSubActive = -1
+		}
+		if self.activeItem == -1 {
+			self.activeItem = 0
+		} else {
+			self.activeItem++
+			if self.activeItem >= len(self.items) {
+				self.activeItem = 0
+			}
+		}
+		self.PostUpdate()
+	}
+	if key == sdl.K_DOWN && self.activeItem != -1 {
+		if self.lastSubActive != -1 && self.activeItem != -1 {
+			submenu := self.items[self.lastSubActive].SubMenu()
+			if submenu != nil {
+				hideMenu(submenu)
+			}
+		}
+		if self.activeItem != -1 {
+			xx := int32(0)
+			for i, item := range self.items {
+				w, _ := item.WidthHeight()
+				w += 10
+				if self.activeItem == i {
+					break
+				}
+				xx += w
+
+			}
+			submenu := self.items[self.activeItem].SubMenu()
+			if submenu != nil {
+				self.lastSubActive = self.activeItem
+
+				yy := self.height
+				var widget Widget
+				widget = self
+				for widget != nil {
+					xx += widget.X()
+					yy += widget.Y()
+					widget = widget.Parent()
+				}
+				submenu.Move(xx, yy-2)
+				ShowMenu(submenu)
+			} else {
+				self.lastSubActive = -1
+			}
+		}
+		self.PostUpdate()
+	}
+}
+
 func (self *MenuBarWidget) MousePressDown(x, y int32, button uint8) {
 	self.hasfocus = true
 	self.activeItem = -1 // because we close the menu in the main sws.go loop
