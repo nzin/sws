@@ -32,6 +32,8 @@ func ShowModalError(root *RootWidget, title, iconpath, desc string, callback fun
 
 	root.AddChild(modal)
 	root.SetModal(modal)
+
+	root.SetFocus(ok)
 }
 
 func ShowModalYesNo(root *RootWidget, title, iconpath, desc string, callbackyes func(), callbackno func()) {
@@ -77,4 +79,6 @@ func ShowModalYesNo(root *RootWidget, title, iconpath, desc string, callbackyes 
 
 	root.AddChild(modal)
 	root.SetModal(modal)
+
+	root.SetFocus(no)
 }
