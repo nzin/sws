@@ -14,7 +14,7 @@ type TextAreaWidget struct {
 	hasfocus              bool
 	leftButtonDown        bool
 	writeOffset           int32 // how far we scroll the text
-	readonly              bool
+	disabled              bool
 }
 
 const (
@@ -34,8 +34,8 @@ func (self *TextAreaWidget) SetText(text string) {
 	self.PostUpdate()
 }
 
-func (self *TextAreaWidget) SetReadonly(readonly bool) {
-	self.readonly = readonly
+func (self *TextAreaWidget) SetDisabled(disabled bool) {
+	self.disabled = disabled
 	self.SetColor(0xffdddddd)
 	self.PostUpdate()
 }
@@ -46,7 +46,7 @@ func (self *TextAreaWidget) HasFocus(focus bool) {
 }
 
 func (self *TextAreaWidget) MousePressDown(x, y int32, button uint8) {
-	if self.readonly == true {
+	if self.disabled == true {
 		return
 	}
 
@@ -83,8 +83,34 @@ func (self *TextAreaWidget) MouseMove(x, y, xrel, yrel int32) {
 	}
 }
 
+func (self *TextAreaWidget) InputText(text string) {
+	if self.disabled == true {
+		return
+	}
+	if self.initialCursorPosition == self.endCursorPosition {
+		self.text = self.text[:self.initialCursorPosition] + text + self.text[self.initialCursorPosition:]
+		self.initialCursorPosition += len(text)
+	} else {
+		i, e := self.initialCursorPosition, self.endCursorPosition
+		if i > e {
+			i, e = e, i
+		}
+		self.text = self.text[:i] + text + self.text[e:]
+		self.initialCursorPosition = i + 1
+	}
+	self.endCursorPosition = self.initialCursorPosition
+	self.PostUpdate()
+
+}
+
 func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
-	if self.readonly == true {
+	if key == sdl.K_TAB && (mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT) {
+		if self.focusOnNextInputWidgetCallback != nil {
+			self.focusOnNextInputWidgetCallback()
+			return
+		}
+	}
+	if self.disabled == true {
 		return
 	}
 	if key == sdl.K_UP {
@@ -153,12 +179,7 @@ func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 			self.initialCursorPosition = len(self.text)
 			self.PostUpdate()
 		}
-	} else if (key >= 'a' && key <= 'z') || (key >= '0' && key <= '9') || key == ' ' || key == sdl.K_TAB || key == sdl.K_RETURN {
-		if key >= 'a' && key <= 'z' {
-			if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
-				key += 'A' - 'a'
-			}
-		}
+	} else if key == sdl.K_TAB || key == sdl.K_RETURN {
 		if key == sdl.K_RETURN {
 			key = '\n'
 		}
@@ -394,7 +415,7 @@ func (self *TextAreaWidget) Repaint() {
 	self.parseText(renderWord)
 
 	// write boundaries
-	if self.readonly == false {
+	if self.disabled == false {
 		self.SetDrawColor(0, 0, 0, 255)
 		self.DrawLine(0, 2, 0, self.Height()-3)
 		self.DrawLine(self.Width()-1, 2, self.Width()-1, self.Height()-3)
@@ -435,7 +456,7 @@ func NewTextAreaWidget(w, h int32, s string) *TextAreaWidget {
 		hasfocus:              false,
 		leftButtonDown:        false,
 		writeOffset:           0,
-		readonly:              false}
+		disabled:              false}
 	widget.SetColor(0xffffffff)
 	return widget
 }

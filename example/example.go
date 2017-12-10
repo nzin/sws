@@ -10,6 +10,7 @@ package main
 import (
 	"flag"
 	"fmt"
+
 	"github.com/nzin/sws"
 	//"github.com/veandco/go-sdl2/sdl"
 	_ "log"
@@ -144,7 +145,7 @@ func main() {
 	ta.Move(100, 100)
 
 	ta2 := sws.NewTextAreaWidget(100, 100, "initial text another line t\tt\tt")
-	ta2.SetReadonly(true)
+	ta2.SetDisabled(true)
 	corewidget2.AddChild(ta2)
 	ta2.Move(0, 200)
 
@@ -161,13 +162,13 @@ func main() {
 	ta4 := sws.NewTextAreaWidget(100, 100, "text area4 ")
 	tabs.AddTab("text area 3", ta3)
 	tabs.AddTab("text area 4", ta4)
-	
+
 	tree := sws.NewTreeViewWidget()
-	ti1 := sws.NewTreeViewItem("tree view item 1","",nil) 
-	ti2 := sws.NewTreeViewItem("tree view item 2","",nil) 
-	ti3 := sws.NewTreeViewItem("tree view item 3","",nil) 
-	sti1 := sws.NewTreeViewItem("sub item 1","",nil) 
-	sti2 := sws.NewTreeViewItem("sub item 2","",nil) 
+	ti1 := sws.NewTreeViewItem("tree view item 1", "", nil)
+	ti2 := sws.NewTreeViewItem("tree view item 2", "", nil)
+	ti3 := sws.NewTreeViewItem("tree view item 3", "", nil)
+	sti1 := sws.NewTreeViewItem("sub item 1", "", nil)
+	sti2 := sws.NewTreeViewItem("sub item 2", "", nil)
 	ti1.AddSubItem(sti1)
 	ti1.AddSubItem(sti2)
 	tree.AddItem(ti1)
