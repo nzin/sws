@@ -16,6 +16,11 @@ type InputWidget struct {
 	internalcolor         uint32
 }
 
+func (self *InputWidget) SetInnerColor(color uint32) {
+	self.internalcolor = color
+	self.PostUpdate()
+}
+
 func (self *InputWidget) IsInputWidget() bool {
 	return true
 }
