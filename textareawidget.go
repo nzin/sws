@@ -15,6 +15,7 @@ type TextAreaWidget struct {
 	leftButtonDown        bool
 	writeOffset           int32 // how far we scroll the text
 	disabled              bool
+	internalcolor         uint32
 }
 
 const (
@@ -36,7 +37,7 @@ func (self *TextAreaWidget) SetText(text string) {
 
 func (self *TextAreaWidget) SetDisabled(disabled bool) {
 	self.disabled = disabled
-	self.SetColor(0xffdddddd)
+	self.internalcolor = 0xffdddddd
 	self.PostUpdate()
 }
 
@@ -72,7 +73,7 @@ func (self *TextAreaWidget) MouseMove(x, y, xrel, yrel int32) {
 				self.writeOffset = 0
 			}
 		}
-		if self.yCursor > self.Height()-2 {
+		if self.yCursor > self.Height()-3 {
 			//self.writeOffset+=(y-(self.Height()-2)-int32(self.Font().Height()))
 			//self.writeOffset+=(y-(self.Height()-2))
 			self.writeOffset += int32(self.Font().Height())
@@ -201,13 +202,13 @@ func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 	// recompute self.xCursor, self.yCursor
 	self.parseText(renderWord)
 
-	if self.writeOffset > 0 && self.yCursor < 2 {
+	if self.writeOffset > 0 && self.yCursor < 3 {
 		self.writeOffset -= int32(self.Font().Height())
 		if self.writeOffset < 0 {
 			self.writeOffset = 0
 		}
 	}
-	if self.yCursor > self.Height()-2 {
+	if self.yCursor > self.Height()-3 {
 		self.writeOffset += int32(self.Font().Height())
 	}
 	self.PostUpdate()
@@ -237,7 +238,7 @@ func updatePositionWord(self *TextAreaWidget, typeGlyph, x, y int32, word string
 }
 
 func (self *TextAreaWidget) UpdatePosition(x, y int32) {
-	if y < 2 && self.writeOffset == 0 {
+	if y < 3 && self.writeOffset == 0 {
 		self.initialCursorPosition = 0
 	} else {
 		self.xCursor = x
@@ -280,7 +281,7 @@ func renderWord(self *TextAreaWidget, typeGlyph, x, y int32, word string, positi
 		self.WriteText(x, y, word, sdl.Color{0, 0, 0, 255})
 	} else { // TAB
 		if i <= int(position) && e >= int(position)+1 {
-			self.FillRect(x, y, 2+(((x-2+32)>>5)<<5)-x, int32(self.Font().Height()), 0xff8888ff)
+			self.FillRect(x, y, 3+(((x-3+32)>>5)<<5)-x, int32(self.Font().Height()), 0xff8888ff)
 		}
 		// compute x,y cursor position
 		if self.initialCursorPosition == int(position) {
@@ -296,7 +297,11 @@ func renderWord(self *TextAreaWidget, typeGlyph, x, y int32, word string, positi
 				if position+int32(i) == int32(self.endCursorPosition) {
 					width, _, _ := self.Font().SizeUTF8(word[:i])
 					self.SetDrawColor(0, 0, 0, 255)
-					self.DrawLine(x+int32(width), y, x+int32(width), y+int32(self.Font().Height()))
+					yEnd := y + int32(self.Font().Height())
+					if yEnd > self.height-2 {
+						yEnd = self.height - 2
+					}
+					self.DrawLine(x+int32(width), y, x+int32(width), yEnd)
 				}
 			}
 		}
@@ -304,7 +309,11 @@ func renderWord(self *TextAreaWidget, typeGlyph, x, y int32, word string, positi
 	if self.hasfocus {
 		if (typeGlyph == GLYPH_END || typeGlyph == GLYPH_ENTER) && int32(self.endCursorPosition) == position { // word is empty: enter (4) or end of text (3)
 			self.SetDrawColor(0, 0, 0, 255)
-			self.DrawLine(x, y, x, y+int32(self.Font().Height()))
+			yEnd := y + int32(self.Font().Height())
+			if yEnd > self.height-2 {
+				yEnd = self.height - 2
+			}
+			self.DrawLine(x, y, x, yEnd)
 		}
 	}
 }
@@ -315,31 +324,31 @@ func (self *TextAreaWidget) renderText(typeGlyph int32, word string, x, y *int32
 		treat(self, typeGlyph, *x, *y, word, position)
 		*x = *x + int32(width)
 	} else if typeGlyph == GLYPH_TAB { //tab
-		if ((*x-2+32)>>5)<<5 >= self.Width()-4 {
-			*x = 2
+		if ((*x-3+32)>>5)<<5 >= self.Width()-6 {
+			*x = 3
 			*y += int32(self.Font().Height())
 			treat(self, typeGlyph, *x, *y, word, position)
-			*x = 34
+			*x = 32 + 3
 		} else {
 			treat(self, typeGlyph, *x, *y, word, position)
-			*x = 2 + ((*x-2+32)>>5)<<5
+			*x = 3 + ((*x-3+32)>>5)<<5
 		}
 	} else if typeGlyph == GLYPH_ENTER { //enter
 		treat(self, typeGlyph, *x, *y, "", position)
-		*x = 2
+		*x = 3
 		*y += int32(self.Font().Height())
 	} else if typeGlyph == GLYPH_WORD { // word
 		width, _, _ := self.Font().SizeUTF8(word)
-		if (*x+int32(width)) > self.Width()-4 && *x > 2 {
-			*x = 2
+		if (*x+int32(width)) > self.Width()-6 && *x > 3 {
+			*x = 3
 			*y += int32(self.Font().Height())
 		}
 		// the word is longer than the line
-		for int32(width) > self.Width()-4 && self.Width() > 0 {
+		for int32(width) > self.Width()-6 && self.Width() > 0 {
 			subword := ""
 			for i, c := range word {
 				subwidth, _, _ := self.Font().SizeUTF8(word[:i+1])
-				if int32(subwidth) < self.Width()-4 || len(subword) == 0 {
+				if int32(subwidth) < self.Width()-6 || len(subword) == 0 {
 					subword = subword + string(c)
 				} else {
 					break
@@ -366,8 +375,8 @@ func (self *TextAreaWidget) parseText(treat treatWord) {
 	// tab is like word
 	// enter is a bit like tab
 	var x, y, typeGlyph, position int32
-	x = 2
-	y = 2 - self.writeOffset
+	x = 3
+	y = 3 - self.writeOffset
 	typeGlyph = -1
 	word := ""
 	for currentpos, char := range self.text {
@@ -412,40 +421,55 @@ func (self *TextAreaWidget) parseText(treat treatWord) {
 func (self *TextAreaWidget) Repaint() {
 	self.CoreWidget.Repaint()
 
+	self.FillRect(2, 2, self.width-4, self.height-4, self.internalcolor)
 	self.parseText(renderWord)
 
 	// write boundaries
 	if self.disabled == false {
 		self.SetDrawColor(0, 0, 0, 255)
-		self.DrawLine(0, 2, 0, self.Height()-3)
-		self.DrawLine(self.Width()-1, 2, self.Width()-1, self.Height()-3)
-		self.DrawLine(2, 0, self.Width()-3, 0)
-		self.DrawLine(2, self.Height()-1, self.Width()-3, self.Height()-1)
-		self.DrawPoint(1, self.Height()-2)
-		self.DrawPoint(1, 1)
-		self.DrawPoint(self.Width()-2, 1)
-		self.DrawPoint(self.Width()-2, self.Height()-2)
+		self.DrawLine(1, 3, 1, self.Height()-4)
+		self.DrawLine(self.Width()-2, 3, self.Width()-2, self.Height()-4)
+		self.DrawLine(3, 1, self.Width()-4, 1)
+		self.DrawLine(3, self.Height()-2, self.Width()-4, self.Height()-2)
+		self.DrawPoint(2, self.Height()-3)
+		self.DrawPoint(2, 2)
+		self.DrawPoint(self.Width()-3, 2)
+		self.DrawPoint(self.Width()-3, self.Height()-3)
 
 		self.SetDrawColor(0xdd, 0xdd, 0xdd, 255)
-		self.DrawLine(2, 1, self.Width()-3, 1)
-		self.DrawLine(1, 2, 1, self.Height()-3)
-		self.DrawPoint(0, 0)
-		self.DrawPoint(0, 1)
-		self.DrawPoint(1, 0)
+		self.DrawLine(3, 2, self.Width()-4, 2)
+		self.DrawLine(2, 3, 2, self.Height()-4)
+		self.DrawPoint(1, 1)
+		self.DrawPoint(1, 2)
+		self.DrawPoint(2, 1)
 
-		self.DrawPoint(self.Width()-1, 0)
-		self.DrawPoint(self.Width()-1, 1)
-		self.DrawPoint(self.Width()-2, 0)
+		self.DrawPoint(self.Width()-2, 1)
+		self.DrawPoint(self.Width()-2, 2)
+		self.DrawPoint(self.Width()-3, 1)
 
-		self.DrawPoint(0, self.Height()-1)
-		self.DrawPoint(0, self.Height()-2)
-		self.DrawPoint(1, self.Height()-1)
+		self.DrawPoint(1, self.Height()-2)
+		self.DrawPoint(1, self.Height()-3)
+		self.DrawPoint(2, self.Height()-2)
 
-		self.DrawPoint(self.Width()-1, self.Height()-1)
-		self.DrawPoint(self.Width()-1, self.Height()-2)
-		self.DrawPoint(self.Width()-2, self.Height()-1)
+		self.DrawPoint(self.Width()-2, self.Height()-2)
+		self.DrawPoint(self.Width()-2, self.Height()-3)
+		self.DrawPoint(self.Width()-3, self.Height()-2)
 	}
-
+	if self.hasfocus {
+		self.SetDrawColor(0x46, 0xc8, 0xe8, 255)
+		self.DrawLine(0, 3, 0, self.Height()-4)
+		self.DrawPoint(1, self.Height()-3)
+		self.DrawPoint(2, self.Height()-2)
+		self.DrawLine(3, self.Height()-1, self.Width()-4, self.Height()-1)
+		self.DrawPoint(self.Width()-3, self.Height()-2)
+		self.DrawPoint(self.Width()-2, self.Height()-3)
+		self.DrawLine(self.Width()-1, self.Height()-4, self.Width()-1, 3)
+		self.DrawPoint(self.Width()-3, 1)
+		self.DrawPoint(self.Width()-2, 2)
+		self.DrawLine(self.Width()-4, 0, 3, 0)
+		self.DrawPoint(2, 1)
+		self.DrawPoint(1, 2)
+	}
 }
 
 func NewTextAreaWidget(w, h int32, s string) *TextAreaWidget {
@@ -456,7 +480,8 @@ func NewTextAreaWidget(w, h int32, s string) *TextAreaWidget {
 		hasfocus:              false,
 		leftButtonDown:        false,
 		writeOffset:           0,
-		disabled:              false}
-	widget.SetColor(0xffffffff)
+		disabled:              false,
+		internalcolor:         0xffffffff,
+	}
 	return widget
 }

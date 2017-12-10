@@ -11,10 +11,16 @@ type CheckboxWidget struct {
 	Selected     bool
 	disabled     bool
 	clicked      func()
+	hasfocus     bool
 }
 
 func (self *CheckboxWidget) IsInputWidget() bool {
 	return true
+}
+
+func (self *CheckboxWidget) HasFocus(focus bool) {
+	self.hasfocus = focus
+	self.PostUpdate()
 }
 
 func (self *CheckboxWidget) KeyDown(key sdl.Keycode, mod uint16) {
@@ -25,6 +31,9 @@ func (self *CheckboxWidget) KeyDown(key sdl.Keycode, mod uint16) {
 	}
 	if key == sdl.K_SPACE && self.disabled == false {
 		self.Selected = !self.Selected
+		if self.clicked != nil {
+			self.clicked()
+		}
 		self.PostUpdate()
 	}
 }
@@ -105,7 +114,16 @@ func (self *CheckboxWidget) Repaint() {
 	self.DrawLine(19, 19, 19, 5)
 	self.DrawLine(19, 5, 5, 5)
 
+	if self.hasfocus {
+		self.SetDrawColor(0x46, 0xc8, 0xe8, 255)
+		self.DrawLine(4, 5, 4, 19)
+		self.DrawLine(5, 20, 19, 20)
+		self.DrawLine(20, 19, 20, 5)
+		self.DrawLine(19, 4, 5, 4)
+	}
+
 	if selected {
+		self.SetDrawColor(0, 0, 0, 255)
 		self.DrawLine(8, 11, 10, 13)
 		self.DrawLine(8, 12, 10, 14)
 		self.DrawLine(8, 13, 10, 15)
@@ -113,7 +131,6 @@ func (self *CheckboxWidget) Repaint() {
 		self.DrawLine(10, 14, 20, 4)
 		self.DrawLine(10, 15, 20, 5)
 	}
-
 }
 
 func NewCheckboxWidget() *CheckboxWidget {
