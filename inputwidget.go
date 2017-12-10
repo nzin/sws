@@ -13,6 +13,11 @@ type InputWidget struct {
 	leftButtonDown        bool
 	writeOffset           int32
 	enterCallback         func()
+	internalcolor         uint32
+}
+
+func (self *InputWidget) IsInputWidget() bool {
+	return true
 }
 
 func (self *InputWidget) SetEnterCallback(callback func()) {
@@ -126,6 +131,11 @@ func (self *InputWidget) InputText(text string) {
 }
 
 func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
+	if key == sdl.K_TAB {
+		if self.focusOnNextInputWidgetCallback != nil {
+			self.focusOnNextInputWidgetCallback()
+		}
+	}
 	if key == sdl.K_RETURN {
 		self.enterCallback()
 	}
@@ -226,6 +236,8 @@ func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 
 func (self *InputWidget) Repaint() {
 	self.CoreWidget.Repaint()
+
+	self.FillRect(2, 2, self.width-4, self.height-4, self.internalcolor)
 	// write text and cursor
 	i := self.initialCursorPosition
 	e := self.endCursorPosition
@@ -245,50 +257,65 @@ func (self *InputWidget) Repaint() {
 	strafter := self.text[e:]
 	wMiddle, _, _ := self.Font().SizeUTF8(strMiddle)
 
-	wbefore, _ := self.WriteText(2-self.writeOffset, 2, strbefore, sdl.Color{0, 0, 0, 255})
+	wbefore, _ := self.WriteText(3-self.writeOffset, 3, strbefore, sdl.Color{0, 0, 0, 255})
 	//    fmt.Println(wbefore,wMiddle)
-	self.FillRect(wbefore+2-self.writeOffset, 3, int32(wMiddle), self.Height()-2, 0xff8888ff)
+	self.FillRect(wbefore+3-self.writeOffset, 4, int32(wMiddle), self.Height()-4, 0xff8888ff)
 	self.SetDrawColor(0, 0, 0, 255)
-	self.WriteText(wbefore+2-self.writeOffset, 2, strMiddle, sdl.Color{0, 0, 0, 255})
-	self.WriteText(wbefore+int32(wMiddle)+2-self.writeOffset, 2, strafter, sdl.Color{0, 0, 0, 255})
+	self.WriteText(wbefore+3-self.writeOffset, 3, strMiddle, sdl.Color{0, 0, 0, 255})
+	self.WriteText(wbefore+int32(wMiddle)+3-self.writeOffset, 3, strafter, sdl.Color{0, 0, 0, 255})
 	if self.hasfocus {
 		if self.initialCursorPosition < self.endCursorPosition {
-			self.DrawLine(wbefore+2-self.writeOffset, 3, wbefore+2-self.writeOffset, self.Height()-4)
+			self.DrawLine(wbefore+3-self.writeOffset, 4, wbefore+3-self.writeOffset, self.Height()-6)
 		} else {
-			self.DrawLine(wbefore+int32(wMiddle)+2-self.writeOffset, 3, wbefore+int32(wMiddle)+2-self.writeOffset, self.Height()-4)
+			self.DrawLine(wbefore+int32(wMiddle)+3-self.writeOffset, 4, wbefore+int32(wMiddle)+3-self.writeOffset, self.Height()-6)
 		}
 	}
 
 	// write boundaries
 	self.SetDrawColor(0, 0, 0, 255)
-	self.DrawLine(0, 2, 0, self.Height()-3)
-	self.DrawLine(self.Width()-1, 2, self.Width()-1, self.Height()-3)
-	self.DrawLine(2, 0, self.Width()-3, 0)
-	self.DrawLine(2, self.Height()-1, self.Width()-3, self.Height()-1)
-	self.DrawPoint(1, self.Height()-2)
-	self.DrawPoint(1, 1)
-	self.DrawPoint(self.Width()-2, 1)
-	self.DrawPoint(self.Width()-2, self.Height()-2)
+	self.DrawLine(1, 3, 1, self.Height()-4)
+	self.DrawLine(self.Width()-2, 3, self.Width()-2, self.Height()-4)
+	self.DrawLine(3, 1, self.Width()-4, 1)
+	self.DrawLine(3, self.Height()-2, self.Width()-4, self.Height()-2)
+	self.DrawPoint(2, self.Height()-3)
+	self.DrawPoint(2, 2)
+	self.DrawPoint(self.Width()-3, 2)
+	self.DrawPoint(self.Width()-3, self.Height()-3)
 
 	self.SetDrawColor(0xdd, 0xdd, 0xdd, 255)
-	self.DrawLine(2, 1, self.Width()-3, 1)
-	self.DrawLine(1, 2, 1, self.Height()-3)
-	self.DrawPoint(0, 0)
-	self.DrawPoint(0, 1)
-	self.DrawPoint(1, 0)
+	self.DrawLine(3, 2, self.Width()-4, 2)
+	self.DrawLine(2, 3, 2, self.Height()-4)
+	self.DrawPoint(1, 1)
+	self.DrawPoint(1, 2)
+	self.DrawPoint(2, 1)
 
-	self.DrawPoint(self.Width()-1, 0)
-	self.DrawPoint(self.Width()-1, 1)
-	self.DrawPoint(self.Width()-2, 0)
+	self.DrawPoint(self.Width()-2, 1)
+	self.DrawPoint(self.Width()-2, 2)
+	self.DrawPoint(self.Width()-3, 1)
 
-	self.DrawPoint(0, self.Height()-1)
-	self.DrawPoint(0, self.Height()-2)
-	self.DrawPoint(1, self.Height()-1)
+	self.DrawPoint(1, self.Height()-2)
+	self.DrawPoint(1, self.Height()-3)
+	self.DrawPoint(2, self.Height()-2)
 
-	self.DrawPoint(self.Width()-1, self.Height()-1)
-	self.DrawPoint(self.Width()-1, self.Height()-2)
-	self.DrawPoint(self.Width()-2, self.Height()-1)
+	self.DrawPoint(self.Width()-2, self.Height()-2)
+	self.DrawPoint(self.Width()-2, self.Height()-3)
+	self.DrawPoint(self.Width()-3, self.Height()-2)
 
+	if self.hasfocus {
+		self.SetDrawColor(0x46, 0xc8, 0xe8, 255)
+		self.DrawLine(0, 3, 0, self.Height()-4)
+		self.DrawPoint(1, self.Height()-3)
+		self.DrawPoint(2, self.Height()-2)
+		self.DrawLine(3, self.Height()-1, self.Width()-4, self.Height()-1)
+		self.DrawPoint(self.Width()-3, self.Height()-2)
+		self.DrawPoint(self.Width()-2, self.Height()-3)
+		self.DrawLine(self.Width()-1, self.Height()-4, self.Width()-1, 3)
+		self.DrawPoint(self.Width()-3, 1)
+		self.DrawPoint(self.Width()-2, 2)
+		self.DrawLine(self.Width()-4, 0, 3, 0)
+		self.DrawPoint(2, 1)
+		self.DrawPoint(1, 2)
+	}
 }
 
 func NewInputWidget(w, h int32, s string) *InputWidget {
@@ -298,7 +325,8 @@ func NewInputWidget(w, h int32, s string) *InputWidget {
 		initialCursorPosition: 0,
 		hasfocus:              false,
 		leftButtonDown:        false,
-		writeOffset:           0}
-	widget.SetColor(0xffffffff)
+		writeOffset:           0,
+		internalcolor:         0xffffffff,
+	}
 	return widget
 }

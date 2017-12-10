@@ -15,6 +15,48 @@ type DropdownWidget struct {
 	hasfocus     bool
 }
 
+func (self *DropdownWidget) IsInputWidget() bool {
+	return true
+}
+
+func (self *DropdownWidget) KeyDown(key sdl.Keycode, mod uint16) {
+	if key == sdl.K_TAB {
+		if self.focusOnNextInputWidgetCallback != nil {
+			self.menu = nil
+			hideMenu(nil)
+			self.focusOnNextInputWidgetCallback()
+		}
+	}
+	if key == sdl.K_UP || key == sdl.K_DOWN {
+		if self.menu == nil {
+			self.menu = NewMenuWidget()
+			for i, choice := range self.Choices {
+				index := i
+				self.menu.AddItem(NewMenuItemLabel(choice, func() {
+					self.ActiveChoice = int32(index)
+					self.PostUpdate()
+					if self.clicked != nil {
+						self.clicked()
+					}
+				}))
+			}
+			var xx int32
+			yy := self.height
+			var widget Widget
+			widget = self
+			for widget != nil {
+				xx += widget.X()
+				yy += widget.Y()
+				widget = widget.Parent()
+			}
+			self.menu.Move(xx, yy-2)
+			ShowMenu(self.menu)
+			self.PostUpdate()
+		} else {
+		}
+	}
+}
+
 func (self *DropdownWidget) SetChoices(choices []string) {
 	self.Choices = choices
 	self.ActiveChoice = 0
@@ -53,6 +95,7 @@ func (self *DropdownWidget) MousePressDown(x, y int32, button uint8) {
 		self.cursorInside = true
 		if self.menu != nil && self.menu.Parent() != nil {
 			hideMenu(nil)
+			self.menu = nil
 		} else {
 			self.menu = NewMenuWidget()
 			for i, choice := range self.Choices {
@@ -131,34 +174,46 @@ func (self *DropdownWidget) Repaint() {
 	}
 
 	self.CoreWidget.Repaint()
-	self.FillRect(2, 2, self.width-4, self.height-4, 0xffdddddd)
+	self.FillRect(3, 3, self.width-6, self.height-6, 0xffdddddd)
 	self.SetDrawColor(0, 0, 0, 255)
-	self.DrawLine(0, 1, 0, self.Height()-2)
-	self.DrawLine(self.Width()-1, 1, self.Width()-1, self.Height()-2)
-	self.DrawLine(1, 0, self.Width()-2, 0)
-	self.DrawLine(1, self.Height()-1, self.Width()-2, self.Height()-1)
-	self.WriteText(4, 0, label, sdl.Color{0, 0, 0, 255})
-	self.FillRect(self.Width()-25, 2, 20, self.Height()-4, 0xffdddddd)
+	self.DrawLine(1, 2, 1, self.Height()-3)
+	self.DrawLine(self.Width()-2, 2, self.Width()-2, self.Height()-3)
+	self.DrawLine(2, 1, self.Width()-3, 1)
+	self.DrawLine(2, self.Height()-2, self.Width()-3, self.Height()-2)
+	self.WriteText(5, 1, label, sdl.Color{0, 0, 0, 255})
+	self.FillRect(self.Width()-26, 3, 18, self.Height()-6, 0xffdddddd)
 	self.SetDrawColor(0, 0, 0, 255)
 	//self.DrawLine(self.Width()-25,4,self.Width()-25,self.Height()-6)
 	for i := 0; i < 5; i++ {
-		self.DrawLine(self.Width()-18+int32(i), 6+int32(i)*2, self.Width()-9-int32(i), 6+int32(i)*2)
-		self.DrawLine(self.Width()-18+int32(i), 7+int32(i)*2, self.Width()-9-int32(i), 7+int32(i)*2)
+		self.DrawLine(self.Width()-19+int32(i), 6+int32(i)*2, self.Width()-10-int32(i), 6+int32(i)*2)
+		self.DrawLine(self.Width()-19+int32(i), 7+int32(i)*2, self.Width()-10-int32(i), 7+int32(i)*2)
 	}
 	// bright
 	self.SetDrawColor(255, 255, 255, 255)
-	self.DrawLine(1, 1, 1, self.Height()-2)
-	self.DrawLine(1, 1, self.Width()-2, 1)
-	self.SetDrawColor(240, 240, 240, 255)
 	self.DrawLine(2, 2, 2, self.Height()-3)
 	self.DrawLine(2, 2, self.Width()-3, 2)
+	self.SetDrawColor(240, 240, 240, 255)
+	self.DrawLine(3, 3, 3, self.Height()-4)
+	self.DrawLine(3, 3, self.Width()-4, 3)
 	//dark
 	self.SetDrawColor(50, 50, 50, 255)
-	self.DrawLine(self.Width()-2, 1, self.Width()-2, self.Height()-2)
-	self.DrawLine(1, self.Height()-2, self.Width()-2, self.Height()-2)
-	self.SetDrawColor(150, 150, 150, 255)
 	self.DrawLine(self.Width()-3, 2, self.Width()-3, self.Height()-3)
 	self.DrawLine(2, self.Height()-3, self.Width()-3, self.Height()-3)
+	self.SetDrawColor(150, 150, 150, 255)
+	self.DrawLine(self.Width()-4, 3, self.Width()-4, self.Height()-4)
+	self.DrawLine(3, self.Height()-4, self.Width()-4, self.Height()-4)
+
+	if self.hasfocus {
+		self.SetDrawColor(0x46, 0xc8, 0xe8, 255)
+		self.DrawLine(0, 2, 0, self.Height()-3)
+		self.DrawPoint(1, self.Height()-2)
+		self.DrawLine(2, self.Height()-1, self.Width()-3, self.Height()-1)
+		self.DrawPoint(self.Width()-2, self.Height()-2)
+		self.DrawLine(self.Width()-1, self.Height()-3, self.Width()-1, 2)
+		self.DrawPoint(self.Width()-2, 1)
+		self.DrawLine(self.Width()-3, 0, 2, 0)
+		self.DrawPoint(1, 1)
+	}
 }
 
 func NewDropdownWidget(w, h int32, choices []string) *DropdownWidget {

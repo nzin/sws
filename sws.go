@@ -56,7 +56,6 @@ type Widget interface {
 	InputText(string)
 	TranslateXYToWidget(globalX, globalY int32) (x, y int32)
 	IsInside(x, y int32) bool
-	HasFocus(focus bool)
 	Font() *ttf.Font
 	Destroy()
 	DragMove(x, y int32, payload DragPayload)
@@ -65,6 +64,12 @@ type Widget interface {
 	DragDrop(x, y int32, payload DragPayload) bool
 	IsDirty() bool
 	PostUpdate()
+	// deal with current focus
+	HasFocus(focus bool)
+	// to know if this widget receive input (checkbox, input text, slider, button, ...)
+	IsInputWidget() bool
+	// when we press tab and want to switch to the next input widget
+	SetCallbackFocusOnNextInputWidget(callback func())
 }
 
 //
@@ -469,6 +474,16 @@ func PoolEvent() bool {
 				}
 			}
 		case *sdl.KeyboardEvent:
+			menu := findMenuForKeyboard()
+			if menu != nil {
+				if t.State == sdl.PRESSED {
+					menu.KeyDown(t.Keysym.Sym, t.Keysym.Mod)
+				}
+				if t.State == sdl.RELEASED {
+					menu.KeyUp(t.Keysym.Sym, t.Keysym.Mod)
+				}
+				break
+			}
 			//			fmt.Printf("[%d ms] Keyboard\ttype:%d\tsym:%c\tmodifiers:%d\tstate:%d\trepeat:%d\tunicode:%d\n",
 			//				t.Timestamp, t.Type, t.Keysym.Sym, t.Keysym.Mod, t.State, t.Repeat, t.Keysym.Unicode)
 			if focus != nil {

@@ -144,6 +144,42 @@ func (self *MenuWidget) MousePressUp(x, y int32, button uint8) {
 	}
 }
 
+func (self *MenuWidget) KeyDown(key sdl.Keycode, mod uint16) {
+	if key == sdl.K_UP {
+		if self.activeItem == -1 {
+			self.activeItem = len(self.items) - 1
+		} else {
+			self.activeItem--
+			if self.activeItem == -1 {
+				self.activeItem = len(self.items) - 1
+			}
+		}
+		self.PostUpdate()
+	}
+	if key == sdl.K_DOWN {
+		if self.activeItem == -1 {
+			self.activeItem = 0
+		} else {
+			self.activeItem++
+			if self.activeItem >= len(self.items) {
+				self.activeItem = 0
+			}
+		}
+		self.PostUpdate()
+	}
+	if key == sdl.K_ESCAPE {
+		hideMenu(nil)
+	}
+	if key == sdl.K_TAB && menuInitiator != nil {
+		menuInitiator.KeyDown(key, mod)
+	}
+	if key == sdl.K_RETURN || key == sdl.K_SPACE {
+		if self.activeItem != -1 {
+			self.items[self.activeItem].Clicked()
+		}
+	}
+}
+
 func (self *MenuWidget) MouseMove(x, y, xrel, yrel int32) {
 	previousActiveItem := self.activeItem
 	x -= 2 // UI border
@@ -271,6 +307,13 @@ func findMenu(x int32, y int32) *MenuWidget {
 		}
 	}
 	return nil
+}
+
+func findMenuForKeyboard() *MenuWidget {
+	if menuStack == nil {
+		return nil
+	}
+	return menuStack[len(menuStack)-1]
 }
 
 //

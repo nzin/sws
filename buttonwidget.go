@@ -16,6 +16,45 @@ type ButtonWidget struct {
 	textcolor    sdl.Color
 	buttonColor  uint32
 	clicked      func()
+	hasfocus     bool
+}
+
+func (self *ButtonWidget) IsInputWidget() bool {
+	return true
+}
+
+func (self *ButtonWidget) HasFocus(focus bool) {
+	self.hasfocus = focus
+	self.PostUpdate()
+}
+
+func (self *ButtonWidget) KeyDown(key sdl.Keycode, mod uint16) {
+	if key == sdl.K_TAB {
+		self.buttonState = false
+		self.cursorInside = false
+		self.PostUpdate()
+		if self.focusOnNextInputWidgetCallback != nil {
+			self.focusOnNextInputWidgetCallback()
+		}
+	}
+	if key == sdl.K_SPACE {
+		self.buttonState = true
+		self.cursorInside = true
+		self.PostUpdate()
+	}
+}
+
+func (self *ButtonWidget) KeyUp(key sdl.Keycode, mod uint16) {
+	if key == sdl.K_SPACE {
+		self.buttonState = false
+		if self.cursorInside == true {
+			if self.clicked != nil {
+				self.clicked()
+			}
+		}
+		self.cursorInside = false
+		self.PostUpdate()
+	}
 }
 
 func (self *ButtonWidget) AlignImageLeft(alignleft bool) {
@@ -91,13 +130,13 @@ func (self *ButtonWidget) MouseMove(x, y, xrel, yrel int32) {
 func (self *ButtonWidget) Repaint() {
 	self.CoreWidget.Repaint()
 	if self.buttonColor != 0 {
-		self.FillRect(2, 2, self.width-4, self.height-4, self.buttonColor)
+		self.FillRect(3, 3, self.width-6, self.height-6, self.buttonColor)
 	}
 	self.SetDrawColor(0, 0, 0, 255)
-	self.DrawLine(0, 1, 0, self.Height()-2)
-	self.DrawLine(self.Width()-1, 1, self.Width()-1, self.Height()-2)
-	self.DrawLine(1, 0, self.Width()-2, 0)
-	self.DrawLine(1, self.Height()-1, self.Width()-2, self.Height()-1)
+	self.DrawLine(1, 2, 1, self.Height()-3)
+	self.DrawLine(self.Width()-2, 2, self.Width()-2, self.Height()-3)
+	self.DrawLine(2, 1, self.Width()-3, 1)
+	self.DrawLine(2, self.Height()-2, self.Width()-3, self.Height()-2)
 
 	// text
 	var text *sdl.Surface
@@ -117,7 +156,7 @@ func (self *ButtonWidget) Repaint() {
 				wGap = 0
 			}
 			rectSrc := sdl.Rect{0, 0, text.W, text.H}
-			rectDst := sdl.Rect{2 + (wGap / 2), 2 + (hGap / 2), self.Width() - 2 - (wGap / 2), self.Height() - 2 - (hGap / 2)}
+			rectDst := sdl.Rect{3 + (wGap / 2), 3 + (hGap / 2), self.Width() - 6 - (wGap / 2), self.Height() - 6 - (hGap / 2)}
 			if err = text.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
 			}
 		} else if text == nil && self.image != nil {
@@ -127,7 +166,7 @@ func (self *ButtonWidget) Repaint() {
 				wGap = 0
 			}
 			rectSrc := sdl.Rect{0, 0, self.image.W, self.image.H}
-			rectDst := sdl.Rect{2 + (wGap / 2), 2 + (hGap / 2), self.Width() - 2 - (wGap / 2), self.Height() - 2 - (hGap / 2)}
+			rectDst := sdl.Rect{3 + (wGap / 2), 3 + (hGap / 2), self.Width() - 6 - (wGap / 2), self.Height() - 6 - (hGap / 2)}
 			if err = self.image.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
 			}
 		} else if text != nil && self.image != nil {
@@ -140,11 +179,11 @@ func (self *ButtonWidget) Repaint() {
 					wIGap = 0
 				}
 				rectSrc := sdl.Rect{0, 0, self.image.W, self.image.H}
-				rectDst := sdl.Rect{2 + (wIGap / 2), 2 + (hGap / 2), self.Width() - 2 - (wIGap / 2), self.Height() - 2 - (hGap / 2)}
+				rectDst := sdl.Rect{3 + (wIGap / 2), 3 + (hGap / 2), self.Width() - 6 - (wIGap / 2), self.Height() - 6 - (hGap / 2)}
 				if err = self.image.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
 				}
 				rectSrc = sdl.Rect{0, 0, text.W, text.H}
-				rectDst = sdl.Rect{2 + (wTGap / 2), 2 + (hGap / 2) + self.image.H, self.Width() - 2 - (wTGap / 2), self.Height() - 2 - (hGap / 2) - self.image.H}
+				rectDst = sdl.Rect{3 + (wTGap / 2), 3 + (hGap / 2) + self.image.H, self.Width() - 6 - (wTGap / 2), self.Height() - 6 - (hGap / 2) - self.image.H}
 				if err = text.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
 				}
 
@@ -156,29 +195,29 @@ func (self *ButtonWidget) Repaint() {
 					wGap = 0
 				}
 				rectSrc := sdl.Rect{0, 0, self.image.W, self.image.H}
-				rectDst := sdl.Rect{2 + (wGap / 2), 2 + (hIGap / 2), self.Width() - 2 - (wGap / 2), self.Height() - 2 - (hIGap / 2)}
+				rectDst := sdl.Rect{3 + (wGap / 2), 3 + (hIGap / 2), self.Width() - 6 - (wGap / 2), self.Height() - 6 - (hIGap / 2)}
 				if err = self.image.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
 				}
 				rectSrc = sdl.Rect{0, 0, text.W, text.H}
-				rectDst = sdl.Rect{2 + (wGap / 2) + self.image.W, 2 + (hTGap / 2), self.Width() - 2 - (wGap / 2) - self.image.W, self.Height() - 2 - (hTGap / 2)}
+				rectDst = sdl.Rect{3 + (wGap / 2) + self.image.W, 3 + (hTGap / 2), self.Width() - 6 - (wGap / 2) - self.image.W, self.Height() - 6 - (hTGap / 2)}
 				if err = text.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
 				}
 			}
 		}
 		// dark
 		self.SetDrawColor(50, 50, 50, 255)
-		self.DrawLine(1, 1, 1, self.Height()-2)
-		self.DrawLine(1, 1, self.Width()-2, 1)
-		self.SetDrawColor(150, 150, 150, 255)
 		self.DrawLine(2, 2, 2, self.Height()-3)
 		self.DrawLine(2, 2, self.Width()-3, 2)
+		self.SetDrawColor(150, 150, 150, 255)
+		self.DrawLine(3, 3, 3, self.Height()-4)
+		self.DrawLine(3, 3, self.Width()-4, 3)
 		//brigth
 		self.SetDrawColor(255, 255, 255, 255)
-		self.DrawLine(self.Width()-2, 1, self.Width()-2, self.Height()-2)
-		self.DrawLine(1, self.Height()-2, self.Width()-2, self.Height()-2)
-		self.SetDrawColor(240, 240, 240, 255)
 		self.DrawLine(self.Width()-3, 2, self.Width()-3, self.Height()-3)
 		self.DrawLine(2, self.Height()-3, self.Width()-3, self.Height()-3)
+		self.SetDrawColor(240, 240, 240, 255)
+		self.DrawLine(self.Width()-4, 3, self.Width()-4, self.Height()-4)
+		self.DrawLine(3, self.Height()-4, self.Width()-4, self.Height()-4)
 	} else {
 		if text != nil && self.image == nil {
 			wGap := self.Width() - text.W
@@ -187,7 +226,7 @@ func (self *ButtonWidget) Repaint() {
 				wGap = 0
 			}
 			rectSrc := sdl.Rect{0, 0, text.W, text.H}
-			rectDst := sdl.Rect{(wGap / 2), (hGap / 2), self.Width() - (wGap / 2), self.Height() - (hGap / 2)}
+			rectDst := sdl.Rect{1 + (wGap / 2), 1 + (hGap / 2), self.Width() - 2 - (wGap / 2), self.Height() - 2 - (hGap / 2)}
 			if err = text.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
 			}
 		} else if text == nil && self.image != nil {
@@ -197,7 +236,7 @@ func (self *ButtonWidget) Repaint() {
 				wGap = 0
 			}
 			rectSrc := sdl.Rect{0, 0, self.image.W, self.image.H}
-			rectDst := sdl.Rect{(wGap / 2), (hGap / 2), self.Width() - (wGap / 2), self.Height() - (hGap / 2)}
+			rectDst := sdl.Rect{1 + (wGap / 2), 1 + (hGap / 2), self.Width() - 2 - (wGap / 2), self.Height() - 2 - (hGap / 2)}
 			if err = self.image.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
 			}
 		} else if text != nil && self.image != nil {
@@ -209,28 +248,39 @@ func (self *ButtonWidget) Repaint() {
 				wIGap = 0
 			}
 			rectSrc := sdl.Rect{0, 0, self.image.W, self.image.H}
-			rectDst := sdl.Rect{(wIGap / 2), (hGap / 2), self.Width() - (wIGap / 2), self.Height() - (hGap / 2)}
+			rectDst := sdl.Rect{1 + (wIGap / 2), 1 + (hGap / 2), self.Width() - 2 - (wIGap / 2), self.Height() - 2 - (hGap / 2)}
 			if err = self.image.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
 			}
 			rectSrc = sdl.Rect{0, 0, text.W, text.H}
-			rectDst = sdl.Rect{(wTGap / 2), (hGap / 2) + self.image.H, self.Width() - (wTGap / 2), self.Height() - (hGap / 2) - self.image.H}
+			rectDst = sdl.Rect{1 + (wTGap / 2), 1 + (hGap / 2) + self.image.H, self.Width() - 2 - (wTGap / 2), self.Height() - 2 - (hGap / 2) - self.image.H}
 			if err = text.Blit(&rectSrc, self.Surface(), &rectDst); err != nil {
 			}
 		}
 		// bright
 		self.SetDrawColor(255, 255, 255, 255)
-		self.DrawLine(1, 1, 1, self.Height()-2)
-		self.DrawLine(1, 1, self.Width()-2, 1)
-		self.SetDrawColor(240, 240, 240, 255)
 		self.DrawLine(2, 2, 2, self.Height()-3)
 		self.DrawLine(2, 2, self.Width()-3, 2)
+		self.SetDrawColor(240, 240, 240, 255)
+		self.DrawLine(3, 3, 3, self.Height()-4)
+		self.DrawLine(3, 3, self.Width()-4, 3)
 		//dark
 		self.SetDrawColor(50, 50, 50, 255)
-		self.DrawLine(self.Width()-2, 1, self.Width()-2, self.Height()-2)
-		self.DrawLine(1, self.Height()-2, self.Width()-2, self.Height()-2)
-		self.SetDrawColor(150, 150, 150, 255)
 		self.DrawLine(self.Width()-3, 2, self.Width()-3, self.Height()-3)
 		self.DrawLine(2, self.Height()-3, self.Width()-3, self.Height()-3)
+		self.SetDrawColor(150, 150, 150, 255)
+		self.DrawLine(self.Width()-4, 3, self.Width()-4, self.Height()-4)
+		self.DrawLine(3, self.Height()-4, self.Width()-4, self.Height()-4)
+	}
+	if self.hasfocus {
+		self.SetDrawColor(0x46, 0xc8, 0xe8, 255)
+		self.DrawLine(0, 2, 0, self.Height()-3)
+		self.DrawPoint(1, self.Height()-2)
+		self.DrawLine(2, self.Height()-1, self.Width()-3, self.Height()-1)
+		self.DrawPoint(self.Width()-2, self.Height()-2)
+		self.DrawLine(self.Width()-1, self.Height()-3, self.Width()-1, 2)
+		self.DrawPoint(self.Width()-2, 1)
+		self.DrawLine(self.Width()-3, 0, 2, 0)
+		self.DrawPoint(1, 1)
 	}
 }
 

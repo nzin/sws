@@ -16,7 +16,7 @@ func ShowModalError(root *RootWidget, title, iconpath, desc string, callback fun
 
 	textarea := NewTextAreaWidget(400, 70, desc)
 	textarea.Move(70, 40)
-	textarea.SetReadonly(true)
+	textarea.SetDisabled(true)
 	modal.AddChild(textarea)
 
 	ok := NewButtonWidget(100, 25, "Ok")
@@ -34,7 +34,7 @@ func ShowModalError(root *RootWidget, title, iconpath, desc string, callback fun
 	root.SetModal(modal)
 }
 
-func ShowModalYesNo(root *RootWidget, title, iconpath, desc string, callbackyes func(),callbackno func()) {
+func ShowModalYesNo(root *RootWidget, title, iconpath, desc string, callbackyes func(), callbackno func()) {
 	modal := NewMainWidget(500, 200, title, false, false)
 	modal.SetCloseCallback(func() {
 		root.RemoveChild(modal)
@@ -50,7 +50,7 @@ func ShowModalYesNo(root *RootWidget, title, iconpath, desc string, callbackyes 
 
 	textarea := NewTextAreaWidget(400, 70, desc)
 	textarea.Move(70, 40)
-	textarea.SetReadonly(true)
+	textarea.SetDisabled(true)
 	modal.AddChild(textarea)
 
 	yes := NewButtonWidget(50, 25, "Yes")

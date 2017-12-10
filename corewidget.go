@@ -18,17 +18,18 @@ import (
 // to provide cache when we need to refresh the content.
 //
 type CoreWidget struct {
-	surface  *sdl.Surface
-	renderer *sdl.Renderer
-	children []Widget
-	parent   Widget
-	bgColor  uint32
-	x        int32
-	y        int32
-	width    int32
-	height   int32
-	font     *ttf.Font
-	dirty    bool
+	surface                        *sdl.Surface
+	renderer                       *sdl.Renderer
+	children                       []Widget
+	parent                         Widget
+	bgColor                        uint32
+	x                              int32
+	y                              int32
+	width                          int32
+	height                         int32
+	font                           *ttf.Font
+	dirty                          bool
+	focusOnNextInputWidgetCallback func()
 }
 
 func NewCoreWidget(w, h int32) *CoreWidget {
@@ -205,9 +206,6 @@ func (self *CoreWidget) SetFont(font *ttf.Font) {
 	self.font = font
 }
 
-func (self *CoreWidget) HasFocus(focus bool) {
-}
-
 func (self *CoreWidget) Surface() *sdl.Surface {
 	return self.surface
 }
@@ -246,6 +244,11 @@ func (self *CoreWidget) AddChild(child Widget) {
 	}
 	self.children = append(self.children, child)
 	child.SetParent(self)
+	if child.IsInputWidget() {
+		child.SetCallbackFocusOnNextInputWidget(func() {
+			self.selectNextInputWidget(child)
+		})
+	}
 	self.PostUpdate()
 }
 
@@ -346,6 +349,37 @@ func (self *CoreWidget) DragLeave(payload DragPayload) {
 
 func (self *CoreWidget) DragDrop(x, y int32, payload DragPayload) bool {
 	return false
+}
+
+func (self *CoreWidget) HasFocus(focus bool) {
+}
+
+func (self *CoreWidget) IsInputWidget() bool {
+	return false
+}
+
+func (self *CoreWidget) SetCallbackFocusOnNextInputWidget(callback func()) {
+	self.focusOnNextInputWidgetCallback = callback
+}
+
+func (self *CoreWidget) selectNextInputWidget(current Widget) {
+	nextChildren := make([]Widget, len(self.children))
+	copy(nextChildren, self.children)
+	for _, c := range self.children {
+		if c != current {
+			// we shift the array until we find 'current'
+			nextChildren = append(nextChildren[1:], c)
+		} else {
+			// we unroll the array to the next inputwidget
+			for _, n := range nextChildren[1:] {
+				if n.IsInputWidget() {
+					root.SetFocus(n)
+					return
+				}
+			}
+			return
+		}
+	}
 }
 
 //
