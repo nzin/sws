@@ -13,6 +13,22 @@ type CheckboxWidget struct {
 	clicked      func()
 }
 
+func (self *CheckboxWidget) IsInputWidget() bool {
+	return true
+}
+
+func (self *CheckboxWidget) KeyDown(key sdl.Keycode, mod uint16) {
+	if key == sdl.K_TAB {
+		if self.focusOnNextInputWidgetCallback != nil {
+			self.focusOnNextInputWidgetCallback()
+		}
+	}
+	if key == sdl.K_SPACE && self.disabled == false {
+		self.Selected = !self.Selected
+		self.PostUpdate()
+	}
+}
+
 func (self *CheckboxWidget) SetDisabled(disabled bool) {
 	self.disabled = disabled
 	self.PostUpdate()

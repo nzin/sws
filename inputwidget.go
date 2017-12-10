@@ -15,6 +15,10 @@ type InputWidget struct {
 	enterCallback         func()
 }
 
+func (self *InputWidget) IsInputWidget() bool {
+	return true
+}
+
 func (self *InputWidget) SetEnterCallback(callback func()) {
 	self.enterCallback = callback
 }
@@ -126,6 +130,11 @@ func (self *InputWidget) InputText(text string) {
 }
 
 func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
+	if key == sdl.K_TAB {
+		if self.focusOnNextInputWidgetCallback != nil {
+			self.focusOnNextInputWidgetCallback()
+		}
+	}
 	if key == sdl.K_RETURN {
 		self.enterCallback()
 	}

@@ -25,6 +25,10 @@ const (
 	GLYPH_ENTER = 4
 )
 
+func (self *TextAreaWidget) IsInputWidget() bool {
+	return true
+}
+
 func (self *TextAreaWidget) SetText(text string) {
 	self.text = text
 	self.PostUpdate()

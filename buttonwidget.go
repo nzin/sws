@@ -18,6 +18,39 @@ type ButtonWidget struct {
 	clicked      func()
 }
 
+func (self *ButtonWidget) IsInputWidget() bool {
+	return true
+}
+
+func (self *ButtonWidget) KeyDown(key sdl.Keycode, mod uint16) {
+	if key == sdl.K_TAB {
+		self.buttonState = false
+		self.cursorInside = false
+		self.PostUpdate()
+		if self.focusOnNextInputWidgetCallback != nil {
+			self.focusOnNextInputWidgetCallback()
+		}
+	}
+	if key == sdl.K_SPACE {
+		self.buttonState = true
+		self.cursorInside = true
+		self.PostUpdate()
+	}
+}
+
+func (self *ButtonWidget) KeyUp(key sdl.Keycode, mod uint16) {
+	if key == sdl.K_SPACE {
+		self.buttonState = false
+		if self.cursorInside == true {
+			if self.clicked != nil {
+				self.clicked()
+			}
+		}
+		self.cursorInside = false
+		self.PostUpdate()
+	}
+}
+
 func (self *ButtonWidget) AlignImageLeft(alignleft bool) {
 	self.imageleft = alignleft
 }

@@ -15,6 +15,48 @@ type DropdownWidget struct {
 	hasfocus     bool
 }
 
+func (self *DropdownWidget) IsInputWidget() bool {
+	return true
+}
+
+func (self *DropdownWidget) KeyDown(key sdl.Keycode, mod uint16) {
+	if key == sdl.K_TAB {
+		if self.focusOnNextInputWidgetCallback != nil {
+			self.menu = nil
+			hideMenu(nil)
+			self.focusOnNextInputWidgetCallback()
+		}
+	}
+	if key == sdl.K_UP || key == sdl.K_DOWN {
+		if self.menu == nil {
+			self.menu = NewMenuWidget()
+			for i, choice := range self.Choices {
+				index := i
+				self.menu.AddItem(NewMenuItemLabel(choice, func() {
+					self.ActiveChoice = int32(index)
+					self.PostUpdate()
+					if self.clicked != nil {
+						self.clicked()
+					}
+				}))
+			}
+			var xx int32
+			yy := self.height
+			var widget Widget
+			widget = self
+			for widget != nil {
+				xx += widget.X()
+				yy += widget.Y()
+				widget = widget.Parent()
+			}
+			self.menu.Move(xx, yy-2)
+			ShowMenu(self.menu)
+			self.PostUpdate()
+		} else {
+		}
+	}
+}
+
 func (self *DropdownWidget) SetChoices(choices []string) {
 	self.Choices = choices
 	self.ActiveChoice = 0
@@ -53,6 +95,7 @@ func (self *DropdownWidget) MousePressDown(x, y int32, button uint8) {
 		self.cursorInside = true
 		if self.menu != nil && self.menu.Parent() != nil {
 			hideMenu(nil)
+			self.menu = nil
 		} else {
 			self.menu = NewMenuWidget()
 			for i, choice := range self.Choices {
