@@ -38,6 +38,7 @@ type Widget interface {
 	Move(x, y int32)
 	Resize(width, height int32)
 	Surface() *sdl.Surface
+	SetAlphaMod(alpha uint8)
 	Renderer() *sdl.Renderer
 	GetChildren() []Widget
 	Parent() Widget

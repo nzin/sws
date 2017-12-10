@@ -15,7 +15,7 @@ type TimerEvent struct {
 	triggertime time.Time
 	repeat      time.Duration // if >=0
 	next        *TimerEvent
-	trigger     func()
+	trigger     func(*TimerEvent)
 }
 
 var timerlist *TimerEvent
@@ -25,7 +25,7 @@ var timerlist *TimerEvent
 //
 // If repeat>0, this event is repeatable (until stopped. See StopRepeat())
 //
-func TimerAddEvent(triggertime time.Time, repeat time.Duration, trigger func()) *TimerEvent {
+func TimerAddEvent(triggertime time.Time, repeat time.Duration, trigger func(evt *TimerEvent)) *TimerEvent {
 	te := &TimerEvent{
 		triggertime: triggertime,
 		repeat:      repeat,
@@ -69,11 +69,11 @@ func TriggerEvents() {
 	for timerlist != nil && timerlist.triggertime.Before(now) {
 		t := timerlist
 		timerlist = timerlist.next
-		t.trigger()
 		if t.repeat > 0 {
 			t.triggertime = t.triggertime.Add(t.repeat)
 			placeEvent(t)
 		}
+		t.trigger(t)
 	}
 }
 

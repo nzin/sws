@@ -1,8 +1,9 @@
 package sws
 
 import (
-	"github.com/veandco/go-sdl2/sdl"
 	"time"
+
+	"github.com/veandco/go-sdl2/sdl"
 )
 
 type Scrollbarcallback func(currentposition int32)
@@ -77,7 +78,7 @@ func (self *ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 					self.callback(self.Currentposition)
 				}
 				self.PostUpdate()
-				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
+				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func(evt *TimerEvent) {
 					self.Currentposition -= self.Width() / 2
 					if self.Currentposition < self.minimum {
 						self.Currentposition = self.minimum
@@ -97,7 +98,7 @@ func (self *ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 					self.callback(self.Currentposition)
 				}
 				self.PostUpdate()
-				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
+				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func(evt *TimerEvent) {
 					self.Currentposition += self.Width() / 2
 					if self.Currentposition > self.maximum {
 						self.Currentposition = self.maximum
@@ -130,7 +131,7 @@ func (self *ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 					self.callback(self.Currentposition)
 				}
 				self.PostUpdate()
-				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
+				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func(evt *TimerEvent) {
 					self.Currentposition -= self.Height() / 2
 					if self.Currentposition < self.minimum {
 						self.Currentposition = self.minimum
@@ -150,7 +151,7 @@ func (self *ScrollbarWidget) MousePressDown(x, y int32, button uint8) {
 					self.callback(self.Currentposition)
 				}
 				self.PostUpdate()
-				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func() {
+				self.timerevent = TimerAddEvent(time.Now().Add(500*time.Millisecond), 250*time.Millisecond, func(evt *TimerEvent) {
 					self.Currentposition += self.Height() / 2
 					if self.Currentposition > self.maximum {
 						self.Currentposition = self.maximum

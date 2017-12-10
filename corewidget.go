@@ -23,6 +23,7 @@ type CoreWidget struct {
 	children                       []Widget
 	parent                         Widget
 	bgColor                        uint32
+	alphamod                       uint8
 	x                              int32
 	y                              int32
 	width                          int32
@@ -52,8 +53,17 @@ func NewCoreWidget(w, h int32) *CoreWidget {
 		font:     defaultFont,
 		dirty:    true,
 		parent:   nil,
+		alphamod: 255,
 	}
 	return widget
+}
+
+func (self *CoreWidget) SetAlphaMod(alpha uint8) {
+	self.alphamod = alpha
+	if self.surface != nil {
+		self.surface.SetAlphaMod(alpha)
+		self.PostUpdate()
+	}
 }
 
 //
@@ -96,6 +106,7 @@ func (self *CoreWidget) Resize(width, height int32) {
 	if err != nil {
 		panic(err)
 	}
+	surface.SetAlphaMod(self.alphamod)
 	renderer, err := sdl.CreateSoftwareRenderer(surface)
 	if err != nil {
 		panic(err)
@@ -420,6 +431,7 @@ func (self *CoreWidget) Repaint() {
 		if err != nil {
 			panic(err)
 		}
+		surface.SetAlphaMod(self.alphamod)
 		if self.surface != nil {
 			self.surface.Free()
 		}
