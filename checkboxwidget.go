@@ -117,7 +117,7 @@ func (self *CheckboxWidget) Repaint() {
 	self.DrawLine(19, 19, 19, 5)
 	self.DrawLine(19, 5, 5, 5)
 
-	if self.hasfocus {
+	if self.hasfocus && self.disabled == false {
 		self.SetDrawColor(0x46, 0xc8, 0xe8, 255)
 		self.DrawLine(4, 5, 4, 19)
 		self.DrawLine(5, 20, 19, 20)

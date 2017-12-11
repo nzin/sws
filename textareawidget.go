@@ -458,7 +458,7 @@ func (self *TextAreaWidget) Repaint() {
 		self.DrawPoint(self.Width()-2, self.Height()-3)
 		self.DrawPoint(self.Width()-3, self.Height()-2)
 	}
-	if self.hasfocus {
+	if self.hasfocus && self.disabled == false {
 		self.SetDrawColor(0x46, 0xc8, 0xe8, 255)
 		self.DrawLine(0, 3, 0, self.Height()-4)
 		self.DrawPoint(1, self.Height()-3)
