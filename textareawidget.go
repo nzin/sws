@@ -35,6 +35,9 @@ func (self *TextAreaWidget) IsInputWidget() bool {
 
 func (self *TextAreaWidget) SetText(text string) {
 	self.text = text
+	if self.valueChangedCallback != nil {
+		self.valueChangedCallback()
+	}
 	self.PostUpdate()
 }
 
@@ -104,7 +107,9 @@ func (self *TextAreaWidget) InputText(text string) {
 	}
 	self.endCursorPosition = self.initialCursorPosition
 	self.PostUpdate()
-
+	if self.valueChangedCallback != nil {
+		self.valueChangedCallback()
+	}
 }
 
 func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
@@ -175,6 +180,9 @@ func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		}
 		self.endCursorPosition = self.initialCursorPosition
 		self.PostUpdate()
+		if self.valueChangedCallback != nil {
+			self.valueChangedCallback()
+		}
 	}
 
 	if mod == sdl.KMOD_LCTRL || mod == sdl.KMOD_RCTRL {
@@ -200,6 +208,9 @@ func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		}
 		self.endCursorPosition = self.initialCursorPosition
 		self.PostUpdate()
+		if self.valueChangedCallback != nil {
+			self.valueChangedCallback()
+		}
 	}
 
 	// recompute self.xCursor, self.yCursor

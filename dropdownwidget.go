@@ -70,6 +70,9 @@ func (self *DropdownWidget) SetActiveChoice(choice int32) {
 			self.clicked()
 		}
 		self.PostUpdate()
+		if self.valueChangedCallback != nil {
+			self.valueChangedCallback()
+		}
 	}
 }
 
@@ -105,6 +108,9 @@ func (self *DropdownWidget) MousePressDown(x, y int32, button uint8) {
 					self.PostUpdate()
 					if self.clicked != nil {
 						self.clicked()
+					}
+					if self.valueChangedCallback != nil {
+						self.valueChangedCallback()
 					}
 				}))
 			}

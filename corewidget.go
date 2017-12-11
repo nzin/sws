@@ -31,6 +31,7 @@ type CoreWidget struct {
 	font                           *ttf.Font
 	dirty                          bool
 	focusOnNextInputWidgetCallback func(forward bool)
+	valueChangedCallback           func()
 }
 
 func NewCoreWidget(w, h int32) *CoreWidget {
@@ -376,6 +377,10 @@ func (self *CoreWidget) IsInputWidget() bool {
 
 func (self *CoreWidget) SetCallbackFocusOnNextInputWidget(callback func(forward bool)) {
 	self.focusOnNextInputWidgetCallback = callback
+}
+
+func (self *CoreWidget) SetCallbackValueChanged(callback func()) {
+	self.valueChangedCallback = callback
 }
 
 func (self *CoreWidget) selectNextInputWidget(current Widget) {

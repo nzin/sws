@@ -43,6 +43,9 @@ func (self *InputWidget) SetText(str string) {
 	self.initialCursorPosition = 0
 	self.endCursorPosition = 0
 	self.writeOffset = 0
+	if self.valueChangedCallback != nil {
+		self.valueChangedCallback()
+	}
 	self.PostUpdate()
 }
 
@@ -133,6 +136,9 @@ func (self *InputWidget) InputText(text string) {
 		self.writeOffset = int32(w) - self.Width() + 4
 		self.PostUpdate()
 	}
+	if self.valueChangedCallback != nil {
+		self.valueChangedCallback()
+	}
 }
 
 func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
@@ -142,7 +148,9 @@ func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		}
 	}
 	if key == sdl.K_RETURN {
-		self.enterCallback()
+		if self.enterCallback != nil {
+			self.enterCallback()
+		}
 	}
 	if key == sdl.K_UP {
 		if mod == sdl.KMOD_LSHIFT || mod == sdl.KMOD_RSHIFT {
@@ -214,6 +222,9 @@ func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		}
 		self.endCursorPosition = self.initialCursorPosition
 		self.PostUpdate()
+		if self.valueChangedCallback != nil {
+			self.valueChangedCallback()
+		}
 	}
 
 	if mod == sdl.KMOD_LCTRL || mod == sdl.KMOD_RCTRL {

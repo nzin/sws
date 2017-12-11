@@ -49,6 +49,9 @@ func (self *CheckboxWidget) SetDisabled(disabled bool) {
 func (self *CheckboxWidget) SetSelected(selected bool) {
 	self.Selected = selected
 	self.PostUpdate()
+	if self.valueChangedCallback != nil {
+		self.valueChangedCallback()
+	}
 }
 
 func (self *CheckboxWidget) SetClicked(callback func()) {
@@ -80,6 +83,9 @@ func (self *CheckboxWidget) MousePressUp(x, y int32, button uint8) {
 		}
 		self.cursorInside = false
 		self.PostUpdate()
+		if self.valueChangedCallback != nil {
+			self.valueChangedCallback()
+		}
 	}
 }
 

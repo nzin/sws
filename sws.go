@@ -71,6 +71,8 @@ type Widget interface {
 	IsInputWidget() bool
 	// when we press tab and want to switch to the next input widget
 	SetCallbackFocusOnNextInputWidget(callback func(forward bool))
+	// when the input widget see its "value" changed
+	SetCallbackValueChanged(callback func())
 }
 
 //
