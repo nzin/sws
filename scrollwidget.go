@@ -1,8 +1,10 @@
 package sws
 
 import (
-//	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/sdl"
 )
+
+//	"github.com/veandco/go-sdl2/sdl"
 
 const (
 	SCROLLBAR_WIDTH = 17
@@ -18,6 +20,12 @@ type ScrollWidget struct {
 	yOffset    int32
 	showH      bool
 	showV      bool
+	showBezel  bool
+}
+
+func (self *ScrollWidget) ShowBezel(bezel bool) {
+	self.showBezel = bezel
+	self.PostUpdate()
 }
 
 func (self *ScrollWidget) SetHorizontalPosition(position int32) {
@@ -41,7 +49,7 @@ func (self *ScrollWidget) ShowHorizontalScrollbar(showH bool) {
 }
 
 func (self *ScrollWidget) PostUpdate() {
-	self.Resize(self.Width(),self.Height())
+	self.Resize(self.Width(), self.Height())
 	self.CoreWidget.PostUpdate()
 }
 
@@ -60,30 +68,101 @@ func (self *ScrollWidget) Resize(width, height int32) {
 	self.hScrollbar.SetMaximum(self.subwidget.Width() - self.Width())
 	self.vScrollbar.SetMaximum(self.subwidget.Height() - self.Height())
 	if self.subwidget != nil {
-		if self.subwidget.Width() > self.Width()-SCROLLBAR_WIDTH && self.subwidget.Height() > self.Height()-SCROLLBAR_WIDTH && self.showH == true && self.showV == true {
-			self.hScrollbar.SetMaximum(self.subwidget.Width() - (self.Width() - SCROLLBAR_WIDTH))
-			self.AddChild(self.hScrollbar)
-			self.hScrollbar.Resize(self.Width()-SCROLLBAR_WIDTH, SCROLLBAR_WIDTH)
-			self.hScrollbar.Move(0, self.Height()-SCROLLBAR_WIDTH)
-			self.vScrollbar.SetMaximum(self.subwidget.Height() - (self.Height() - SCROLLBAR_WIDTH))
-			self.AddChild(self.vScrollbar)
-			self.vScrollbar.Resize(SCROLLBAR_WIDTH, self.Height()-SCROLLBAR_WIDTH)
-			self.vScrollbar.Move(self.Width()-SCROLLBAR_WIDTH, 0)
-			self.AddChild(self.corner)
-			self.corner.Move(self.Width()-SCROLLBAR_WIDTH, self.Height()-SCROLLBAR_WIDTH)
-		} else if self.subwidget.Width() > self.Width() && self.showH == true {
-			self.hScrollbar.SetMaximum(self.subwidget.Width() - self.Width())
-			self.AddChild(self.hScrollbar)
-			self.hScrollbar.Move(0, self.Height()-SCROLLBAR_WIDTH)
-			self.hScrollbar.Resize(self.Width(), SCROLLBAR_WIDTH)
-		} else if self.subwidget.Height() > self.Height() && self.showV == true {
-			self.vScrollbar.SetMaximum(self.subwidget.Height() - self.Height())
-			self.AddChild(self.vScrollbar)
-			self.vScrollbar.Resize(SCROLLBAR_WIDTH, self.Height())
-			self.vScrollbar.Move(self.Width()-SCROLLBAR_WIDTH, 0)
+		if self.showBezel == false {
+
+			if self.subwidget.Width() > self.Width()-SCROLLBAR_WIDTH && self.subwidget.Height() > self.Height()-SCROLLBAR_WIDTH && self.showH == true && self.showV == true {
+				self.hScrollbar.SetMaximum(self.subwidget.Width() - (self.Width() - SCROLLBAR_WIDTH))
+				self.AddChild(self.hScrollbar)
+				self.hScrollbar.Resize(self.Width()-SCROLLBAR_WIDTH, SCROLLBAR_WIDTH)
+				self.hScrollbar.Move(0, self.Height()-SCROLLBAR_WIDTH)
+				self.vScrollbar.SetMaximum(self.subwidget.Height() - (self.Height() - SCROLLBAR_WIDTH))
+				self.AddChild(self.vScrollbar)
+				self.vScrollbar.Resize(SCROLLBAR_WIDTH, self.Height()-SCROLLBAR_WIDTH)
+				self.vScrollbar.Move(self.Width()-SCROLLBAR_WIDTH, 0)
+				self.AddChild(self.corner)
+				self.corner.Move(self.Width()-SCROLLBAR_WIDTH, self.Height()-SCROLLBAR_WIDTH)
+			} else if self.subwidget.Width() > self.Width() && self.showH == true {
+				self.hScrollbar.SetMaximum(self.subwidget.Width() - self.Width())
+				self.AddChild(self.hScrollbar)
+				self.hScrollbar.Move(0, self.Height()-SCROLLBAR_WIDTH)
+				self.hScrollbar.Resize(self.Width(), SCROLLBAR_WIDTH)
+			} else if self.subwidget.Height() > self.Height() && self.showV == true {
+				self.vScrollbar.SetMaximum(self.subwidget.Height() - self.Height())
+				self.AddChild(self.vScrollbar)
+				self.vScrollbar.Resize(SCROLLBAR_WIDTH, self.Height())
+				self.vScrollbar.Move(self.Width()-SCROLLBAR_WIDTH, 0)
+			}
+		} else {
+			if self.subwidget.Width() > self.Width()-SCROLLBAR_WIDTH-4 && self.subwidget.Height() > self.Height()-SCROLLBAR_WIDTH-4 && self.showH == true && self.showV == true {
+				self.hScrollbar.SetMaximum(self.subwidget.Width() - (self.Width() - SCROLLBAR_WIDTH - 4))
+				self.AddChild(self.hScrollbar)
+				self.hScrollbar.Resize(self.Width()-SCROLLBAR_WIDTH-4, SCROLLBAR_WIDTH)
+				self.hScrollbar.Move(2, self.Height()-SCROLLBAR_WIDTH-2)
+				self.vScrollbar.SetMaximum(self.subwidget.Height() - (self.Height() - SCROLLBAR_WIDTH - 4))
+				self.AddChild(self.vScrollbar)
+				self.vScrollbar.Resize(SCROLLBAR_WIDTH, self.Height()-SCROLLBAR_WIDTH-4)
+				self.vScrollbar.Move(self.Width()-SCROLLBAR_WIDTH-2, 2)
+				self.AddChild(self.corner)
+				self.corner.Move(self.Width()-SCROLLBAR_WIDTH-2, self.Height()-SCROLLBAR_WIDTH-2)
+			} else if self.subwidget.Width() > self.Width()-4 && self.showH == true {
+				self.hScrollbar.SetMaximum(self.subwidget.Width() - self.Width() - 4)
+				self.AddChild(self.hScrollbar)
+				self.hScrollbar.Move(2, self.Height()-SCROLLBAR_WIDTH-2)
+				self.hScrollbar.Resize(self.Width()-4, SCROLLBAR_WIDTH)
+			} else if self.subwidget.Height() > self.Height()-4 && self.showV == true {
+				self.vScrollbar.SetMaximum(self.subwidget.Height() - self.Height() - 4)
+				self.AddChild(self.vScrollbar)
+				self.vScrollbar.Resize(SCROLLBAR_WIDTH, self.Height()-4)
+				self.vScrollbar.Move(self.Width()-SCROLLBAR_WIDTH-2, 2)
+			}
 		}
+
 	}
 	self.CoreWidget.PostUpdate()
+}
+
+func (self *ScrollWidget) Repaint() {
+	if self.showBezel {
+		self.FillRect(0, 0, self.width, self.height, 0xffffffff)
+
+		self.SetDrawColor(0x88, 0x88, 0x88, 0xff)
+		self.DrawLine(0, 0, 0, self.Height()-1)
+		self.DrawLine(0, self.Height()-1, self.Width()-1, self.Height()-1)
+		//	self.SetDrawColor(0xff, 0xff, 0xff, 0xff)
+		//	self.DrawLine(self.Width()-1, self.Height()-1, self.Width()-1, 0)
+		//	self.DrawLine(self.Width()-1, 0, 0, 0)
+		self.DrawLine(1, 1, 1, self.Height()-2)
+		self.DrawLine(1, self.Height()-2, self.Width()-2, self.Height()-2)
+		self.DrawLine(self.Width()-2, self.Height()-2, self.Width()-2, 1)
+		self.DrawLine(self.Width()-2, 1, 1, 1)
+
+		for _, child := range self.children {
+			// adjust the clipping to the current child
+			if child.IsDirty() {
+				child.Repaint()
+			}
+			widthDst := child.Width()
+			heightDst := child.Height()
+			if child.X()+widthDst > self.Width()-4 {
+				widthDst = self.Width() - 4 - child.X()
+			}
+			if widthDst < 0 {
+				widthDst = 0
+			}
+			if child.Y()+heightDst > self.Height()-4 {
+				heightDst = self.Height() - 4 - child.Y()
+			}
+			if heightDst < 0 {
+				heightDst = 0
+			}
+			rectSrc := sdl.Rect{0, 0, widthDst, heightDst}
+			rectDst := sdl.Rect{child.X() + 2, child.Y() + 2, widthDst, heightDst}
+			child.Surface().Blit(&rectSrc, self.Surface(), &rectDst)
+		}
+		self.dirty = false
+	} else {
+		self.CoreWidget.Repaint()
+	}
 }
 
 func (self *ScrollWidget) SetInnerWidget(widget Widget) bool {
