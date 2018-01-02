@@ -127,7 +127,7 @@ func (self *ScrollWidget) Repaint() {
 
 		self.SetDrawColor(0x88, 0x88, 0x88, 0xff)
 		self.DrawLine(0, 0, 0, self.Height()-1)
-		self.DrawLine(0, self.Height()-1, self.Width()-1, self.Height()-1)
+		self.DrawLine(0, 0, self.Width()-1, 0)
 		//	self.SetDrawColor(0xff, 0xff, 0xff, 0xff)
 		//	self.DrawLine(self.Width()-1, self.Height()-1, self.Width()-1, 0)
 		//	self.DrawLine(self.Width()-1, 0, 0, 0)
