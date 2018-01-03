@@ -12,8 +12,13 @@ type ListWidget struct {
 	items             []*ListWidgetItem
 	yoffset           int32
 	scrollbar         *ScrollbarWidget
-	changeselected    func()
 	mousedownonscroll bool
+	hasfocus          bool
+}
+
+func (self *ListWidget) HasFocus(focus bool) {
+	self.hasfocus = focus
+	self.PostUpdate()
 }
 
 func (self *ListWidget) GetCurrentItem() *ListWidgetItem {
@@ -26,14 +31,37 @@ func (self *ListWidget) AddItem(label string) {
 	self.Resize(self.Width(), self.Height())
 }
 
+func (self *ListWidget) GetItems() []*ListWidgetItem {
+	return self.items
+}
+
+func (self *ListWidget) RemoveItem(item *ListWidgetItem) {
+	for i, l := range self.items {
+		if l == item {
+			self.items = append(self.items[:i], self.items[i+1:]...)
+			if self.yoffset > int32(25*i) {
+				self.yoffset -= 25
+				if self.yoffset < 0 {
+					self.yoffset = 0
+				}
+			}
+			break
+		}
+	}
+	if item == self.currentItem {
+		self.currentItem = nil
+	}
+	self.PostUpdate()
+}
+
 func (self *ListWidget) SelectItem(item *ListWidgetItem) {
 	if self.currentItem != nil {
 		self.currentItem.Selected(false)
 	}
 	self.currentItem = item
 	item.Selected(true)
-	if self.changeselected != nil {
-		self.changeselected()
+	if self.valueChangedCallback != nil {
+		self.valueChangedCallback()
 	}
 	self.PostUpdate()
 }
@@ -97,6 +125,7 @@ func (self *ListWidget) KeyDown(key sdl.Keycode, mod uint16) {
 	if key == sdl.K_DOWN {
 		if self.currentItem == nil && len(self.items) > 0 {
 			self.SelectItem(self.items[0])
+			return
 		}
 		if self.currentItem != nil && self.currentItem != self.items[len(self.items)-1] {
 			for i, item := range self.items {
@@ -122,6 +151,7 @@ func (self *ListWidget) KeyDown(key sdl.Keycode, mod uint16) {
 	if key == sdl.K_UP {
 		if self.currentItem == nil && len(self.items) > 0 {
 			self.SelectItem(self.items[len(self.items)-1])
+			return
 		}
 		if self.currentItem != nil && self.currentItem != self.items[0] {
 			for i, item := range self.items {
@@ -178,10 +208,17 @@ func (self *ListWidget) Repaint() {
 	self.DrawLine(1, self.Height()-2, self.Width()-2, self.Height()-2)
 	self.DrawLine(self.Width()-2, self.Height()-2, self.Width()-2, 1)
 	self.DrawLine(self.Width()-2, 1, 1, 1)
-}
-
-func (self *ListWidget) SetChangeSelectedCallback(changeselected func()) {
-	self.changeselected = changeselected
+	if self.hasfocus {
+		width := self.Width() - 3
+		if self.Height() < int32(25*len(self.items)) {
+			width = self.Width() - 3 - self.scrollbar.Width()
+		}
+		self.SetDrawColor(0x46, 0xc8, 0xe8, 255)
+		self.DrawLine(2, 2, 2, self.Height()-3)
+		self.DrawLine(2, self.Height()-3, width, self.Height()-3)
+		self.DrawLine(width, self.Height()-3, width, 2)
+		self.DrawLine(width, 2, 2, 2)
+	}
 }
 
 func NewListWidget(w, h int32) *ListWidget {
@@ -192,8 +229,8 @@ func NewListWidget(w, h int32) *ListWidget {
 		items:             make([]*ListWidgetItem, 0, 0),
 		yoffset:           0,
 		scrollbar:         NewScrollbarWidget(25, h-4, false),
-		changeselected:    nil,
 		mousedownonscroll: false,
+		hasfocus:          false,
 	}
 	widget.scrollbar.Move(w-27, 2)
 	widget.scrollbar.SetCallback(func(currentposition int32) {
