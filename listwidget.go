@@ -38,11 +38,15 @@ func (self *ListWidget) GetItems() []*ListWidgetItem {
 func (self *ListWidget) RemoveItem(item *ListWidgetItem) {
 	for i, l := range self.items {
 		if l == item {
-			self.items = append(self.items[:i], self.items[i+1:]...)
-			if self.yoffset > int32(25*i) {
-				self.yoffset -= 25
-				if self.yoffset < 0 {
-					self.yoffset = 0
+			if i == 0 {
+				self.items = self.items[i+1:]
+			} else {
+				self.items = append(self.items[:i], self.items[i+1:]...)
+				if self.yoffset > int32(25*i) {
+					self.yoffset -= 25
+					if self.yoffset < 0 {
+						self.yoffset = 0
+					}
 				}
 			}
 			break
