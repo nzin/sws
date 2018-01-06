@@ -1,6 +1,11 @@
 package sws
 
-func ShowModalError(root *RootWidget, title, iconpath, desc string, callback func()) {
+import (
+	"github.com/veandco/go-sdl2/img"
+	"github.com/veandco/go-sdl2/sdl"
+)
+
+func ShowModalErrorSurfaceicon(root *RootWidget, title string, iconsurface *sdl.Surface, desc string, callback func()) {
 	modal := NewMainWidget(500, 200, title, false, false)
 	modal.SetCloseCallback(func() {
 		root.RemoveChild(modal)
@@ -10,7 +15,9 @@ func ShowModalError(root *RootWidget, title, iconpath, desc string, callback fun
 	})
 
 	icon := NewLabelWidget(32, 32, "")
-	icon.SetImage(iconpath) //"resources/icon-triangular-big.png"
+	if iconsurface != nil {
+		icon.SetImageSurface(iconsurface)
+	}
 	icon.Move(20, 50)
 	modal.AddChild(icon)
 
@@ -36,7 +43,12 @@ func ShowModalError(root *RootWidget, title, iconpath, desc string, callback fun
 	root.SetFocus(ok)
 }
 
-func ShowModalYesNo(root *RootWidget, title, iconpath, desc string, callbackyes func(), callbackno func()) {
+func ShowModalError(root *RootWidget, title, iconpath, desc string, callback func()) {
+	img, _ := img.Load(iconpath)
+	ShowModalErrorSurfaceicon(root, title, img, desc, callback)
+}
+
+func ShowModalYesNoSurfaceicon(root *RootWidget, title string, iconsurface *sdl.Surface, desc string, callbackyes func(), callbackno func()) {
 	modal := NewMainWidget(500, 200, title, false, false)
 	modal.SetCloseCallback(func() {
 		root.RemoveChild(modal)
@@ -46,7 +58,9 @@ func ShowModalYesNo(root *RootWidget, title, iconpath, desc string, callbackyes 
 	})
 
 	icon := NewLabelWidget(32, 32, "")
-	icon.SetImage(iconpath) //"resources/icon-triangular-big.png"
+	if icon != nil {
+		icon.SetImageSurface(iconsurface) //"resources/icon-triangular-big.png"
+	}
 	icon.Move(20, 50)
 	modal.AddChild(icon)
 
@@ -81,4 +95,9 @@ func ShowModalYesNo(root *RootWidget, title, iconpath, desc string, callbackyes 
 	root.SetModal(modal)
 
 	root.SetFocus(no)
+}
+
+func ShowModalYesNo(root *RootWidget, title, iconpath, desc string, callbackyes func(), callbackno func()) {
+	img, _ := img.Load(iconpath)
+	ShowModalYesNoSurfaceicon(root, title, img, desc, callbackyes, callbackno)
 }
