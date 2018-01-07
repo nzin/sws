@@ -1,13 +1,19 @@
-FROM golang:1.9-stretch
+FROM golang:1.9-alpine3.7
 
-RUN apt-get update && \
-    apt-get upgrade -y
-RUN apt-get install -y \
-    pkg-config \
-    libsdl2-dev \
-    libsdl-ttf2.0-dev \
-    libsdl2-image-2.0-0
+RUN apk add --no-cache \
+    git \
+    gcc \
+    cmake \
+    build-base \
+    libx11-dev \
+    pkgconf \
+    sdl2-dev \
+    sdl2_ttf-dev \
+    sdl2_image-dev
 
-COPY . /go
-WORKDIR /go
-#RUN go get ./...
+
+COPY . /go/src/github.com/user/sws/
+WORKDIR /go/src/github.com/user/sws/
+
+RUN go get ./...
+RUN go build ./...
