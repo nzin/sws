@@ -12,8 +12,8 @@ RUN apk add --no-cache \
     sdl2_image-dev
 
 
-COPY . /go/src/github.com/user/sws/
-WORKDIR /go/src/github.com/user/sws/
+WORKDIR /go/src/github.com/nzin/sws/
+COPY . .
 
 RUN go get ./...
 RUN go build ./...
