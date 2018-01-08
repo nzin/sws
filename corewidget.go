@@ -43,6 +43,7 @@ func NewCoreWidget(w, h int32) *CoreWidget {
 	if err != nil {
 		panic(err)
 	}
+	renderer.SetDrawBlendMode(sdl.BLENDMODE_BLEND)
 
 	widget := &CoreWidget{x: 0,
 		y:        0,
@@ -112,6 +113,7 @@ func (self *CoreWidget) Resize(width, height int32) {
 	if err != nil {
 		panic(err)
 	}
+	renderer.SetDrawBlendMode(sdl.BLENDMODE_BLEND)
 	self.surface.Free()
 	self.surface = surface
 	self.renderer.Destroy()
@@ -445,6 +447,7 @@ func (self *CoreWidget) Repaint() {
 		if err != nil {
 			panic(err)
 		}
+		renderer.SetDrawBlendMode(sdl.BLENDMODE_BLEND)
 		self.renderer = renderer
 	}
 	for _, child := range self.children {

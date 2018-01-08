@@ -88,6 +88,11 @@ func (self *ButtonWidget) SetImage(image string) {
 	self.PostUpdate()
 }
 
+func (self *ButtonWidget) SetImageSurface(img *sdl.Surface) {
+	self.image = img
+	self.PostUpdate()
+}
+
 func (self *ButtonWidget) SetClicked(callback func()) {
 	self.clicked = callback
 }
