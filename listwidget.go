@@ -58,6 +58,13 @@ func (self *ListWidget) RemoveItem(item *ListWidgetItem) {
 	self.PostUpdate()
 }
 
+func (self *ListWidget) RemoveAllItems() {
+	self.items = make([]*ListWidgetItem, 0, 0)
+	self.currentItem = nil
+	self.yoffset = 0
+	self.PostUpdate()
+}
+
 func (self *ListWidget) SelectItem(item *ListWidgetItem) {
 	if self.currentItem != nil {
 		self.currentItem.Selected(false)
