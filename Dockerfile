@@ -15,6 +15,6 @@ RUN apk add --no-cache \
 
 WORKDIR /go/src/github.com/nzin/sws/
 COPY . .
-
+RUN go get -u github.com/golang/lint/golint
 RUN go get ./...
 RUN go build ./...
