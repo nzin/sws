@@ -36,6 +36,18 @@ type MainWidget struct {
 	heightBeforeFull   int32
 }
 
+func (self *MainWidget) Center(root *RootWidget) {
+	x := (root.Width() - self.Width()) / 2
+	if x < 0 {
+		x = 0
+	}
+	y := (root.Height() - self.Height()) / 2
+	if y < 0 {
+		y = 0
+	}
+	self.Move(x, y)
+}
+
 func (self *MainWidget) SetTitle(label string) {
 	self.label = label
 	self.PostUpdate()
