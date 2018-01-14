@@ -24,8 +24,9 @@ func (self *VBoxWidget) Resize(width, height int32) {
 	self.PostUpdate()
 }
 
-func (self *VBoxWidget) AddChild(child Widget) {
-	self.CoreWidget.AddChild(child)
+//
+// Rebox assumes that children changes from size (from height in fact), and recompute position
+func (self *VBoxWidget) Rebox() {
 	var width, height int32
 	for _, child := range self.children {
 		child.Move(0, height)
@@ -38,6 +39,18 @@ func (self *VBoxWidget) AddChild(child Widget) {
 	self.width = width
 	self.CoreWidget.Resize(width, height)
 	self.PostUpdate()
+}
+
+func (self *VBoxWidget) AddChildTop(child Widget) {
+	// in case of it already exist
+	self.CoreWidget.RemoveChild(child)
+	self.children = append([]Widget{child}, self.children...)
+	self.Rebox()
+}
+
+func (self *VBoxWidget) AddChild(child Widget) {
+	self.CoreWidget.AddChild(child)
+	self.Rebox()
 }
 
 func (self *VBoxWidget) RemoveChild(child Widget) {
