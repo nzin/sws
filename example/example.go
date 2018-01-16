@@ -42,6 +42,41 @@ func a() {
 	sws.ShowMenu(m)
 }
 
+type MyTable struct {
+	headers           []string
+	cell              [][]string
+	nbcolumns, nbrows int32
+}
+
+func (t *MyTable) GetNbColumns() int32 { return t.nbcolumns }
+func (t *MyTable) GetNbRows() int32    { return t.nbrows }
+func (t *MyTable) GetHeader(column int32) (string, int32) {
+	return t.headers[column], 100
+}
+func (t *MyTable) GetCell(column, row int32) string {
+	return t.cell[column][row]
+}
+func (t *MyTable) SetRowUpdateCallback(callback func())  {}
+func (t *MyTable) SetDataChangeCallback(callback func()) {}
+func NewMyTable() *MyTable {
+	nbrows := int32(20)
+	nbcolumns := int32(4)
+	mytable := &MyTable{
+		nbcolumns: nbcolumns,
+		nbrows:    nbrows,
+		headers:   make([]string, nbcolumns, nbcolumns),
+		cell:      make([][]string, nbcolumns, nbcolumns),
+	}
+	for i := int32(0); i < nbcolumns; i++ {
+		mytable.headers[i] = fmt.Sprintf("column %d", i)
+		mytable.cell[i] = make([]string, mytable.nbrows, mytable.nbrows)
+		for j := int32(0); j < nbrows; j++ {
+			mytable.cell[i][j] = fmt.Sprintf("cell %d/%d", i, j)
+		}
+	}
+	return mytable
+}
+
 var memprofile = flag.String("memprofile", "", "write memory profile to this file")
 
 func main() {
@@ -159,6 +194,9 @@ func main() {
 	ta4 := sws.NewTextAreaWidget(100, 100, "text area4 ")
 	tabs.AddTab("text area 3", ta3)
 	tabs.AddTab("text area 4", ta4)
+	tabledata := NewMyTable()
+	table1 := sws.NewTableWidget(100, 100, tabledata)
+	tabs.AddTab("table widget", table1)
 
 	tree := sws.NewTreeViewWidget()
 	ti1 := sws.NewTreeViewItem("tree view item 1", "", nil)
