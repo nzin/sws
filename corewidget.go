@@ -461,3 +461,7 @@ func (self *CoreWidget) Repaint() {
 	}
 	self.dirty = false
 }
+
+func (self *CoreWidget) SetDirtyFalse() {
+	self.dirty = false
+}
