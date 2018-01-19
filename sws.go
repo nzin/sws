@@ -222,7 +222,7 @@ func (self *RootWidget) RemoveChild(child Widget) {
 	}
 }
 
-func (self *RootWidget) SetModal(widget *MainWidget) {
+func (self *RootWidget) SetModal(widget Widget) {
 	// just to be sure to raise it
 	self.CoreWidget.RemoveChild(widget)
 	self.CoreWidget.AddChild(widget)
