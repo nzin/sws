@@ -64,6 +64,11 @@ func (self *DropdownWidget) SetChoices(choices []string) {
 }
 
 func (self *DropdownWidget) SetActiveChoice(choice int32) {
+	// to avoid to loop over callback
+	if choice == self.ActiveChoice {
+		return
+	}
+
 	if choice < int32(len(self.Choices)) {
 		self.ActiveChoice = choice
 		if self.clicked != nil {
