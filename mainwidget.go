@@ -91,6 +91,10 @@ func (self *MainWidget) SetMenuBar(menubar *MenuBarWidget) {
 func (self *MainWidget) HasFocus(focus bool) {
 	if self.hasfocus != focus {
 		self.hasfocus = focus
+		// when a modal window appears from nowhere
+		if focus == false {
+			self.inmove = false
+		}
 		self.PostUpdate()
 	}
 }
