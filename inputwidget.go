@@ -298,7 +298,7 @@ func (self *InputWidget) Repaint() {
 	self.DrawPoint(self.Width()-3, 2)
 	self.DrawPoint(self.Width()-3, self.Height()-3)
 
-	self.SetDrawColor(0xdd, 0xdd, 0xdd, 255)
+	self.SetDrawColorHex(self.bgColor)
 	self.DrawLine(3, 2, self.Width()-4, 2)
 	self.DrawLine(2, 3, 2, self.Height()-4)
 	self.DrawPoint(1, 1)
