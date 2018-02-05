@@ -381,7 +381,7 @@ func PoolEvent() bool {
 
 				// else find the widget
 				focus, xTarget, yTarget = findWidget(t.X, t.Y, root)
-				if root.modalwidget != nil {
+				if menu == nil && root.modalwidget != nil {
 					focus, xTarget, yTarget = findWidget(t.X-root.X(), t.Y-root.Y(), root.modalwidget)
 				}
 				if previousFocus != focus {
