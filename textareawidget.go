@@ -185,6 +185,31 @@ func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		}
 	}
 
+	if ((mod & (sdl.KMOD_CTRL | sdl.KMOD_GUI)) != 0) && key == 'v' {
+		if clipboard, err := sdl.GetClipboardText(); err == nil {
+			i, e := self.initialCursorPosition, self.endCursorPosition
+			if i > e {
+				i, e = e, i
+			}
+			self.text = self.text[:i] + clipboard + self.text[e:]
+			self.initialCursorPosition = i + len(clipboard)
+			self.endCursorPosition = self.initialCursorPosition
+			self.PostUpdate()
+			if self.valueChangedCallback != nil {
+				self.valueChangedCallback()
+			}
+		}
+	}
+
+	if ((mod & (sdl.KMOD_CTRL | sdl.KMOD_GUI)) != 0) && key == 'c' {
+		i, e := self.initialCursorPosition, self.endCursorPosition
+		if i > e {
+			i, e = e, i
+		}
+		clipboard := self.text[i:e]
+		sdl.SetClipboardText(clipboard)
+	}
+
 	if mod == sdl.KMOD_LCTRL || mod == sdl.KMOD_RCTRL {
 		if key == 'a' {
 			self.endCursorPosition = 0
