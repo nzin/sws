@@ -41,6 +41,10 @@ func (self *TextAreaWidget) SetText(text string) {
 	self.PostUpdate()
 }
 
+func (self *TextAreaWidget) GetText() string {
+	return self.text
+}
+
 func (self *TextAreaWidget) SetDisabled(disabled bool) {
 	self.disabled = disabled
 	self.internalcolor = 0xffdddddd
@@ -185,6 +189,23 @@ func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		}
 	}
 
+	if ((mod & (sdl.KMOD_CTRL | sdl.KMOD_GUI)) != 0) && key == 'x' {
+		i, e := self.initialCursorPosition, self.endCursorPosition
+		if i > e {
+			i, e = e, i
+		}
+		clipboard := self.text[i:e]
+		sdl.SetClipboardText(clipboard)
+
+		self.text = self.text[:i] + self.text[e:]
+		self.initialCursorPosition = i
+		self.endCursorPosition = self.initialCursorPosition
+		self.PostUpdate()
+		if self.valueChangedCallback != nil {
+			self.valueChangedCallback()
+		}
+	}
+
 	if ((mod & (sdl.KMOD_CTRL | sdl.KMOD_GUI)) != 0) && key == 'v' {
 		if clipboard, err := sdl.GetClipboardText(); err == nil {
 			i, e := self.initialCursorPosition, self.endCursorPosition
@@ -210,13 +231,13 @@ func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		sdl.SetClipboardText(clipboard)
 	}
 
-	if mod == sdl.KMOD_LCTRL || mod == sdl.KMOD_RCTRL {
-		if key == 'a' {
-			self.endCursorPosition = 0
-			self.initialCursorPosition = len(self.text)
-			self.PostUpdate()
-		}
-	} else if key == sdl.K_TAB || key == sdl.K_RETURN {
+	if ((mod & (sdl.KMOD_CTRL | sdl.KMOD_GUI)) != 0) && key == 'a' {
+		self.endCursorPosition = 0
+		self.initialCursorPosition = len(self.text)
+		self.PostUpdate()
+	}
+
+	if key == sdl.K_TAB || key == sdl.K_RETURN {
 		if key == sdl.K_RETURN {
 			key = '\n'
 		}

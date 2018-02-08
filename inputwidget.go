@@ -227,6 +227,23 @@ func (self *InputWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		}
 	}
 
+	if ((mod & (sdl.KMOD_CTRL | sdl.KMOD_GUI)) != 0) && key == 'x' {
+		i, e := self.initialCursorPosition, self.endCursorPosition
+		if i > e {
+			i, e = e, i
+		}
+		clipboard := self.text[i:e]
+		sdl.SetClipboardText(clipboard)
+
+		self.text = self.text[:i] + self.text[e:]
+		self.initialCursorPosition = i
+		self.endCursorPosition = self.initialCursorPosition
+		self.PostUpdate()
+		if self.valueChangedCallback != nil {
+			self.valueChangedCallback()
+		}
+	}
+
 	if ((mod & (sdl.KMOD_CTRL | sdl.KMOD_GUI)) != 0) && key == 'v' {
 		if clipboard, err := sdl.GetClipboardText(); err == nil {
 			i, e := self.initialCursorPosition, self.endCursorPosition
