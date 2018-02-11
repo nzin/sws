@@ -22,6 +22,7 @@ type TextAreaWidget struct {
 	heightChangeCallback  func(int32)
 	yoffsetChangeCallback func(int32)
 	showLineNumber        bool
+	previousHeight        int32
 }
 
 const (
@@ -54,6 +55,14 @@ func (self *TextAreaWidget) SetYOffset(offset int32) {
 		if self.yoffsetChangeCallback != nil {
 			self.yoffsetChangeCallback(offset)
 		}
+	}
+}
+
+func (self *TextAreaWidget) Resize(w, h int32) {
+	self.CoreWidget.Resize(w, h)
+	if self.previousHeight != h {
+		self.heightChangeCallback(self.totalHeight)
+		self.previousHeight = h
 	}
 }
 
@@ -421,7 +430,7 @@ func renderWord(self *TextAreaWidget, typeGlyph, x, y int32, word string, positi
 	}
 }
 
-func (self *TextAreaWidget) renderText(typeGlyph int32, word string, x, y *int32, position int32, treat treatWord) {
+func (self *TextAreaWidget) renderText(typeGlyph int32, word string, x, y, linenumber *int32, position int32, treat treatWord) {
 	if typeGlyph == GLYPH_SPACE { // space
 		width, _, _ := self.Font().SizeUTF8(word)
 		treat(self, typeGlyph, *x, *y, word, position)
@@ -431,7 +440,6 @@ func (self *TextAreaWidget) renderText(typeGlyph int32, word string, x, y *int32
 			*x = 3
 			*y += int32(self.Font().Height())
 			if self.showLineNumber {
-				self.WriteText(3, *y, fmt.Sprintf("%3d", ((*y-3+self.writeOffset)/int32(self.Font().Height())+1)%1000), sdl.Color{0, 0, 0, 255})
 				*x += 64
 			}
 			treat(self, typeGlyph, *x, *y, word, position)
@@ -448,7 +456,8 @@ func (self *TextAreaWidget) renderText(typeGlyph int32, word string, x, y *int32
 		*x = 3
 		*y += int32(self.Font().Height())
 		if self.showLineNumber {
-			self.WriteText(3, *y, fmt.Sprintf("%3d", ((*y-3+self.writeOffset)/int32(self.Font().Height())+1)%1000), sdl.Color{0, 0, 0, 255})
+			*linenumber++
+			self.WriteText(3, *y, fmt.Sprintf("%3d", *linenumber%1000), sdl.Color{0, 0, 0, 255})
 			*x += 64
 		}
 	} else if typeGlyph == GLYPH_WORD { // word
@@ -457,7 +466,6 @@ func (self *TextAreaWidget) renderText(typeGlyph int32, word string, x, y *int32
 			*x = 3
 			*y += int32(self.Font().Height())
 			if self.showLineNumber {
-				self.WriteText(3, *y, fmt.Sprintf("%3d", ((*y-3+self.writeOffset)/int32(self.Font().Height())+1)%1000), sdl.Color{0, 0, 0, 255})
 				*x += 64
 			}
 		}
@@ -492,42 +500,43 @@ func (self *TextAreaWidget) parseText(treat treatWord) {
 	// space we alway render on the same line
 	// tab is like word
 	// enter is a bit like tab
-	var x, y, typeGlyph, position int32
+	var x, y, linenumber, typeGlyph, position int32
+	linenumber = 1
 	x = 3
 	y = 3 - self.writeOffset
 	if self.showLineNumber {
-		self.WriteText(3, y, fmt.Sprintf("%3d", ((y-3+self.writeOffset)/int32(self.Font().Height())+1)%1000), sdl.Color{0, 0, 0, 255})
+		self.WriteText(3, y, fmt.Sprintf("%3d", linenumber%1000), sdl.Color{0, 0, 0, 255})
 		x += 64
 	}
 	typeGlyph = -1
 	word := ""
 	for currentpos, char := range self.text {
 		if char == ' ' && typeGlyph != GLYPH_SPACE { // space
-			self.renderText(typeGlyph, word, &x, &y, position, treat)
+			self.renderText(typeGlyph, word, &x, &y, &linenumber, position, treat)
 			typeGlyph = GLYPH_SPACE
 			word = ""
 			position = int32(currentpos)
 		} else if char == '\t' { // tab
-			self.renderText(typeGlyph, word, &x, &y, position, treat)
+			self.renderText(typeGlyph, word, &x, &y, &linenumber, position, treat)
 			typeGlyph = GLYPH_TAB
 			word = ""
 			position = int32(currentpos)
 		} else if char == '\n' { // enter
-			self.renderText(typeGlyph, word, &x, &y, position, treat)
+			self.renderText(typeGlyph, word, &x, &y, &linenumber, position, treat)
 			typeGlyph = GLYPH_ENTER
 			word = ""
 			position = int32(currentpos)
 		} else if typeGlyph != GLYPH_WORD { // word
-			self.renderText(typeGlyph, word, &x, &y, position, treat)
+			self.renderText(typeGlyph, word, &x, &y, &linenumber, position, treat)
 			typeGlyph = GLYPH_WORD
 			word = ""
 			position = int32(currentpos)
 		}
 		word = word + string(char)
 	}
-	self.renderText(typeGlyph, word, &x, &y, position, treat)
+	self.renderText(typeGlyph, word, &x, &y, &linenumber, position, treat)
 	// for the cursor at the end
-	self.renderText(GLYPH_END, "", &x, &y, int32(len(self.text)), treat)
+	self.renderText(GLYPH_END, "", &x, &y, &linenumber, int32(len(self.text)), treat)
 	// replace cursor (if it is at the end)
 	if self.yCursor >= y {
 		if self.xCursor >= x {
@@ -622,6 +631,7 @@ func NewTextAreaWidget(w, h int32, s string) *TextAreaWidget {
 		disabled:              false,
 		internalcolor:         0xffffffff,
 		showLineNumber:        false,
+		previousHeight:        h,
 	}
 	return widget
 }
