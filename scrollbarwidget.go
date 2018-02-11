@@ -28,11 +28,13 @@ func (self *ScrollbarWidget) SetPosition(position int32) {
 	if position > self.maximum {
 		position = self.maximum
 	}
-	self.Currentposition = position
-	if self.callback != nil {
-		self.callback(self.Currentposition)
+	if self.Currentposition != position {
+		self.Currentposition = position
+		if self.callback != nil {
+			self.callback(self.Currentposition)
+		}
+		self.PostUpdate()
 	}
-	self.PostUpdate()
 }
 
 func (self *ScrollbarWidget) SetCallback(callback Scrollbarcallback) {
@@ -213,8 +215,13 @@ func (self *ScrollbarWidget) MouseMove(x, y, xrel, yrel int32) {
 			if ypos > self.Height()-h {
 				ypos = self.Height() - h
 			}
-			self.Currentposition = self.minimum + (self.maximum-self.minimum)*ypos/(self.Height()-h)
-			if self.callback != nil {
+			previousPosition := self.Currentposition
+			if self.Height()-h == 0 {
+				self.Currentposition = 0
+			} else {
+				self.Currentposition = self.minimum + (self.maximum-self.minimum)*ypos/(self.Height()-h)
+			}
+			if self.callback != nil && previousPosition != self.Currentposition {
 				self.callback(self.Currentposition)
 			}
 			self.PostUpdate()

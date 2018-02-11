@@ -16,6 +16,9 @@ type TextAreaWidget struct {
 	writeOffset           int32 // how far we scroll the text
 	disabled              bool
 	internalcolor         uint32
+	totalHeight           int32
+	heightChangeCallback  func(int32)
+	yoffsetChangeCallback func(int32)
 }
 
 const (
@@ -25,6 +28,26 @@ const (
 	GLYPH_END   = 3
 	GLYPH_ENTER = 4
 )
+
+// SetHeightChangeCallback is used to inform when the text grows/shrink in term of number of lines
+func (self *TextAreaWidget) SetHeightChangeCallback(callback func(int32)) {
+	self.heightChangeCallback = callback
+}
+
+// SetHeightChangeCallback is used to inform when we scroll down/up
+func (self *TextAreaWidget) SetYOffsetChangedCallback(callback func(int32)) {
+	self.yoffsetChangeCallback = callback
+}
+
+func (self *TextAreaWidget) SetYOffset(offset int32) {
+	if self.writeOffset != offset {
+		self.writeOffset = offset
+		self.PostUpdate()
+		if self.yoffsetChangeCallback != nil {
+			self.yoffsetChangeCallback(offset)
+		}
+	}
+}
 
 func (self *TextAreaWidget) IsInputWidget() bool {
 	if self.disabled == true {
@@ -82,11 +105,17 @@ func (self *TextAreaWidget) MouseMove(x, y, xrel, yrel int32) {
 			if self.writeOffset < 0 {
 				self.writeOffset = 0
 			}
+			if self.yoffsetChangeCallback != nil {
+				self.yoffsetChangeCallback(self.writeOffset)
+			}
 		}
 		if self.yCursor > self.Height()-3 {
 			//self.writeOffset+=(y-(self.Height()-2)-int32(self.Font().Height()))
 			//self.writeOffset+=(y-(self.Height()-2))
 			self.writeOffset += int32(self.Font().Height())
+			if self.yoffsetChangeCallback != nil {
+				self.yoffsetChangeCallback(self.writeOffset)
+			}
 		}
 		self.UpdatePosition(x, y)
 
@@ -267,9 +296,15 @@ func (self *TextAreaWidget) KeyDown(key sdl.Keycode, mod uint16) {
 		if self.writeOffset < 0 {
 			self.writeOffset = 0
 		}
+		if self.yoffsetChangeCallback != nil {
+			self.yoffsetChangeCallback(self.writeOffset)
+		}
 	}
 	if self.yCursor > self.Height()-3 {
 		self.writeOffset += int32(self.Font().Height())
+		if self.yoffsetChangeCallback != nil {
+			self.yoffsetChangeCallback(self.writeOffset)
+		}
 	}
 	self.PostUpdate()
 }
@@ -476,6 +511,12 @@ func (self *TextAreaWidget) parseText(treat treatWord) {
 			self.yCursor = y
 		}
 	}
+	if self.totalHeight != y-(3-self.writeOffset)+int32(self.Font().Height()) {
+		self.totalHeight = y - (3 - self.writeOffset) + int32(self.Font().Height())
+		if self.heightChangeCallback != nil {
+			self.heightChangeCallback(self.totalHeight)
+		}
+	}
 }
 
 func (self *TextAreaWidget) Repaint() {
@@ -515,21 +556,23 @@ func (self *TextAreaWidget) Repaint() {
 		self.DrawPoint(self.Width()-2, self.Height()-3)
 		self.DrawPoint(self.Width()-3, self.Height()-2)
 	}
+
+	// draw the bezel
 	if self.hasfocus && self.disabled == false {
 		self.SetDrawColor(0x46, 0xc8, 0xe8, 255)
-		self.DrawLine(0, 3, 0, self.Height()-4)
-		self.DrawPoint(1, self.Height()-3)
-		self.DrawPoint(2, self.Height()-2)
-		self.DrawLine(3, self.Height()-1, self.Width()-4, self.Height()-1)
-		self.DrawPoint(self.Width()-3, self.Height()-2)
-		self.DrawPoint(self.Width()-2, self.Height()-3)
-		self.DrawLine(self.Width()-1, self.Height()-4, self.Width()-1, 3)
-		self.DrawPoint(self.Width()-3, 1)
-		self.DrawPoint(self.Width()-2, 2)
-		self.DrawLine(self.Width()-4, 0, 3, 0)
-		self.DrawPoint(2, 1)
-		self.DrawPoint(1, 2)
 	}
+	self.DrawLine(0, 3, 0, self.Height()-4)
+	self.DrawPoint(1, self.Height()-3)
+	self.DrawPoint(2, self.Height()-2)
+	self.DrawLine(3, self.Height()-1, self.Width()-4, self.Height()-1)
+	self.DrawPoint(self.Width()-3, self.Height()-2)
+	self.DrawPoint(self.Width()-2, self.Height()-3)
+	self.DrawLine(self.Width()-1, self.Height()-4, self.Width()-1, 3)
+	self.DrawPoint(self.Width()-3, 1)
+	self.DrawPoint(self.Width()-2, 2)
+	self.DrawLine(self.Width()-4, 0, 3, 0)
+	self.DrawPoint(2, 1)
+	self.DrawPoint(1, 2)
 }
 
 func NewTextAreaWidget(w, h int32, s string) *TextAreaWidget {
