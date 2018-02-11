@@ -1,6 +1,8 @@
 package sws
 
 import (
+	"fmt"
+
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -19,6 +21,7 @@ type TextAreaWidget struct {
 	totalHeight           int32
 	heightChangeCallback  func(int32)
 	yoffsetChangeCallback func(int32)
+	showLineNumber        bool
 }
 
 const (
@@ -28,6 +31,11 @@ const (
 	GLYPH_END   = 3
 	GLYPH_ENTER = 4
 )
+
+func (self *TextAreaWidget) ShowLineNumber() {
+	self.showLineNumber = true
+	self.PostUpdate()
+}
 
 // SetHeightChangeCallback is used to inform when the text grows/shrink in term of number of lines
 func (self *TextAreaWidget) SetHeightChangeCallback(callback func(int32)) {
@@ -422,8 +430,15 @@ func (self *TextAreaWidget) renderText(typeGlyph int32, word string, x, y *int32
 		if ((*x-3+32)>>5)<<5 >= self.Width()-6 {
 			*x = 3
 			*y += int32(self.Font().Height())
+			if self.showLineNumber {
+				self.WriteText(3, *y, fmt.Sprintf("%3d", ((*y-3+self.writeOffset)/int32(self.Font().Height())+1)%1000), sdl.Color{0, 0, 0, 255})
+				*x += 64
+			}
 			treat(self, typeGlyph, *x, *y, word, position)
 			*x = 32 + 3
+			if self.showLineNumber {
+				*x += 64
+			}
 		} else {
 			treat(self, typeGlyph, *x, *y, word, position)
 			*x = 3 + ((*x-3+32)>>5)<<5
@@ -432,11 +447,19 @@ func (self *TextAreaWidget) renderText(typeGlyph int32, word string, x, y *int32
 		treat(self, typeGlyph, *x, *y, "", position)
 		*x = 3
 		*y += int32(self.Font().Height())
+		if self.showLineNumber {
+			self.WriteText(3, *y, fmt.Sprintf("%3d", ((*y-3+self.writeOffset)/int32(self.Font().Height())+1)%1000), sdl.Color{0, 0, 0, 255})
+			*x += 64
+		}
 	} else if typeGlyph == GLYPH_WORD { // word
 		width, _, _ := self.Font().SizeUTF8(word)
 		if (*x+int32(width)) > self.Width()-6 && *x > 3 {
 			*x = 3
 			*y += int32(self.Font().Height())
+			if self.showLineNumber {
+				self.WriteText(3, *y, fmt.Sprintf("%3d", ((*y-3+self.writeOffset)/int32(self.Font().Height())+1)%1000), sdl.Color{0, 0, 0, 255})
+				*x += 64
+			}
 		}
 		// the word is longer than the line
 		for int32(width) > self.Width()-6 && self.Width() > 0 {
@@ -472,6 +495,10 @@ func (self *TextAreaWidget) parseText(treat treatWord) {
 	var x, y, typeGlyph, position int32
 	x = 3
 	y = 3 - self.writeOffset
+	if self.showLineNumber {
+		self.WriteText(3, y, fmt.Sprintf("%3d", ((y-3+self.writeOffset)/int32(self.Font().Height())+1)%1000), sdl.Color{0, 0, 0, 255})
+		x += 64
+	}
 	typeGlyph = -1
 	word := ""
 	for currentpos, char := range self.text {
@@ -522,8 +549,17 @@ func (self *TextAreaWidget) parseText(treat treatWord) {
 func (self *TextAreaWidget) Repaint() {
 	self.CoreWidget.Repaint()
 
-	self.FillRect(2, 2, self.width-4, self.height-4, self.internalcolor)
+	if self.showLineNumber {
+		self.FillRect(65, 2, self.width-67, self.height-4, self.internalcolor)
+	} else {
+		self.FillRect(2, 2, self.width-4, self.height-4, self.internalcolor)
+	}
 	self.parseText(renderWord)
+
+	if self.showLineNumber {
+		self.SetDrawColor(0, 0, 0, 255)
+		self.DrawLine(65, 3, 65, self.Height()-4)
+	}
 
 	// write boundaries
 	if self.disabled == false {
@@ -585,6 +621,7 @@ func NewTextAreaWidget(w, h int32, s string) *TextAreaWidget {
 		writeOffset:           0,
 		disabled:              false,
 		internalcolor:         0xffffffff,
+		showLineNumber:        false,
 	}
 	return widget
 }
