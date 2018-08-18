@@ -8,7 +8,7 @@ import (
 
 //
 // After translation it can be used with:
-//rwops := sdl.RWFromMem(unsafe.Pointer(&bmp[0]), len(bmp))
+//rwops := sdl.RWFromMem(bmp)
 //surface := sdl.LoadBMP_RW(rwops,1)
 //
 

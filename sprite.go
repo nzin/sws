@@ -1,8 +1,6 @@
 package sws
 
 import (
-	"unsafe"
-
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -456,17 +454,36 @@ var mainright = []byte("\x42\x4d\x8a\x04\x00\x00\x00\x00\x00\x00\x8a\x00\x00\x00
 	"\xdd\xdd\xff\xdd\xdd\xdd\xff\xdd\xdd\xdd\xff\xdd\xdd\xdd\xff\xdd" +
 	"\xdd\xdd\xff\xdd\xdd\xdd\xff\xdd\xdd\xdd\xff\xdd\xdd\xdd\xff\xdd")
 
-func InitSprites() {
-	rwops := sdl.RWFromMem(unsafe.Pointer(&mainlefth[0]), len(mainlefth))
-	mainlefths, _ = sdl.LoadBMPRW(rwops, 1)
-	rwops = sdl.RWFromMem(unsafe.Pointer(&mainlefthclicked[0]), len(mainlefthclicked))
-	mainlefthclickeds, _ = sdl.LoadBMPRW(rwops, 1)
-	rwops = sdl.RWFromMem(unsafe.Pointer(&mainrighth[0]), len(mainrighth))
-	mainrighths, _ = sdl.LoadBMPRW(rwops, 1)
-	rwops = sdl.RWFromMem(unsafe.Pointer(&mainrighthclicked[0]), len(mainrighthclicked))
-	mainrighthclickeds, _ = sdl.LoadBMPRW(rwops, 1)
-	rwops = sdl.RWFromMem(unsafe.Pointer(&mainleft[0]), len(mainleft))
-	mainlefts, _ = sdl.LoadBMPRW(rwops, 1)
-	rwops = sdl.RWFromMem(unsafe.Pointer(&mainright[0]), len(mainright))
-	mainrights, _ = sdl.LoadBMPRW(rwops, 1)
+func InitSprites() error {
+	rwops, err := sdl.RWFromMem(mainlefth)
+	if err != nil {
+		return err
+	}
+	mainlefths, _ = sdl.LoadBMPRW(rwops, true)
+	rwops, err = sdl.RWFromMem(mainlefthclicked)
+	if err != nil {
+		return err
+	}
+	mainlefthclickeds, _ = sdl.LoadBMPRW(rwops, true)
+	rwops, err = sdl.RWFromMem(mainrighth)
+	if err != nil {
+		return err
+	}
+	mainrighths, _ = sdl.LoadBMPRW(rwops, true)
+	rwops, err = sdl.RWFromMem(mainrighthclicked)
+	if err != nil {
+		return err
+	}
+	mainrighthclickeds, _ = sdl.LoadBMPRW(rwops, true)
+	rwops, err = sdl.RWFromMem(mainleft)
+	if err != nil {
+		return err
+	}
+	mainlefts, _ = sdl.LoadBMPRW(rwops, true)
+	rwops, err = sdl.RWFromMem(mainright)
+	if err != nil {
+		return err
+	}
+	mainrights, _ = sdl.LoadBMPRW(rwops, true)
+	return nil
 }
