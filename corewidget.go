@@ -143,7 +143,7 @@ func (self *CoreWidget) WriteText(x, y int32, str string, color sdl.Color) (int3
 	}
 
 	if solid, err = self.Font().RenderUTF8Blended(str, color); err != nil {
-		fmt.Fprint(os.Stderr, "Failed to render text: %s\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to render text: %s\n", err.Error())
 		return 0, 0
 	}
 	defer solid.Free()
@@ -165,7 +165,7 @@ func (self *CoreWidget) WriteTextCenter(x, y int32, str string, color sdl.Color)
 	var err error
 
 	if solid, err = self.Font().RenderUTF8Blended(str, color); err != nil {
-		fmt.Fprint(os.Stderr, "Failed to render text: %s\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to render text: %s\n", err.Error())
 		return
 	}
 	rectSrc := sdl.Rect{0, 0, solid.W, solid.H}
