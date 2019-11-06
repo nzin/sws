@@ -47,7 +47,7 @@ func (self *MenuItemLabel) Repaint(selected bool) *sdl.Surface {
 		}
 
 		if solid, err = self.font.RenderUTF8Blended(self.Label, color); err != nil {
-			fmt.Fprint(os.Stderr, "Failed to render text: %s\n", err)
+			fmt.Fprintf(os.Stderr, "Failed to render text: %s\n", err.Error())
 			return self.surface
 		}
 		self.surface.Free()

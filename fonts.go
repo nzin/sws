@@ -1,6 +1,9 @@
 package sws
 
 import (
+	"fmt"
+	"unsafe"
+
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 )
@@ -12,9 +15,9 @@ var LatoRegular14 *ttf.Font
 var LatoRegular12 *ttf.Font
 
 func InitFonts() error {
-	rwops,err := sdl.RWFromMem(latoRegular)
-	if err != nil {
-		return err
+	rwops := sdl.RWFromMem(unsafe.Pointer(&latoRegular), len(latoRegular))
+	if rwops == nil {
+		return fmt.Errorf("Not able to load latoRegular")
 	}
 	defaultFont, _ = ttf.OpenFontRW(rwops, 1, 16)
 	LatoRegular20, _ = ttf.OpenFontRW(rwops, 1, 20)

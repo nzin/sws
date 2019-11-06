@@ -136,7 +136,7 @@ func (self *MainWidget) Repaint() {
 		self.label = "unnamed"
 	}
 	if solid, err = self.Font().RenderUTF8Blended(self.label, color); err != nil {
-		fmt.Fprint(os.Stderr, "Failed to render text: %s\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to render text: %s\n", err.Error())
 	}
 	defer solid.Free()
 

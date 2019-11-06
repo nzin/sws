@@ -1,6 +1,9 @@
 package sws
 
 import (
+	"fmt"
+	"unsafe"
+
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -455,34 +458,34 @@ var mainright = []byte("\x42\x4d\x8a\x04\x00\x00\x00\x00\x00\x00\x8a\x00\x00\x00
 	"\xdd\xdd\xff\xdd\xdd\xdd\xff\xdd\xdd\xdd\xff\xdd\xdd\xdd\xff\xdd")
 
 func InitSprites() error {
-	rwops, err := sdl.RWFromMem(mainlefth)
-	if err != nil {
-		return err
+	rwops := sdl.RWFromMem(unsafe.Pointer(&mainlefth), len(mainlefth))
+	if rwops == nil {
+		return fmt.Errorf("Unable to read mainlefth")
 	}
 	mainlefths, _ = sdl.LoadBMPRW(rwops, true)
-	rwops, err = sdl.RWFromMem(mainlefthclicked)
-	if err != nil {
-		return err
+	rwops = sdl.RWFromMem(unsafe.Pointer(&mainlefthclicked), len(mainlefthclicked))
+	if rwops == nil {
+		return fmt.Errorf("Unable to read mainlefthclicked")
 	}
 	mainlefthclickeds, _ = sdl.LoadBMPRW(rwops, true)
-	rwops, err = sdl.RWFromMem(mainrighth)
-	if err != nil {
-		return err
+	rwops = sdl.RWFromMem(unsafe.Pointer(&mainrighth), len(mainrighth))
+	if rwops == nil {
+		return fmt.Errorf("Unable to read mainrighth")
 	}
 	mainrighths, _ = sdl.LoadBMPRW(rwops, true)
-	rwops, err = sdl.RWFromMem(mainrighthclicked)
-	if err != nil {
-		return err
+	rwops = sdl.RWFromMem(unsafe.Pointer(&mainrighthclicked), len(mainrighthclicked))
+	if rwops == nil {
+		return fmt.Errorf("Unable to read mainrighthclicked")
 	}
 	mainrighthclickeds, _ = sdl.LoadBMPRW(rwops, true)
-	rwops, err = sdl.RWFromMem(mainleft)
-	if err != nil {
-		return err
+	rwops = sdl.RWFromMem(unsafe.Pointer(&mainleft), len(mainleft))
+	if rwops == nil {
+		return fmt.Errorf("Unable to read mainleft")
 	}
 	mainlefts, _ = sdl.LoadBMPRW(rwops, true)
-	rwops, err = sdl.RWFromMem(mainright)
-	if err != nil {
-		return err
+	rwops = sdl.RWFromMem(unsafe.Pointer(&mainright), len(mainright))
+	if rwops == nil {
+		return fmt.Errorf("Unable to read mainright")
 	}
 	mainrights, _ = sdl.LoadBMPRW(rwops, true)
 	return nil
