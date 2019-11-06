@@ -458,32 +458,32 @@ var mainright = []byte("\x42\x4d\x8a\x04\x00\x00\x00\x00\x00\x00\x8a\x00\x00\x00
 	"\xdd\xdd\xff\xdd\xdd\xdd\xff\xdd\xdd\xdd\xff\xdd\xdd\xdd\xff\xdd")
 
 func InitSprites() error {
-	rwops := sdl.RWFromMem(unsafe.Pointer(&mainlefth), len(mainlefth))
+	rwops := sdl.RWFromMem(unsafe.Pointer(&mainlefth[0]), len(mainlefth))
 	if rwops == nil {
 		return fmt.Errorf("Unable to read mainlefth")
 	}
 	mainlefths, _ = sdl.LoadBMPRW(rwops, true)
-	rwops = sdl.RWFromMem(unsafe.Pointer(&mainlefthclicked), len(mainlefthclicked))
+	rwops = sdl.RWFromMem(unsafe.Pointer(&mainlefthclicked[0]), len(mainlefthclicked))
 	if rwops == nil {
 		return fmt.Errorf("Unable to read mainlefthclicked")
 	}
 	mainlefthclickeds, _ = sdl.LoadBMPRW(rwops, true)
-	rwops = sdl.RWFromMem(unsafe.Pointer(&mainrighth), len(mainrighth))
+	rwops = sdl.RWFromMem(unsafe.Pointer(&mainrighth[0]), len(mainrighth))
 	if rwops == nil {
 		return fmt.Errorf("Unable to read mainrighth")
 	}
 	mainrighths, _ = sdl.LoadBMPRW(rwops, true)
-	rwops = sdl.RWFromMem(unsafe.Pointer(&mainrighthclicked), len(mainrighthclicked))
+	rwops = sdl.RWFromMem(unsafe.Pointer(&mainrighthclicked[0]), len(mainrighthclicked))
 	if rwops == nil {
 		return fmt.Errorf("Unable to read mainrighthclicked")
 	}
 	mainrighthclickeds, _ = sdl.LoadBMPRW(rwops, true)
-	rwops = sdl.RWFromMem(unsafe.Pointer(&mainleft), len(mainleft))
+	rwops = sdl.RWFromMem(unsafe.Pointer(&mainleft[0]), len(mainleft))
 	if rwops == nil {
 		return fmt.Errorf("Unable to read mainleft")
 	}
 	mainlefts, _ = sdl.LoadBMPRW(rwops, true)
-	rwops = sdl.RWFromMem(unsafe.Pointer(&mainright), len(mainright))
+	rwops = sdl.RWFromMem(unsafe.Pointer(&mainright[0]), len(mainright))
 	if rwops == nil {
 		return fmt.Errorf("Unable to read mainright")
 	}
