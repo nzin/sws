@@ -15,7 +15,7 @@ var LatoRegular14 *ttf.Font
 var LatoRegular12 *ttf.Font
 
 func InitFonts() error {
-	rwops := sdl.RWFromMem(unsafe.Pointer(&latoRegular), len(latoRegular))
+	rwops := sdl.RWFromMem(unsafe.Pointer(&latoRegular[0]), len(latoRegular))
 	if rwops == nil {
 		return fmt.Errorf("Not able to load latoRegular")
 	}
