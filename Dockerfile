@@ -1,4 +1,4 @@
-FROM golang:1.9-alpine3.7
+FROM golang:1.18-alpine
 MAINTAINER Jordi Riera <kender.jr@gmail.com>
 
 RUN apk add --no-cache \
@@ -15,6 +15,6 @@ RUN apk add --no-cache \
 
 WORKDIR /go/src/github.com/nzin/sws/
 COPY . .
-RUN go get -u github.com/golang/lint/golint
+#RUN go get -u github.com/golang/lint/golint
 RUN go get ./...
 RUN go build ./...

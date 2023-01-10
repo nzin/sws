@@ -2,7 +2,6 @@ package sws
 
 import (
 	"fmt"
-	"unsafe"
 
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -458,34 +457,34 @@ var mainright = []byte("\x42\x4d\x8a\x04\x00\x00\x00\x00\x00\x00\x8a\x00\x00\x00
 	"\xdd\xdd\xff\xdd\xdd\xdd\xff\xdd\xdd\xdd\xff\xdd\xdd\xdd\xff\xdd")
 
 func InitSprites() error {
-	rwops := sdl.RWFromMem(unsafe.Pointer(&mainlefth[0]), len(mainlefth))
-	if rwops == nil {
-		return fmt.Errorf("Unable to read mainlefth")
+	rwops, err := sdl.RWFromMem(mainlefth)
+	if err != nil {
+		return fmt.Errorf("Unable to read mainlefth: %v", err)
 	}
 	mainlefths, _ = sdl.LoadBMPRW(rwops, true)
-	rwops = sdl.RWFromMem(unsafe.Pointer(&mainlefthclicked[0]), len(mainlefthclicked))
-	if rwops == nil {
-		return fmt.Errorf("Unable to read mainlefthclicked")
+	rwops, err = sdl.RWFromMem(mainlefthclicked)
+	if err != nil {
+		return fmt.Errorf("Unable to read mainlefthclicked: %v", err)
 	}
 	mainlefthclickeds, _ = sdl.LoadBMPRW(rwops, true)
-	rwops = sdl.RWFromMem(unsafe.Pointer(&mainrighth[0]), len(mainrighth))
-	if rwops == nil {
-		return fmt.Errorf("Unable to read mainrighth")
+	rwops, err = sdl.RWFromMem(mainrighth)
+	if err != nil {
+		return fmt.Errorf("Unable to read mainrighth: %v", err)
 	}
 	mainrighths, _ = sdl.LoadBMPRW(rwops, true)
-	rwops = sdl.RWFromMem(unsafe.Pointer(&mainrighthclicked[0]), len(mainrighthclicked))
-	if rwops == nil {
-		return fmt.Errorf("Unable to read mainrighthclicked")
+	rwops, err = sdl.RWFromMem(mainrighthclicked)
+	if err != nil {
+		return fmt.Errorf("Unable to read mainrighthclicked: %v", err)
 	}
 	mainrighthclickeds, _ = sdl.LoadBMPRW(rwops, true)
-	rwops = sdl.RWFromMem(unsafe.Pointer(&mainleft[0]), len(mainleft))
-	if rwops == nil {
-		return fmt.Errorf("Unable to read mainleft")
+	rwops, err = sdl.RWFromMem(mainleft)
+	if err != nil {
+		return fmt.Errorf("Unable to read mainleft: %v", err)
 	}
 	mainlefts, _ = sdl.LoadBMPRW(rwops, true)
-	rwops = sdl.RWFromMem(unsafe.Pointer(&mainright[0]), len(mainright))
-	if rwops == nil {
-		return fmt.Errorf("Unable to read mainright")
+	rwops, err = sdl.RWFromMem(mainright)
+	if err != nil {
+		return fmt.Errorf("Unable to read mainright: %v", err)
 	}
 	mainrights, _ = sdl.LoadBMPRW(rwops, true)
 	return nil
